@@ -1,11 +1,14 @@
-const CACHE_NAME = 'admin-console-v2';
+const CACHE_NAME = 'admin-console-opt-v3';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
+  // External Libraries (Aggressive Cache)
   'https://cdn.tailwindcss.com',
   'https://unpkg.com/lucide@latest',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap',
+  // Cache Logo URL agar tetap muncul offline
+  'https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png'
 ];
 
 self.addEventListener('install', event => {
