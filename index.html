@@ -38,6 +38,8 @@
         .dark .glass { background: rgba(24, 24, 27, 0.85); }
         .card-hover:active { transform: scale(0.98); }
         @media (hover: hover) { .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); } }
+        /* Prevent CLS on load */
+        .cloak { visibility: hidden; }
     </style>
 </head>
 <body class="text-zinc-800 dark:text-zinc-200 min-h-screen flex flex-col transition-colors duration-300 relative">
@@ -53,7 +55,7 @@
                     </div>
                     <div>
                         <h1 class="font-bold text-lg tracking-tight leading-none dark:text-white">Admin<span class="text-indigo-600">Console</span></h1>
-                        <span id="nav-role-badge" class="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-semibold">Guest Access</span>
+                        <span id="nav-role-badge" class="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-semibold cloak">Guest Access</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
@@ -63,7 +65,7 @@
                     </button>
                     <div class="h-6 w-px bg-zinc-200 dark:bg-zinc-800"></div>
                     <button onclick="app.openAuthModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold bg-zinc-900 text-white dark:bg-white dark:text-black hover:opacity-90 transition shadow-sm">
-                        <i data-lucide="user-circle" class="w-4 h-4"></i> <span id="btn-auth-text" class="hidden sm:inline">Login</span>
+                        <i data-lucide="user-circle" class="w-4 h-4"></i> <span id="btn-auth-text" class="hidden sm:inline cloak">Login</span>
                     </button>
                 </div>
             </div>
@@ -146,46 +148,82 @@
 
     <script>
         const app = {
-            // URL DARI USER
+            // !!! PASTE URL WEB APP BARU DI SINI !!!
             apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
             
             user: null,
 
             init: function() {
-                // Register Service Worker for PWA
+                // 1. Service Worker for Caching & Performance
                 if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('sw.js').then(reg => console.log('SW Registered')).catch(err => console.log('SW Fail', err));
+                    navigator.serviceWorker.register('sw.js')
+                        .then(reg => console.log('SW Ready'))
+                        .catch(err => console.log('SW Error', err));
                 }
 
-                // Theme Init
+                // 2. Theme Init
                 if(localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     document.documentElement.classList.add('dark');
                 }
                 
-                // Session Check
+                // 3. Session Check (Immediate UI Update to prevent flash)
                 const sess = localStorage.getItem('sa_console_sess');
                 if(sess) {
                     this.user = JSON.parse(sess);
-                    this.updateUIState();
                 }
+                this.updateUIState(); // Run immediately
 
+                // 4. Load Data with Cache-First Strategy
                 this.loadData();
                 lucide.createIcons();
             },
 
             loadData: function() {
                 const grid = document.getElementById('menu-grid');
-                grid.innerHTML = `<div class="col-span-full py-16 flex flex-col items-center justify-center text-zinc-400"><i data-lucide="loader" class="animate-spin w-8 h-8 mb-2"></i><span class="text-xs font-mono">SYNCING DATA...</span></div>`;
-                lucide.createIcons();
+                const CACHE_KEY = 'app_menu_cache_v2';
 
+                // -- STRATEGI STALE-WHILE-REVALIDATE --
+                
+                // A. Tampilkan Cache Dulu (Jika ada)
+                const cachedData = localStorage.getItem(CACHE_KEY);
+                let hasCache = false;
+
+                if (cachedData) {
+                    try {
+                        const parsed = JSON.parse(cachedData);
+                        if(Array.isArray(parsed) && parsed.length > 0) {
+                            this.renderMenu(parsed);
+                            hasCache = true;
+                            console.log("Loaded from cache");
+                        }
+                    } catch (e) { localStorage.removeItem(CACHE_KEY); }
+                }
+
+                if (!hasCache) {
+                    // Hanya tampilkan loading jika tidak ada cache
+                    grid.innerHTML = `<div class="col-span-full py-16 flex flex-col items-center justify-center text-zinc-400"><i data-lucide="loader" class="animate-spin w-8 h-8 mb-2"></i><span class="text-xs font-mono">SYNCING DATA...</span></div>`;
+                    lucide.createIcons();
+                }
+
+                // B. Fetch Data Baru di Background
                 fetch(this.apiURL)
                 .then(r => r.json())
                 .then(data => {
-                    this.renderMenu(data.menu);
+                    // Update Cache
+                    const newDataStr = JSON.stringify(data.menu);
+                    
+                    // Render ulang hanya jika data berubah
+                    if (newDataStr !== cachedData) {
+                        localStorage.setItem(CACHE_KEY, newDataStr);
+                        this.renderMenu(data.menu);
+                        console.log("Updated from network");
+                    }
                 })
                 .catch(e => {
-                    grid.innerHTML = `<div class="col-span-full text-center p-8 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl"><i data-lucide="wifi-off" class="w-8 h-8 text-red-500 mx-auto mb-2"></i><p class="text-red-500 font-bold text-sm">Connection Failed</p></div>`;
-                    lucide.createIcons();
+                    if (!hasCache) {
+                        grid.innerHTML = `<div class="col-span-full text-center p-8 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl"><i data-lucide="wifi-off" class="w-8 h-8 text-red-500 mx-auto mb-2"></i><p class="text-red-500 font-bold text-sm">Connection Failed</p></div>`;
+                        lucide.createIcons();
+                    }
                 });
             },
 
@@ -195,7 +233,7 @@
                 
                 const filtered = items.filter(item => {
                     const reqRole = (item.role || "").toLowerCase().trim();
-                    if(reqRole === "") return true; // Public Link
+                    if(reqRole === "") return true; 
                     if(userRole === "super admin") return true; 
                     if(userRole === "admin" && (reqRole === "admin" || reqRole === "operator")) return true;
                     if(userRole === "operator" && reqRole === "operator") return true;
@@ -210,7 +248,6 @@
 
                 grid.innerHTML = filtered.map(item => {
                     const color = item.warna || 'zinc';
-                    // Style Mapper
                     let iconClass = 'text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800';
                     if(color === 'blue') iconClass = 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20';
                     if(color === 'red') iconClass = 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20';
@@ -254,7 +291,6 @@
                         this.updateUIState();
                         this.loadData();
                         this.closeModal();
-                        // Track
                         fetch(`${this.apiURL}`, { method:'POST', body: JSON.stringify({action:'track', email:email}), mode:'no-cors' }).catch(()=>{});
                     } else {
                         alert("Access Denied: " + res.message);
@@ -271,6 +307,7 @@
             doLogout: function() {
                 if(confirm("Terminate current session?")) {
                     localStorage.removeItem('sa_console_sess');
+                    localStorage.removeItem('app_menu_cache_v2'); // Clear menu cache juga agar aman
                     this.user = null;
                     this.updateUIState();
                     this.loadData();
@@ -285,6 +322,10 @@
                 const header = document.getElementById('dashboard-header');
                 const navBadge = document.getElementById('nav-role-badge');
                 const authBtnText = document.getElementById('btn-auth-text');
+                
+                // Remove cloak
+                navBadge.classList.remove('cloak');
+                authBtnText.classList.remove('cloak');
 
                 if(isLoggedIn) {
                     loginForm.classList.add('hidden');
@@ -311,12 +352,8 @@
                 }
             },
 
-            openAuthModal: function() { 
-                document.getElementById('auth-modal').classList.remove('hidden'); 
-            },
-            closeModal: function() { 
-                document.getElementById('auth-modal').classList.add('hidden'); 
-            },
+            openAuthModal: function() { document.getElementById('auth-modal').classList.remove('hidden'); },
+            closeModal: function() { document.getElementById('auth-modal').classList.add('hidden'); },
             toggleTheme: function() {
                 const isDark = document.documentElement.classList.toggle('dark');
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
