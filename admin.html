@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="theme-color" content="#18181b">
-    <meta name="description" content="Super Admin Console v2.0">
-    <title>Admin Console v2.0</title>
+    <meta name="description" content="Super Admin Console v3.0">
+    <title>Admin Console v3.0</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png">
@@ -31,373 +31,347 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        body { background-color: #f4f4f5; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+        * { -webkit-tap-highlight-color: transparent; }
+        body { background-color: #fafafa; font-family: 'Inter', sans-serif; }
         .dark body { background-color: #09090b; }
-        .bg-grid { background-image: radial-gradient(#a1a1aa 1px, transparent 1px); background-size: 20px 20px; opacity: 0.15; }
-        .dark .bg-grid { background-image: radial-gradient(#3f3f46 1px, transparent 1px); opacity: 0.1; }
-        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-        .dark .glass { background: rgba(24, 24, 27, 0.85); }
-        .card-hover:active { transform: scale(0.98); }
-        @media (hover: hover) { .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); } }
-        .cloak { visibility: hidden; }
-        .sortable-ghost { opacity: 0.4; background: #818cf8 !important; }
-        .sortable-chosen { transform: scale(1.05); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); z-index: 100; }
+        .bg-grid { background-image: radial-gradient(#a1a1aa 1px, transparent 1px); background-size: 24px 24px; opacity: 0.1; }
+        .dark .bg-grid { background-image: radial-gradient(#3f3f46 1px, transparent 1px); opacity: 0.08; }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .dark .glass { background: rgba(9, 9, 11, 0.9); }
+        
+        /* Compact cards */
+        .card-compact { padding: 12px; }
+        .card-compact:hover { transform: translateY(-1px); }
+        
+        /* Sortable */
+        .sortable-ghost { opacity: 0.3; background: #818cf8 !important; }
+        .sortable-chosen { transform: scale(1.03); z-index: 100; }
         .drag-handle { cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
-        .modal-enter { animation: modalIn 0.2s ease-out; }
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .toast { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .icon-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); 
-            gap: 6px; 
-            max-height: 200px; 
-            overflow-y: auto; 
-            padding: 8px;
-            border: 1px solid #e4e4e7;
-            border-radius: 8px;
-        }
+        
+        /* Modal */
+        .modal-enter { animation: modalIn 0.18s ease-out; }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+        
+        /* Panel slide */
+        .panel-enter { animation: panelIn 0.22s ease-out; }
+        @keyframes panelIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .panel-exit { animation: panelOut 0.2s ease-in forwards; }
+        @keyframes panelOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
+        
+        /* Toast */
+        .toast { animation: slideIn 0.25s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        /* Icon picker */
+        .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 4px; max-height: 180px; overflow-y: auto; padding: 8px; border: 1px solid #e4e4e7; border-radius: 8px; }
         .dark .icon-grid { border-color: #27272a; }
-        .icon-btn { 
-            aspect-ratio: 1; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border-radius: 6px; 
-            cursor: pointer; 
-            transition: all 0.15s;
-        }
+        .icon-btn { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; transition: all 0.12s; }
         .icon-btn:hover { background: #f4f4f5; }
         .dark .icon-btn:hover { background: #27272a; }
         .icon-btn.selected { background: #4f46e5; color: white; }
-        .color-dot { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all 0.15s; }
+        
+        /* Color picker */
+        .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.12s; }
         .color-dot:hover { transform: scale(1.15); }
         .color-dot.selected { border-color: #18181b; transform: scale(1.15); }
         .dark .color-dot.selected { border-color: white; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
         .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
-        ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; }
-        .menu-card { transition: opacity 0.2s ease, transform 0.2s ease; }
-        .menu-card.removing { opacity: 0; transform: scale(0.95); }
-        @keyframes syncPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .sync-pulse { animation: syncPulse 1.5s ease-in-out infinite; }
+        
+        /* List view */
+        .list-row { transition: all 0.12s; }
+        .list-row:hover { background: #f4f4f5; }
+        .dark .list-row:hover { background: rgba(39, 39, 42, 0.5); }
+        
+        /* Sync dot pulse */
+        @keyframes syncPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .sync-pulse { animation: syncPulse 1.2s ease-in-out infinite; }
+        
+        /* Panel tab active */
+        .ptab-active { background: #4f46e5; color: white; }
+        
+        /* Line clamp */
+        .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
-<body class="text-zinc-800 dark:text-zinc-200 min-h-screen flex flex-col transition-colors duration-300 relative">
+<body class="text-zinc-800 dark:text-zinc-200 min-h-screen flex flex-col transition-colors duration-200 relative">
 
     <div class="fixed inset-0 bg-grid pointer-events-none z-0"></div>
 
-    <!-- ============ NAVBAR ============ -->
+    <!-- ============ NAVBAR (COMPACT) ============ -->
     <nav class="sticky top-0 z-40 w-full border-b border-zinc-200 dark:border-border glass">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded bg-zinc-900 dark:bg-white flex items-center justify-center text-white dark:text-black shadow-sm shrink-0">
-                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-6 h-6 object-contain" alt="Logo">
+        <div class="max-w-[1600px] mx-auto px-3 sm:px-4">
+            <div class="flex items-center justify-between h-14 gap-2">
+                
+                <!-- Left: Logo & Brand -->
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-7 h-7 rounded bg-zinc-900 dark:bg-white flex items-center justify-center shrink-0">
+                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-5 h-5 object-contain" alt="Logo">
                     </div>
-                    <div>
-                        <h1 class="font-bold text-lg tracking-tight leading-none dark:text-white">Admin<span class="text-indigo-600">Console</span></h1>
-                        <div class="flex items-center gap-2">
-                            <span id="nav-role-badge" class="text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-semibold">Guest Access</span>
-                            <span id="sync-indicator" class="text-[10px] font-mono flex items-center gap-1 text-zinc-400">
-                                <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                <span id="sync-text" class="hidden sm:inline">Synced</span>
-                            </span>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                            <h1 class="font-bold text-sm tracking-tight leading-none dark:text-white truncate">Console</h1>
+                            <span id="nav-role-badge" class="text-[9px] font-mono uppercase tracking-wider text-zinc-500 font-semibold hidden sm:inline">Guest</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span id="sync-text" class="text-[9px] font-mono text-zinc-400 truncate">Baru saja</span>
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button id="btn-feedback-admin" onclick="app.openFeedbackList()" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 hover:opacity-80 transition relative">
-                        <i data-lucide="inbox" class="w-3.5 h-3.5"></i>
-                        <span class="hidden sm:inline">Feedback</span>
-                        <span id="feedback-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">0</span>
+
+                <!-- Center: Search -->
+                <div class="hidden md:flex flex-1 max-w-md mx-4">
+                    <div class="relative w-full">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"></i>
+                        <input type="text" id="search-input" placeholder="Cari..." 
+                            class="w-full pl-8 pr-3 py-1.5 bg-zinc-100 dark:bg-zinc-900 border border-transparent focus:border-indigo-500 rounded-lg text-xs outline-none transition">
+                    </div>
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="flex items-center gap-1">
+                    <button onclick="app.toggleView()" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800" title="Ganti tampilan">
+                        <i data-lucide="layout-grid" id="view-icon" class="w-4 h-4"></i>
                     </button>
-                    <button id="btn-kategori" onclick="app.openKategoriModal()" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 hover:opacity-80 transition">
-                        <i data-lucide="folder-cog" class="w-3.5 h-3.5"></i>
-                        <span class="hidden sm:inline">Kategori</span>
+                    <button onclick="app.syncNow()" id="btn-sync" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800" title="Sync sekarang">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
-                    <button id="btn-edit-mode" onclick="app.toggleEditMode()" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 hover:opacity-80 transition">
-                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-                        <span class="hidden sm:inline">Edit Mode</span>
+                    <button id="btn-tambah" onclick="app.openLinkModal()" class="hidden p-1.5 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg" title="Tambah link">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="app.toggleTheme()" class="p-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-white transition rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                        <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
-                        <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+                    <button onclick="app.toggleTheme()" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                        <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+                        <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
                     </button>
-                    <div class="h-6 w-px bg-zinc-200 dark:bg-zinc-800"></div>
-                    <button onclick="app.openAuthModal()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold bg-zinc-900 text-white dark:bg-white dark:text-black hover:opacity-90 transition shadow-sm">
-                        <i data-lucide="user-circle" class="w-4 h-4"></i>
+                    <button onclick="app.openPanel()" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800" title="Pengaturan">
+                        <i data-lucide="settings-2" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="app.openAuthModal()" class="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900 text-white dark:bg-white dark:text-black hover:opacity-90 transition">
+                        <i data-lucide="user-circle" class="w-3.5 h-3.5"></i>
                         <span id="btn-auth-text" class="hidden sm:inline">Login</span>
                     </button>
                 </div>
             </div>
         </div>
+        
+        <!-- Mobile search bar -->
+        <div class="md:hidden px-3 pb-2">
+            <div class="relative w-full">
+                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"></i>
+                <input type="text" id="search-input-mobile" placeholder="Cari..." 
+                    class="w-full pl-8 pr-3 py-1.5 bg-zinc-100 dark:bg-zinc-900 border border-transparent focus:border-indigo-500 rounded-lg text-xs outline-none transition">
+            </div>
+        </div>
     </nav>
 
-    <!-- ============ MAIN ============ -->
-    <main class="flex-1 relative z-10 p-4 sm:p-8 pb-24">
-        <div class="max-w-7xl mx-auto space-y-6">
-            
-            <div id="dashboard-header" class="hidden">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-200 dark:border-border pb-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-zinc-900 dark:text-white">Dashboard</h2>
-                        <p class="text-zinc-500 text-sm mt-1">Selamat datang, <span id="user-display-name" class="font-semibold text-indigo-600">Admin</span>.</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="px-3 py-1.5 rounded-md border border-zinc-200 dark:border-zinc-700 text-xs font-mono text-zinc-500 flex items-center gap-2 bg-zinc-50 dark:bg-zinc-900">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> SYSTEM ONLINE
-                        </span>
-                    </div>
-                </div>
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="flex-1 relative z-10 p-3 sm:p-4 max-w-[1600px] mx-auto w-full">
+        
+        <!-- Info banner (jika ada) -->
+        <div id="info-banner" class="hidden mb-3"></div>
+        
+        <!-- Content container -->
+        <div id="content-container">
+            <div class="flex flex-col items-center justify-center py-16 text-zinc-400">
+                <i data-lucide="loader" class="w-6 h-6 animate-spin mb-2"></i>
+                <span class="text-xs font-mono">MEMUAT...</span>
             </div>
-
-            <!-- Toolbar -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <div class="relative flex-1">
-                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"></i>
-                    <input type="text" id="search-input" placeholder="Cari link..." 
-                        class="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-panel border border-zinc-200 dark:border-border rounded-lg text-sm focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none">
-                </div>
-                <div id="btn-tambah-link" class="hidden">
-                    <button onclick="app.openLinkModal()" class="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Tambah Link
-                    </button>
-                </div>
-                <button onclick="app.loadData(true)" class="px-4 py-2.5 bg-white dark:bg-panel border border-zinc-200 dark:border-border rounded-lg text-sm font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition flex items-center justify-center gap-2">
-                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Sync
-                </button>
-                <div id="import-export-group" class="hidden items-center gap-2">
-                    <button onclick="app.exportJSON()" class="px-4 py-2.5 bg-white dark:bg-panel border border-zinc-200 dark:border-border rounded-lg text-sm font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition flex items-center justify-center gap-2" title="Download backup JSON">
-                        <i data-lucide="download" class="w-4 h-4"></i>
-                        <span class="hidden md:inline">Export</span>
-                    </button>
-                    <label class="px-4 py-2.5 bg-white dark:bg-panel border border-zinc-200 dark:border-border rounded-lg text-sm font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition flex items-center justify-center gap-2 cursor-pointer" title="Upload backup JSON">
-                        <i data-lucide="upload" class="w-4 h-4"></i>
-                        <span class="hidden md:inline">Import</span>
-                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="app.importJSON(event)">
-                    </label>
-                </div>
-            </div>
-
-            <div id="menu-container" class="space-y-8">
-                <div class="h-32 rounded-xl bg-zinc-200 dark:bg-zinc-800/50 animate-pulse"></div>
-                <div class="h-32 rounded-xl bg-zinc-200 dark:bg-zinc-800/50 animate-pulse"></div>
-            </div>
-
-            <div id="feedback-link" class="hidden pt-8">
-                <button onclick="app.openFeedbackModal()" class="w-full p-4 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl text-sm text-zinc-500 hover:border-indigo-500 hover:text-indigo-600 transition flex items-center justify-center gap-2">
-                    <i data-lucide="message-circle" class="w-4 h-4"></i>
-                    Kirim Feedback / Laporan Bug
-                </button>
-            </div>
-
+        </div>
+        
+        <!-- Empty state placeholder -->
+        <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-zinc-400">
+            <i data-lucide="inbox" class="w-10 h-10 mb-2 opacity-50"></i>
+            <p class="text-xs">Belum ada menu</p>
         </div>
     </main>
 
+    <!-- ============ SETTINGS PANEL (SLIDE FROM RIGHT) ============ -->
+    <div id="settings-panel" class="fixed inset-0 z-50 hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closePanel()"></div>
+        
+        <!-- Panel -->
+        <div id="panel-content" class="absolute right-0 top-0 bottom-0 w-full max-w-lg bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 flex flex-col panel-enter">
+            
+            <!-- Panel header -->
+            <div class="flex items-center justify-between p-3 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="settings-2" class="w-4 h-4 text-indigo-600"></i>
+                    <h2 class="font-bold text-sm">Pengaturan</h2>
+                </div>
+                <button onclick="app.closePanel()" class="p-1.5 text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="flex gap-1 p-2 border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto shrink-0">
+                <button onclick="app.setPanelTab('info')" data-ptab="info" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                    <i data-lucide="info" class="w-3 h-3 inline mr-1"></i> Info
+                </button>
+                <button onclick="app.setPanelTab('kategori')" data-ptab="kategori" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                    <i data-lucide="folder" class="w-3 h-3 inline mr-1"></i> Kategori
+                </button>
+                <button onclick="app.setPanelTab('users')" data-ptab="users" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                    <i data-lucide="users" class="w-3 h-3 inline mr-1"></i> Users
+                </button>
+                <button onclick="app.setPanelTab('feedback')" data-ptab="feedback" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                    <i data-lucide="inbox" class="w-3 h-3 inline mr-1"></i> Feedback
+                </button>
+                <button onclick="app.setPanelTab('backup')" data-ptab="backup" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                    <i data-lucide="database" class="w-3 h-3 inline mr-1"></i> Backup
+                </button>
+                <button onclick="app.setPanelTab('prefs')" data-ptab="prefs" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                    <i data-lucide="sliders" class="w-3 h-3 inline mr-1"></i> Preferensi
+                </button>
+            </div>
+            
+            <!-- Panel content -->
+            <div id="panel-body" class="flex-1 overflow-y-auto p-4">
+                <!-- Content dynamic -->
+            </div>
+        </div>
+    </div>
+
     <!-- ============ MODAL: LOGIN ============ -->
     <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden modal-enter relative">
-            <button onclick="app.closeModal('auth-modal')" class="absolute top-4 right-4 text-zinc-400 hover:text-zinc-900 dark:hover:text-white z-10"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <div class="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden modal-enter relative">
+            <button onclick="app.closeModal('auth-modal')" class="absolute top-3 right-3 text-zinc-400 hover:text-zinc-900 dark:hover:text-white z-10 p-1">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
 
-            <div id="form-login" class="p-8">
-                <div class="mb-6">
-                    <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-xl flex items-center justify-center mb-4"><i data-lucide="shield-lock" class="w-6 h-6"></i></div>
-                    <h3 class="text-xl font-bold text-zinc-900 dark:text-white">Authentication</h3>
-                    <p class="text-sm text-zinc-500 mt-1">Masuk untuk akses penuh.</p>
+            <div id="form-login" class="p-6">
+                <div class="mb-5">
+                    <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-lg flex items-center justify-center mb-3">
+                        <i data-lucide="shield-lock" class="w-5 h-5"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-zinc-900 dark:text-white">Authentication</h3>
+                    <p class="text-xs text-zinc-500 mt-0.5">Masuk untuk akses penuh.</p>
                 </div>
-                <form onsubmit="event.preventDefault(); app.doLogin()" class="space-y-4">
-                    <input type="email" id="input-email" autocomplete="email" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Email">
-                    <input type="password" id="input-pass" autocomplete="current-password" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Password">
-                    <button type="submit" id="btn-submit" class="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-bold py-3 rounded-lg shadow-lg hover:opacity-90 transition active:scale-[0.98] flex justify-center items-center gap-2">Access Console</button>
+                <form onsubmit="event.preventDefault(); app.doLogin()" class="space-y-3">
+                    <input type="email" id="input-email" autocomplete="email" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Email">
+                    <input type="password" id="input-pass" autocomplete="current-password" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Password">
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-500">
+                        <input type="checkbox" id="remember-me" checked class="w-3 h-3 rounded">
+                        <span>Ingat saya di perangkat ini</span>
+                    </label>
+                    <button type="submit" id="btn-submit" class="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-bold py-2.5 rounded-lg text-sm hover:opacity-90 transition active:scale-[0.98] flex justify-center items-center gap-2">Access Console</button>
                 </form>
             </div>
 
             <div id="view-profile" class="hidden">
-                <div class="bg-zinc-100 dark:bg-zinc-800/50 p-8 border-b border-zinc-200 dark:border-zinc-700 text-center">
-                    <div class="w-20 h-20 bg-white dark:bg-zinc-700 rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-zinc-200 dark:border-zinc-600 shadow-xl overflow-hidden">
-                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-12 h-12 object-contain" alt="Avatar">
+                <div class="bg-zinc-50 dark:bg-zinc-800/50 p-6 border-b border-zinc-200 dark:border-zinc-700 text-center">
+                    <div class="w-16 h-16 bg-white dark:bg-zinc-700 rounded-full mx-auto mb-3 flex items-center justify-center border-4 border-zinc-200 dark:border-zinc-600 shadow-lg overflow-hidden">
+                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-10 h-10 object-contain" alt="Avatar">
                     </div>
-                    <h3 class="text-lg font-bold text-zinc-900 dark:text-white" id="prof-name">-</h3>
-                    <p class="text-indigo-600 dark:text-indigo-400 text-xs font-mono font-bold tracking-widest uppercase mt-1" id="prof-role">-</p>
+                    <h3 class="text-sm font-bold text-zinc-900 dark:text-white" id="prof-name">-</h3>
+                    <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-mono font-bold tracking-widest uppercase mt-0.5" id="prof-role">-</p>
                 </div>
-                <div class="p-6 space-y-3">
-                    <div class="flex justify-between text-sm py-2 border-b border-zinc-100 dark:border-zinc-800">
-                        <span class="text-zinc-500">Unit Kerja</span>
+                <div class="p-4 space-y-2">
+                    <div class="flex justify-between text-xs py-1.5 border-b border-zinc-100 dark:border-zinc-800">
+                        <span class="text-zinc-500">Unit</span>
                         <span class="font-semibold dark:text-zinc-300" id="prof-unit">-</span>
                     </div>
-                    <div class="flex justify-between text-sm py-2 border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="flex justify-between text-xs py-1.5 border-b border-zinc-100 dark:border-zinc-800">
                         <span class="text-zinc-500">Email</span>
-                        <span class="font-semibold dark:text-zinc-300 text-xs" id="prof-email">-</span>
+                        <span class="font-semibold dark:text-zinc-300 text-[10px]" id="prof-email">-</span>
                     </div>
-                    <button onclick="app.doLogout()" class="w-full mt-4 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400 font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
-                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                    <button onclick="app.doLogout()" class="w-full mt-3 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400 font-bold py-2.5 rounded-lg text-sm transition flex items-center justify-center gap-2">
+                        <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Logout
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ============ MODAL: CRUD LINK ============ -->
+    <!-- ============ MODAL: LINK CRUD ============ -->
     <div id="link-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="w-full max-w-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden modal-enter max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
-                <h3 class="text-lg font-bold dark:text-white" id="link-modal-title">Tambah Link</h3>
-                <button onclick="app.closeModal('link-modal')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <div class="w-full max-w-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden modal-enter max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+                <h3 class="text-sm font-bold dark:text-white" id="link-modal-title">Tambah Link</h3>
+                <button onclick="app.closeModal('link-modal')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             
-            <div class="p-5 overflow-y-auto space-y-4">
+            <div class="p-4 overflow-y-auto space-y-3">
                 <input type="hidden" id="link-id">
                 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Judul *</label>
-                    <input type="text" id="link-judul" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Nama link">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Judul *</label>
+                    <input type="text" id="link-judul" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Nama link">
                 </div>
                 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1.5">URL *</label>
-                    <input type="url" id="link-url" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-600 outline-none font-mono" placeholder="https://...">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">URL *</label>
+                    <input type="url" id="link-url" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none font-mono" placeholder="https://...">
                 </div>
                 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Deskripsi</label>
-                    <textarea id="link-deskripsi" rows="2" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-600 outline-none resize-none" placeholder="Deskripsi singkat"></textarea>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Deskripsi</label>
+                    <textarea id="link-deskripsi" rows="2" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none resize-none" placeholder="Deskripsi singkat"></textarea>
                 </div>
                 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Kategori</label>
-                        <select id="link-kategori" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-600 outline-none"></select>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Kategori</label>
+                        <select id="link-kategori" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none"></select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Akses Role</label>
-                        <input type="text" id="link-role" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Super Admin,Admin">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Akses Role</label>
+                        <input type="text" id="link-role" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Super Admin,Admin">
                     </div>
                 </div>
                 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Icon</label>
-                    <input type="text" id="link-icon-search" placeholder="Cari icon..." class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none mb-2">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Icon</label>
+                    <input type="text" id="link-icon-search" placeholder="Cari icon..." class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-xs focus:ring-2 focus:ring-indigo-600 outline-none mb-1.5">
                     <div id="icon-grid" class="icon-grid"></div>
                     <input type="hidden" id="link-icon" value="link">
                 </div>
                 
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Warna</label>
-                    <div class="flex flex-wrap gap-2" id="color-picker"></div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Warna</label>
+                    <div class="flex flex-wrap gap-1.5" id="color-picker"></div>
                     <input type="hidden" id="link-warna" value="zinc">
                 </div>
                 
-                <div class="flex items-center gap-4">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="link-pinned" class="w-4 h-4 rounded">
-                        <span class="text-sm font-semibold">⭐ Pin ke atas</span>
+                <div class="flex items-center gap-3 flex-wrap">
+                    <label class="flex items-center gap-1.5 cursor-pointer text-xs">
+                        <input type="checkbox" id="link-pinned" class="w-3.5 h-3.5 rounded">
+                        <span class="font-semibold">⭐ Pin</span>
                     </label>
-                    <select id="link-status" class="text-sm bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-2 py-1 focus:ring-2 focus:ring-indigo-600 outline-none">
+                    <select id="link-status" class="text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-2 py-1 focus:ring-2 focus:ring-indigo-600 outline-none">
                         <option value="aktif">Aktif</option>
                         <option value="arsip">Arsip</option>
                     </select>
                 </div>
             </div>
             
-            <div class="flex items-center gap-3 p-5 border-t border-zinc-200 dark:border-zinc-800 shrink-0">
-                <button onclick="app.closeModal('link-modal')" class="flex-1 px-4 py-2.5 border border-zinc-300 dark:border-zinc-700 rounded-lg text-sm font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">Batal</button>
-                <button onclick="app.saveLink()" id="btn-save-link" class="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
-                    <i data-lucide="save" class="w-4 h-4"></i> Simpan
+            <div class="flex items-center gap-2 p-4 border-t border-zinc-200 dark:border-zinc-800 shrink-0">
+                <button onclick="app.closeModal('link-modal')" class="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg text-sm font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">Batal</button>
+                <button onclick="app.saveLink()" class="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-1.5">
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i> Simpan
                 </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============ MODAL: KATEGORI ============ -->
-    <div id="kategori-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="w-full max-w-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden modal-enter max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
-                <h3 class="text-lg font-bold dark:text-white">Kelola Kategori</h3>
-                <button onclick="app.closeModal('kategori-modal')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="p-5 overflow-y-auto">
-                <button onclick="app.openKategoriForm()" class="w-full mb-4 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-2">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Tambah Kategori
-                </button>
-                <div id="kategori-list" class="space-y-2"></div>
-                
-                <div id="kategori-form" class="hidden mt-4 p-4 border border-indigo-200 dark:border-indigo-800 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 space-y-3">
-                    <input type="hidden" id="kat-id">
-                    <input type="text" id="kat-nama" placeholder="Nama kategori" class="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
-                    <input type="text" id="kat-icon" placeholder="Icon (contoh: folder)" class="w-full bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
-                    <div class="flex gap-2">
-                        <button onclick="app.saveKategori()" class="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">Simpan</button>
-                        <button onclick="document.getElementById('kategori-form').classList.add('hidden')" class="px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg text-sm">Batal</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============ MODAL: FEEDBACK (KIRIM) ============ -->
-    <div id="feedback-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden modal-enter">
-            <div class="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-zinc-800">
-                <h3 class="text-lg font-bold dark:text-white">Kirim Feedback</h3>
-                <button onclick="app.closeModal('feedback-modal')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="p-5 space-y-3">
-                <select id="fb-tipe" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
-                    <option value="saran">💡 Saran</option>
-                    <option value="bug">🐛 Laporan Bug</option>
-                    <option value="lain">📝 Lainnya</option>
-                </select>
-                <textarea id="fb-pesan" rows="4" placeholder="Tulis pesan..." class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-600 outline-none resize-none"></textarea>
-                <button onclick="app.sendFeedback()" class="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition">Kirim</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============ MODAL: FEEDBACK LIST (ADMIN) ============ -->
-    <div id="feedback-list-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="w-full max-w-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden modal-enter max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between p-5 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
-                <h3 class="text-lg font-bold dark:text-white">Feedback Masuk</h3>
-                <div class="flex items-center gap-2">
-                    <select id="fb-filter-status" onchange="app.renderFeedbackList()" class="text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-2 py-1.5 outline-none">
-                        <option value="">Semua</option>
-                        <option value="baru">Baru</option>
-                        <option value="dibaca">Dibaca</option>
-                        <option value="diproses">Diproses</option>
-                        <option value="selesai">Selesai</option>
-                    </select>
-                    <button onclick="app.closeModal('feedback-list-modal')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-                </div>
-            </div>
-            <div class="p-5 overflow-y-auto">
-                <div id="feedback-list" class="space-y-3"></div>
             </div>
         </div>
     </div>
 
     <!-- ============ TOAST ============ -->
-    <div id="toast-container" class="fixed top-20 right-4 z-[60] space-y-2 max-w-sm"></div>
+    <div id="toast-container" class="fixed top-16 right-3 z-[60] space-y-1.5 max-w-xs"></div>
 
     <script>
     // ============================================================
-    // APP
+    // APP v3.0 — Compact + Persistent + Panel
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
         
+        // State
         user: null,
         menu: [],
         kategori: [],
@@ -408,13 +382,30 @@
         editMode: false,
         sortables: [],
         isOnline: navigator.onLine,
+        currentTab: 'info',
+        panelOpen: false,
         
-        CACHE_KEY: 'sa_cache_v2',
-        SESSION_KEY: 'sa_sess_v2',
-        PENDING_KEY: 'sa_pending_v2',
-        LAST_SYNC_KEY: 'sa_lastsync_v2',
+        // Storage keys (v3)
+        KEYS: {
+            SESSION: 'sa3_session',
+            CACHE: 'sa3_cache',
+            PENDING: 'sa3_pending',
+            LAST_SYNC: 'sa3_lastsync',
+            PREFS: 'sa3_prefs',
+            THEME: 'sa3_theme'
+        },
         
-        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','github','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','hash','at-sign','slash','regex'],
+        // Preferensi default
+        prefs: {
+            view: 'grid',           // 'grid' | 'list'
+            compact: true,
+            autoSync: false,
+            autoSyncInterval: 5,    // menit
+            showClicks: true,
+            showBanner: true
+        },
+        
+        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','github','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','hash','at-sign','regex','info','help-circle','alert-circle','alert-triangle'],
         
         COLORS: ['zinc','blue','red','green','emerald','rose','yellow','indigo','purple','orange','pink','sky','teal','violet'],
         
@@ -422,116 +413,178 @@
         // INIT
         // ============================================================
         init: function() {
+            // Service worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').catch(() => {});
             }
             
-            if(localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            // Theme (persistent)
+            const savedTheme = localStorage.getItem(this.KEYS.THEME);
+            if(savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                 document.documentElement.classList.add('dark');
             }
             
-            const sess = localStorage.getItem(this.SESSION_KEY);
-            if(sess) {
-                try { this.user = JSON.parse(sess); } catch(e) { localStorage.removeItem(this.SESSION_KEY); }
-            }
+            // Prefs
+            try {
+                const p = JSON.parse(localStorage.getItem(this.KEYS.PREFS) || '{}');
+                this.prefs = { ...this.prefs, ...p };
+            } catch(e) {}
             
+            // Session (NO auto validation — direct from storage)
+            try {
+                const sess = JSON.parse(localStorage.getItem(this.KEYS.SESSION) || 'null');
+                if (sess && sess.user) this.user = sess.user;
+            } catch(e) { localStorage.removeItem(this.KEYS.SESSION); }
+            
+            // Load cache
             this.loadFromCache();
+            
+            // Update UI
             this.updateUIState();
             this.renderAll();
+            this.updateSyncIndicator();
             
+            // Search listeners
+            ['search-input','search-input-mobile'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', (e) => this.renderAll(e.target.value.toLowerCase()));
+            });
+            
+            // Icon/Color picker
+            this.setupIconPicker();
+            this.setupColorPicker();
+            
+            // Network listeners
             window.addEventListener('online', () => { 
                 this.isOnline = true; 
                 this.updateSyncIndicator(); 
-                this.syncPending(); 
-                this.loadData(); 
+                if (this.prefs.autoSync) this.syncNow(true); 
+                this.syncPending();
             });
             window.addEventListener('offline', () => { 
                 this.isOnline = false; 
                 this.updateSyncIndicator(); 
             });
             
+            // Storage sync antar tab
             window.addEventListener('storage', (e) => {
-                if (e.key === this.CACHE_KEY) {
+                if (e.key === this.KEYS.CACHE) {
                     this.loadFromCache();
                     this.renderAll();
                 }
             });
             
-            document.getElementById('search-input').addEventListener('input', (e) => this.renderAll(e.target.value.toLowerCase()));
-            
-            this.setupIconPicker();
-            this.setupColorPicker();
-            
-            this.loadData();
-            
-            // Load feedback badge kalau admin
-            if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) {
-                setTimeout(() => this.loadFeedback(), 1500);
+            // Auto sync kalau diaktifkan
+            if (this.prefs.autoSync) {
+                setInterval(() => {
+                    if (this.isOnline) this.syncNow(true);
+                }, this.prefs.autoSyncInterval * 60 * 1000);
             }
+            
+            // Render panel default tab
+            this.renderPanel();
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('search-input').focus(); }
+                if (e.key === 'Escape') { this.closeModal('auth-modal'); this.closeModal('link-modal'); this.closePanel(); }
+            });
             
             lucide.createIcons();
         },
         
         // ============================================================
-        // DATA
+        // STORAGE
         // ============================================================
         loadFromCache: function() {
             try {
-                const cached = JSON.parse(localStorage.getItem(this.CACHE_KEY) || '{}');
+                const cached = JSON.parse(localStorage.getItem(this.KEYS.CACHE) || '{}');
                 this.menu = cached.menu || [];
                 this.kategori = cached.kategori || [];
                 this.info = cached.info || {};
                 this.footer = cached.footer || [];
                 this.users = cached.users || [];
-            } catch(e) {}
+                this.feedbackList = cached.feedback || [];
+            } catch(e) {
+                console.error('Cache parse error:', e);
+            }
         },
         
         saveCache: function() {
-            localStorage.setItem(this.CACHE_KEY, JSON.stringify({
+            localStorage.setItem(this.KEYS.CACHE, JSON.stringify({
                 menu: this.menu,
                 kategori: this.kategori,
                 info: this.info,
                 footer: this.footer,
                 users: this.users,
+                feedback: this.feedbackList,
                 cachedAt: new Date().toISOString()
             }));
         },
         
-        loadData: function(force) {
+        saveSession: function() {
+            if (this.user) {
+                localStorage.setItem(this.KEYS.SESSION, JSON.stringify({
+                    user: this.user,
+                    savedAt: new Date().toISOString()
+                }));
+            } else {
+                localStorage.removeItem(this.KEYS.SESSION);
+            }
+        },
+        
+        savePrefs: function() {
+            localStorage.setItem(this.KEYS.PREFS, JSON.stringify(this.prefs));
+        },
+        
+        // ============================================================
+        // SYNC (MANUAL)
+        // ============================================================
+        syncNow: function(silent) {
             if (!this.isOnline) {
+                if (!silent) this.toast('Offline — tidak bisa sync', 'warning');
                 this.updateSyncIndicator('offline');
                 return;
             }
             
             this.updateSyncIndicator('syncing');
-            const since = force ? null : localStorage.getItem(this.LAST_SYNC_KEY);
-            const url = since 
-                ? `${this.apiURL}?action=delta&since=${encodeURIComponent(since)}` 
-                : `${this.apiURL}?action=bootstrap`;
+            const btn = document.getElementById('btn-sync');
+            if (btn && !silent) {
+                btn.querySelector('i').classList.add('animate-spin');
+            }
             
-            fetch(url)
+            fetch(`${this.apiURL}?action=bootstrap`)
                 .then(r => r.json())
                 .then(res => {
-                    if (res.status !== 'success') throw new Error(res.message || 'Unknown error');
+                    if (res.status !== 'success') throw new Error(res.message);
                     
-                    const data = res.data;
-                    if (data.menu) this.menu = data.menu;
-                    if (data.kategori) this.kategori = data.kategori;
-                    if (data.info) this.info = data.info;
-                    if (data.footer) this.footer = data.footer;
-                    if (data.users) this.users = data.users;
+                    const d = res.data;
+                    if (d.menu) this.menu = d.menu;
+                    if (d.kategori) this.kategori = d.kategori;
+                    if (d.info) this.info = d.info;
+                    if (d.footer) this.footer = d.footer;
+                    if (d.users) this.users = d.users;
                     
                     this.saveCache();
-                    localStorage.setItem(this.LAST_SYNC_KEY, res.serverTime);
+                    localStorage.setItem(this.KEYS.LAST_SYNC, res.serverTime);
                     
                     this.renderAll();
                     this.updateSyncIndicator('synced');
-                    if (force) this.toast('Data tersinkron', 'success');
+                    
+                    if (!silent) this.toast('✓ Data tersinkron', 'success');
+                    
+                    // Load feedback badge kalau admin
+                    if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) {
+                        this.loadFeedback(silent);
+                    }
                 })
                 .catch(err => {
-                    console.error('Load error:', err);
+                    console.error('Sync error:', err);
                     this.updateSyncIndicator('error');
-                    if (force) this.toast('Gagal sync: ' + err.message, 'error');
+                    if (!silent) this.toast('Sync gagal: ' + err.message, 'error');
+                })
+                .finally(() => {
+                    if (btn) btn.querySelector('i').classList.remove('animate-spin');
                 });
         },
         
@@ -540,13 +593,45 @@
         // ============================================================
         renderAll: function(searchQuery) {
             this.renderMenu(searchQuery);
-            this.renderKategoriList();
-            this.renderKategoriOptions();
+            this.renderInfoBanner();
+            lucide.createIcons();
+        },
+        
+        renderInfoBanner: function() {
+            const banner = document.getElementById('info-banner');
+            if (!banner) return;
+            
+            const info = this.info;
+            const showBanner = this.prefs.showBanner && info && (info.STATUS === 'ON' || info.STATUS === 'on' || info.STATUS === true);
+            
+            if (!showBanner || !info.PESAN) {
+                banner.classList.add('hidden');
+                return;
+            }
+            
+            const colorMap = {
+                green: 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-300',
+                blue: 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300',
+                red: 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300',
+                yellow: 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300',
+                indigo: 'bg-indigo-50 border-indigo-200 text-indigo-800 dark:bg-indigo-900/20 dark:border-indigo-800 dark:text-indigo-300'
+            };
+            
+            const cls = colorMap[info.WARNA] || colorMap.blue;
+            
+            banner.className = `mb-3 p-3 border rounded-lg flex items-start gap-2 ${cls}`;
+            banner.innerHTML = `
+                <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                <div class="flex-1 text-xs leading-relaxed">${this.escape(info.PESAN)}</div>
+                <button onclick="document.getElementById('info-banner').classList.add('hidden')" class="text-current opacity-60 hover:opacity-100 shrink-0">
+                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                </button>
+            `;
             lucide.createIcons();
         },
         
         renderMenu: function(searchQuery) {
-            const container = document.getElementById('menu-container');
+            const container = document.getElementById('content-container');
             const q = searchQuery || '';
             const userRole = this.user ? this.user.jabatan.toLowerCase() : '';
             
@@ -570,15 +655,16 @@
             
             if (items.length === 0) {
                 container.innerHTML = `
-                    <div class="text-center py-16 flex flex-col items-center text-zinc-400">
-                        <i data-lucide="inbox" class="w-12 h-12 mb-3 opacity-50"></i>
-                        <p class="text-sm">${q ? 'Tidak ada hasil untuk "' + this.escape(q) + '"' : 'Belum ada menu.'}</p>
+                    <div class="flex flex-col items-center justify-center py-16 text-zinc-400">
+                        <i data-lucide="inbox" class="w-10 h-10 mb-2 opacity-50"></i>
+                        <p class="text-xs">${q ? 'Tidak ada hasil untuk "' + this.escape(q) + '"' : 'Belum ada menu'}</p>
                     </div>
                 `;
                 lucide.createIcons();
                 return;
             }
             
+            // Group by kategori
             const groups = {};
             this.kategori.forEach(k => groups[k.NAMA] = []);
             groups['Lain-lain'] = groups['Lain-lain'] || [];
@@ -589,13 +675,16 @@
                 groups[kat].push(item);
             });
             
+            // Sort kategori
             const sortedKatNames = Object.keys(groups).sort((a, b) => {
                 const ka = this.kategori.find(k => k.NAMA === a);
                 const kb = this.kategori.find(k => k.NAMA === b);
                 return (Number(ka?.URUTAN) || 999) - (Number(kb?.URUTAN) || 999);
             });
             
+            const isListView = this.prefs.view === 'list';
             let html = '';
+            
             sortedKatNames.forEach(katName => {
                 const katItems = groups[katName];
                 if (!katItems || katItems.length === 0) return;
@@ -611,15 +700,16 @@
                 const katIcon = katInfo?.ICON || 'folder';
                 
                 html += `
-                    <div class="space-y-3">
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-2">
-                            <i data-lucide="${katIcon}" class="w-4 h-4"></i>
+                    <div class="mb-5">
+                        <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-2 flex items-center gap-1.5">
+                            <i data-lucide="${katIcon}" class="w-3 h-3"></i>
                             ${this.escape(katName)}
-                            <span class="text-[10px] bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded font-mono">${katItems.length}</span>
+                            <span class="text-[9px] bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">${katItems.length}</span>
                         </h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 menu-grid">
-                            ${katItems.map(item => this.renderCard(item)).join('')}
-                        </div>
+                        ${isListView 
+                            ? `<div class="menu-list flex flex-col gap-1">${katItems.map(item => this.renderListRow(item)).join('')}</div>`
+                            : `<div class="menu-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">${katItems.map(item => this.renderCard(item)).join('')}</div>`
+                        }
                     </div>
                 `;
             });
@@ -634,72 +724,107 @@
             const icon = item.ICON || 'link';
             const isEdit = this.editMode;
             const safeUrl = this.safeUrl(item.URL);
+            const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
             
             return `
-                <div class="menu-card group relative flex flex-col p-5 bg-white dark:bg-panel border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-indigo-500/50 transition-all duration-300 card-hover" data-id="${item.ID}">
+                <div class="menu-card group relative flex flex-col p-3 bg-white dark:bg-panel border border-zinc-200 dark:border-zinc-800 rounded-lg hover:border-indigo-500/40 hover:shadow-sm transition-all duration-150" data-id="${item.ID}">
                     ${isEdit ? `
-                        <div class="drag-handle absolute top-2 left-2 p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400">
-                            <i data-lucide="grip-vertical" class="w-4 h-4"></i>
+                        <div class="drag-handle absolute top-1 left-1 p-0.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400">
+                            <i data-lucide="grip-vertical" class="w-3 h-3"></i>
                         </div>
-                        <div class="absolute top-2 right-2 flex gap-1">
-                            <button onclick="app.editLink('${item.ID}')" class="p-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500" title="Edit">
-                                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                        <div class="absolute top-1 right-1 flex gap-0.5">
+                            <button onclick="app.editLink('${item.ID}')" class="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500" title="Edit">
+                                <i data-lucide="pencil" class="w-3 h-3"></i>
                             </button>
-                            <button onclick="app.deleteLink('${item.ID}')" class="p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500" title="Hapus">
-                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            <button onclick="app.deleteLink('${item.ID}')" class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500" title="Hapus">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i>
                             </button>
                         </div>
                     ` : ''}
                     
-                    ${isPinned && !isEdit ? `<div class="absolute top-2 right-2 text-amber-400">⭐</div>` : ''}
+                    ${isPinned && !isEdit ? `<div class="absolute top-1 right-1 text-amber-400 text-xs">⭐</div>` : ''}
                     
                     <a href="${isEdit ? 'javascript:void(0)' : safeUrl}" ${!isEdit ? 'target="_blank" rel="noopener"' : ''} 
                        onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
                        class="flex flex-col flex-1 ${isEdit ? 'pointer-events-none' : ''}">
-                        <div class="flex items-start justify-between mb-4 ${isEdit ? 'mt-6' : ''}">
-                            <div class="w-12 h-12 rounded-lg flex items-center justify-center ${colorClasses}">
-                                <i data-lucide="${icon}" class="w-6 h-6"></i>
+                        <div class="flex items-start justify-between mb-2 ${isEdit ? 'mt-4' : ''}">
+                            <div class="w-8 h-8 rounded-md flex items-center justify-center ${colorClasses}">
+                                <i data-lucide="${icon}" class="w-4 h-4"></i>
                             </div>
-                            ${!isEdit ? `<i data-lucide="arrow-up-right" class="w-4 h-4 text-zinc-300 group-hover:text-indigo-500 transition"></i>` : ''}
+                            ${!isEdit ? `<i data-lucide="arrow-up-right" class="w-3 h-3 text-zinc-300 group-hover:text-indigo-500 transition"></i>` : ''}
                         </div>
-                        <h4 class="font-bold text-base text-zinc-800 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition line-clamp-1">${this.escape(item.JUDUL)}</h4>
-                        <p class="text-xs text-zinc-500 mt-1 line-clamp-2 leading-relaxed flex-1">${this.escape(item.DESKRIPSI || '')}</p>
-                        ${Number(item.CLICKS) > 0 ? `<div class="mt-2 text-[10px] text-zinc-400 font-mono">${item.CLICKS} clicks</div>` : ''}
+                        <h4 class="font-semibold text-xs text-zinc-800 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition line-clamp-1 leading-tight">${this.escape(item.JUDUL)}</h4>
+                        <p class="text-[10px] text-zinc-500 mt-0.5 line-clamp-1 leading-tight flex-1">${this.escape(item.DESKRIPSI || '')}</p>
+                        ${showClicks ? `<div class="mt-1.5 text-[9px] text-zinc-400 font-mono">${item.CLICKS} clicks</div>` : ''}
                     </a>
                 </div>
             `;
         },
         
-        renderKategoriList: function() {
-            const el = document.getElementById('kategori-list');
-            if (!el) return;
+        renderListRow: function(item) {
+            const isPinned = item.PINNED === true || item.PINNED === 'TRUE';
+            const colorClasses = this.getColorClasses(item.WARNA);
+            const icon = item.ICON || 'link';
+            const isEdit = this.editMode;
+            const safeUrl = this.safeUrl(item.URL);
+            const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
             
-            if (this.kategori.length === 0) {
-                el.innerHTML = `<p class="text-sm text-zinc-500 text-center py-4">Belum ada kategori</p>`;
-                return;
-            }
-            
-            el.innerHTML = this.kategori.map(k => `
-                <div class="flex items-center gap-2 p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
-                    <i data-lucide="${k.ICON || 'folder'}" class="w-4 h-4"></i>
-                    <span class="flex-1 font-semibold text-sm">${this.escape(k.NAMA)}</span>
-                    <button onclick="app.openKategoriForm('${k.ID}')" class="p-1.5 text-zinc-500 hover:text-indigo-600">
-                        <i data-lucide="pencil" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="app.deleteKategori('${k.ID}')" class="p-1.5 text-zinc-500 hover:text-red-500">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
+            return `
+                <div class="list-row group flex items-center gap-2 p-2 bg-white dark:bg-panel border border-zinc-200 dark:border-zinc-800 rounded-lg" data-id="${item.ID}">
+                    ${isEdit ? `<div class="drag-handle p-0.5 text-zinc-400"><i data-lucide="grip-vertical" class="w-3 h-3"></i></div>` : ''}
+                    
+                    <a href="${isEdit ? 'javascript:void(0)' : safeUrl}" ${!isEdit ? 'target="_blank" rel="noopener"' : ''} 
+                       onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
+                       class="flex items-center gap-2 flex-1 min-w-0 ${isEdit ? 'pointer-events-none' : ''}">
+                        <div class="w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${colorClasses}">
+                            <i data-lucide="${icon}" class="w-3.5 h-3.5"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                ${isPinned ? '<span class="text-amber-400 text-[10px]">⭐</span>' : ''}
+                                <h4 class="font-semibold text-xs text-zinc-800 dark:text-zinc-100 truncate">${this.escape(item.JUDUL)}</h4>
+                            </div>
+                            <p class="text-[10px] text-zinc-500 truncate">${this.escape(item.DESKRIPSI || item.URL)}</p>
+                        </div>
+                        ${showClicks ? `<span class="text-[9px] text-zinc-400 font-mono shrink-0">${item.CLICKS}</span>` : ''}
+                    </a>
+                    
+                    ${isEdit ? `
+                        <div class="flex gap-0.5 shrink-0">
+                            <button onclick="app.editLink('${item.ID}')" class="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500">
+                                <i data-lucide="pencil" class="w-3 h-3"></i>
+                            </button>
+                            <button onclick="app.deleteLink('${item.ID}')" class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
-            `).join('');
-            lucide.createIcons();
+            `;
         },
         
-        renderKategoriOptions: function() {
-            const sel = document.getElementById('link-kategori');
-            if (!sel) return;
-            sel.innerHTML = this.kategori.map(k => 
-                `<option value="${this.escape(k.NAMA)}">${this.escape(k.NAMA)}</option>`
-            ).join('') + `<option value="Lain-lain">Lain-lain</option>`;
+        // ============================================================
+        // VIEW TOGGLE
+        // ============================================================
+        toggleView: function() {
+            this.prefs.view = this.prefs.view === 'grid' ? 'list' : 'grid';
+            this.savePrefs();
+            this.updateViewIcon();
+            this.renderAll();
+            
+            const q = document.getElementById('search-input')?.value?.toLowerCase() || 
+                      document.getElementById('search-input-mobile')?.value?.toLowerCase() || '';
+            this.renderMenu(q);
+            lucide.createIcons();
+            this.toast(this.prefs.view === 'list' ? '📋 Tampilan list' : '🔲 Tampilan grid', 'info');
+        },
+        
+        updateViewIcon: function() {
+            const icon = document.getElementById('view-icon');
+            if (!icon) return;
+            const newIcon = this.prefs.view === 'grid' ? 'layout-grid' : 'layout-list';
+            icon.setAttribute('data-lucide', newIcon);
+            lucide.createIcons();
         },
         
         // ============================================================
@@ -708,18 +833,17 @@
         setupSortable: function() {
             this.sortables.forEach(s => { try { s.destroy(); } catch(e) {} });
             this.sortables = [];
-            
             if (!this.editMode) return;
             
-            document.querySelectorAll('.menu-grid').forEach(grid => {
+            document.querySelectorAll('.menu-grid, .menu-list').forEach(grid => {
                 const sortable = Sortable.create(grid, {
-                    animation: 200,
+                    animation: 180,
                     handle: '.drag-handle',
                     ghostClass: 'sortable-ghost',
                     chosenClass: 'sortable-chosen',
                     onEnd: () => {
                         const allIds = [];
-                        document.querySelectorAll('.menu-grid').forEach(g => {
+                        document.querySelectorAll('.menu-grid, .menu-list').forEach(g => {
                             g.querySelectorAll('[data-id]').forEach(el => allIds.push(el.dataset.id));
                         });
                         this.reorderMenus(allIds);
@@ -733,10 +857,10 @@
         // EDIT MODE
         // ============================================================
         toggleEditMode: function() {
-            if (!this.user) { this.toast('Login dulu untuk edit', 'warning'); return; }
+            if (!this.user) { this.toast('Login dulu', 'warning'); return; }
             const role = this.user.jabatan.toLowerCase();
             if (role !== 'super admin' && role !== 'admin') {
-                this.toast('Anda tidak punya akses edit', 'error');
+                this.toast('Tidak punya akses', 'error');
                 return;
             }
             this.editMode = !this.editMode;
@@ -749,6 +873,8 @@
         // LINK CRUD
         // ============================================================
         openLinkModal: function(id) {
+            if (!this.user) { this.toast('Login dulu', 'warning'); return; }
+            
             const modal = document.getElementById('link-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -803,23 +929,12 @@
                 status: document.getElementById('link-status').value
             };
             
-            if (!data.judul || !data.url) {
-                this.toast('Judul & URL wajib diisi', 'error');
-                return;
-            }
+            if (!data.judul || !data.url) { this.toast('Judul & URL wajib', 'error'); return; }
             
             try {
                 const u = new URL(data.url);
                 if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error();
-            } catch(e) {
-                this.toast('URL tidak valid (harus http/https)', 'error');
-                return;
-            }
-            
-            const action = id ? 'update' : 'add';
-            const payload = id 
-                ? { action, id, data, userEmail: this.user?.email }
-                : { action, data, userEmail: this.user?.email };
+            } catch(e) { this.toast('URL tidak valid', 'error'); return; }
             
             this.closeModal('link-modal');
             
@@ -829,16 +944,15 @@
                 data.CLICKS = 0;
                 data.DELETED = false;
                 this.menu.push(data);
-                this.renderAll();
                 this.queuePending({ action: 'add', tempId, data, userEmail: this.user?.email });
             } else {
                 const idx = this.menu.findIndex(m => m.ID === id);
                 if (idx >= 0) this.menu[idx] = { ...this.menu[idx], ...data };
-                this.renderAll();
                 this.queuePending({ action: 'update', id, data, userEmail: this.user?.email });
             }
             
             this.saveCache();
+            this.renderAll();
             this.syncPending();
         },
         
@@ -848,9 +962,8 @@
             if (!confirm(`Hapus "${item.JUDUL}"?`)) return;
             
             this.menu = this.menu.filter(m => m.ID !== id);
-            this.renderAll();
             this.saveCache();
-            
+            this.renderAll();
             this.queuePending({ action: 'delete', id, userEmail: this.user?.email });
             this.syncPending();
         },
@@ -866,90 +979,25 @@
         },
         
         // ============================================================
-        // KATEGORI CRUD
-        // ============================================================
-        openKategoriModal: function() {
-            const m = document.getElementById('kategori-modal');
-            m.classList.remove('hidden'); m.classList.add('flex');
-            this.renderKategoriList();
-        },
-        
-        openKategoriForm: function(id) {
-            const form = document.getElementById('kategori-form');
-            form.classList.remove('hidden');
-            
-            if (id) {
-                const k = this.kategori.find(x => x.ID === id);
-                if (!k) return;
-                document.getElementById('kat-id').value = k.ID;
-                document.getElementById('kat-nama').value = k.NAMA;
-                document.getElementById('kat-icon').value = k.ICON || 'folder';
-            } else {
-                document.getElementById('kat-id').value = '';
-                document.getElementById('kat-nama').value = '';
-                document.getElementById('kat-icon').value = 'folder';
-            }
-        },
-        
-        saveKategori: function() {
-            const id = document.getElementById('kat-id').value;
-            const nama = document.getElementById('kat-nama').value.trim();
-            const icon = document.getElementById('kat-icon').value.trim() || 'folder';
-            
-            if (!nama) { this.toast('Nama wajib', 'error'); return; }
-            
-            const data = { ID: id || null, NAMA: nama, ICON: icon };
-            this.closeModal('kategori-modal');
-            
-            if (id) {
-                const idx = this.kategori.findIndex(k => k.ID === id);
-                if (idx >= 0) this.kategori[idx] = { ...this.kategori[idx], ...data };
-            } else {
-                this.kategori.push({ ID: 'tmp-' + Date.now(), NAMA: nama, ICON: icon, WARNA: 'zinc', URUTAN: this.kategori.length + 1 });
-            }
-            this.renderAll();
-            this.saveCache();
-            
-            this.queuePending({ action: 'saveKategori', data, userEmail: this.user?.email });
-            this.syncPending();
-        },
-        
-        deleteKategori: function(id) {
-            const k = this.kategori.find(x => x.ID === id);
-            if (!k) return;
-            if (!confirm(`Hapus kategori "${k.NAMA}"?`)) return;
-            
-            this.kategori = this.kategori.filter(x => x.ID !== id);
-            this.renderAll();
-            this.saveCache();
-            
-            this.queuePending({ action: 'deleteKategori', id, userEmail: this.user?.email });
-            this.syncPending();
-        },
-        
-        // ============================================================
-        // SYNC / PENDING
+        // PENDING QUEUE
         // ============================================================
         queuePending: function(op) {
-            const queue = JSON.parse(localStorage.getItem(this.PENDING_KEY) || '[]');
+            const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
             queue.push({ ...op, queuedAt: Date.now() });
-            localStorage.setItem(this.PENDING_KEY, JSON.stringify(queue));
+            localStorage.setItem(this.KEYS.PENDING, JSON.stringify(queue));
             this.updateSyncIndicator();
         },
         
         syncPending: function() {
             if (!this.isOnline) { this.updateSyncIndicator('offline'); return; }
             
-            const queue = JSON.parse(localStorage.getItem(this.PENDING_KEY) || '[]');
-            if (queue.length === 0) { this.updateSyncIndicator('synced'); return; }
-            
-            this.updateSyncIndicator('syncing');
+            const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
+            if (queue.length === 0) { this.updateSyncIndicator(); return; }
             
             const processNext = (i) => {
                 if (i >= queue.length) {
-                    localStorage.setItem(this.PENDING_KEY, '[]');
-                    this.updateSyncIndicator('synced');
-                    this.loadData(true);
+                    localStorage.setItem(this.KEYS.PENDING, '[]');
+                    this.updateSyncIndicator();
                     return;
                 }
                 
@@ -970,31 +1018,25 @@
                         processNext(i + 1);
                     } else {
                         console.error('Sync error:', res);
-                        this.toast('Sync error: ' + res.message, 'error');
-                        const remaining = queue.slice(i + 1);
-                        localStorage.setItem(this.PENDING_KEY, JSON.stringify(remaining));
+                        localStorage.setItem(this.KEYS.PENDING, JSON.stringify(queue.slice(i + 1)));
                         this.updateSyncIndicator('error');
                     }
                 })
-                .catch(err => {
-                    console.error('Sync exception:', err);
-                    this.updateSyncIndicator('offline');
-                });
+                .catch(() => this.updateSyncIndicator('offline'));
             };
             
             processNext(0);
         },
         
         trackClick: function(id) {
+            const item = this.menu.find(m => m.ID === id);
+            if (item) item.CLICKS = (Number(item.CLICKS) || 0) + 1;
             if (!this.isOnline) return;
             fetch(this.apiURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'trackClick', id })
             }).catch(() => {});
-            
-            const item = this.menu.find(m => m.ID === id);
-            if (item) item.CLICKS = (Number(item.CLICKS) || 0) + 1;
         },
         
         // ============================================================
@@ -1003,12 +1045,13 @@
         doLogin: function() {
             const email = document.getElementById('input-email').value.trim();
             const pass = document.getElementById('input-pass').value;
+            const remember = document.getElementById('remember-me').checked;
             const btn = document.getElementById('btn-submit');
             
             if (!email || !pass) { this.toast('Email & password wajib', 'error'); return; }
             
             const orig = btn.innerHTML;
-            btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-4 h-4"></i> Verifying...`;
+            btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-3.5 h-3.5"></i> Memverifikasi...`;
             btn.disabled = true;
             lucide.createIcons();
             
@@ -1021,14 +1064,16 @@
             .then(res => {
                 if (res.status === 'success') {
                     this.user = { nama: res.nama, jabatan: res.jabatan, unit: res.unit, email: res.email };
-                    localStorage.setItem(this.SESSION_KEY, JSON.stringify(this.user));
+                    this.saveSession();
                     this.updateUIState();
                     this.renderAll();
                     this.closeModal('auth-modal');
                     this.toast('Selamat datang, ' + res.nama, 'success');
-                    this.trackLogin();
-                    this.loadData(true);
-                    setTimeout(() => this.loadFeedback(), 1000);
+                    
+                    if (remember) {
+                        this.trackLogin();
+                        this.loadFeedback(true);
+                    }
                 } else {
                     this.toast(res.message || 'Login gagal', 'error');
                 }
@@ -1043,7 +1088,7 @@
         
         doLogout: function() {
             if (!confirm('Logout dari console?')) return;
-            localStorage.removeItem(this.SESSION_KEY);
+            localStorage.removeItem(this.KEYS.SESSION);
             this.user = null;
             this.editMode = false;
             this.feedbackList = [];
@@ -1064,84 +1109,377 @@
         },
         
         // ============================================================
-        // FEEDBACK
+        // PANEL
         // ============================================================
-        openFeedbackModal: function() {
-            const m = document.getElementById('feedback-modal');
-            m.classList.remove('hidden'); m.classList.add('flex');
+        openPanel: function() {
+            const panel = document.getElementById('settings-panel');
+            panel.classList.remove('hidden');
+            this.panelOpen = true;
+            this.renderPanel();
+            lucide.createIcons();
         },
         
-        sendFeedback: function() {
-            const tipe = document.getElementById('fb-tipe').value;
-            const pesan = document.getElementById('fb-pesan').value.trim();
-            if (!pesan) { this.toast('Pesan wajib diisi', 'error'); return; }
-            if (!this.isOnline) { this.toast('Butuh koneksi', 'warning'); return; }
+        closePanel: function() {
+            const panel = document.getElementById('settings-panel');
+            const content = document.getElementById('panel-content');
+            content.classList.remove('panel-enter');
+            content.classList.add('panel-exit');
+            setTimeout(() => {
+                panel.classList.add('hidden');
+                content.classList.remove('panel-exit');
+                this.panelOpen = false;
+            }, 180);
+        },
+        
+        setPanelTab: function(tab) {
+            this.currentTab = tab;
+            this.renderPanel();
+        },
+        
+        renderPanel: function() {
+            // Update tab styles
+            document.querySelectorAll('.ptab').forEach(t => {
+                if (t.dataset.ptab === this.currentTab) {
+                    t.classList.add('ptab-active');
+                } else {
+                    t.classList.remove('ptab-active');
+                }
+            });
+            
+            const body = document.getElementById('panel-body');
+            const isLoggedIn = !!this.user;
+            const canEdit = isLoggedIn && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
+            const isSuperAdmin = isLoggedIn && this.user.jabatan.toLowerCase() === 'super admin';
+            
+            const tabs = {
+                info: () => this.renderTabInfo(canEdit),
+                kategori: () => this.renderTabKategori(canEdit),
+                users: () => this.renderTabUsers(isSuperAdmin),
+                feedback: () => this.renderTabFeedback(isSuperAdmin || (isLoggedIn && this.user.jabatan.toLowerCase() === 'admin')),
+                backup: () => this.renderTabBackup(canEdit),
+                prefs: () => this.renderTabPrefs()
+            };
+            
+            body.innerHTML = (tabs[this.currentTab] || tabs.info)();
+            lucide.createIcons();
+        },
+        
+        // ============================================================
+        // TAB: INFO
+        // ============================================================
+        renderTabInfo: function(canEdit) {
+            const info = this.info || {};
+            const disabled = canEdit ? '' : 'disabled';
+            const disabledClass = canEdit ? '' : 'opacity-60 cursor-not-allowed';
+            
+            return `
+                <div class="space-y-4">
+                    <div class="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <p class="text-[10px] text-blue-700 dark:text-blue-300">
+                            <i data-lucide="info" class="w-3 h-3 inline"></i>
+                            Banner muncul di atas halaman utama.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Status Banner</label>
+                        <select id="info-status" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass}">
+                            <option value="ON" ${info.STATUS === 'ON' ? 'selected' : ''}>ON</option>
+                            <option value="OFF" ${info.STATUS !== 'ON' ? 'selected' : ''}>OFF</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Pesan Banner</label>
+                        <textarea id="info-pesan" rows="3" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass} resize-none">${this.escape(info.PESAN || '')}</textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Warna</label>
+                        <select id="info-warna" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass}">
+                            ${['blue','green','red','yellow','indigo'].map(c => `<option value="${c}" ${info.WARNA === c ? 'selected' : ''}>${c}</option>`).join('')}
+                        </select>
+                    </div>
+                    
+                    <hr class="border-zinc-200 dark:border-zinc-800">
+                    
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Versi Aplikasi</label>
+                        <input type="text" id="info-versi" value="${this.escape(info.VERSI || '1.0')}" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass}">
+                    </div>
+                    
+                    <hr class="border-zinc-200 dark:border-zinc-800">
+                    <h4 class="text-[10px] font-bold uppercase text-zinc-500">Popup (Opsional)</h4>
+                    
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Status Popup</label>
+                        <select id="info-popup-status" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass}">
+                            <option value="ON" ${info.POPUP_STATUS === 'ON' ? 'selected' : ''}>ON</option>
+                            <option value="OFF" ${info.POPUP_STATUS !== 'ON' ? 'selected' : ''}>OFF</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Judul Popup</label>
+                        <input type="text" id="info-popup-judul" value="${this.escape(info.POPUP_JUDUL || '')}" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass}">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Pesan Popup</label>
+                        <textarea id="info-popup-pesan" rows="3" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass} resize-none">${this.escape(info.POPUP_PESAN || '')}</textarea>
+                    </div>
+                    
+                    ${canEdit ? `
+                        <button onclick="app.saveInfo()" class="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5">
+                            <i data-lucide="save" class="w-3.5 h-3.5"></i> Simpan Info
+                        </button>
+                    ` : `
+                        <p class="text-[10px] text-center text-zinc-500">Login sebagai Admin untuk mengedit</p>
+                    `}
+                </div>
+            `;
+        },
+        
+        saveInfo: function() {
+            const data = {
+                STATUS: document.getElementById('info-status').value,
+                PESAN: document.getElementById('info-pesan').value.trim(),
+                WARNA: document.getElementById('info-warna').value,
+                VERSI: document.getElementById('info-versi').value.trim(),
+                POPUP_STATUS: document.getElementById('info-popup-status').value,
+                POPUP_JUDUL: document.getElementById('info-popup-judul').value.trim(),
+                POPUP_PESAN: document.getElementById('info-popup-pesan').value.trim()
+            };
+            
+            // Update lokal
+            this.info = { ...this.info, ...data };
+            this.saveCache();
+            this.renderInfoBanner();
+            
+            this.queuePending({ action: 'saveInfo', data, userEmail: this.user?.email });
+            this.syncPending();
+            this.toast('Info disimpan', 'success');
+        },
+        
+        // ============================================================
+        // TAB: KATEGORI
+        // ============================================================
+        renderTabKategori: function(canEdit) {
+            const list = this.kategori.map(k => `
+                <div class="flex items-center gap-2 p-2 border border-zinc-200 dark:border-zinc-800 rounded-lg">
+                    <i data-lucide="${k.ICON || 'folder'}" class="w-3.5 h-3.5 text-zinc-500"></i>
+                    <span class="flex-1 font-semibold text-xs">${this.escape(k.NAMA)}</span>
+                    ${canEdit ? `
+                        <button onclick="app.editKategoriInline('${k.ID}')" class="p-1 text-zinc-400 hover:text-indigo-600">
+                            <i data-lucide="pencil" class="w-3 h-3"></i>
+                        </button>
+                        <button onclick="app.deleteKategoriInline('${k.ID}')" class="p-1 text-zinc-400 hover:text-red-500">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            return `
+                <div class="space-y-3">
+                    ${canEdit ? `
+                        <button onclick="app.addKategoriInline()" class="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah Kategori
+                        </button>
+                    ` : ''}
+                    
+                    <div class="space-y-1.5">
+                        ${list || '<p class="text-xs text-center text-zinc-500 py-4">Belum ada kategori</p>'}
+                    </div>
+                </div>
+            `;
+        },
+        
+        addKategoriInline: function() {
+            const nama = prompt('Nama kategori baru:');
+            if (!nama || !nama.trim()) return;
+            const icon = prompt('Icon (Lucide name, contoh: folder):', 'folder') || 'folder';
+            
+            const data = { ID: null, NAMA: nama.trim(), ICON: icon.trim() };
+            this.kategori.push({ ...data, ID: 'tmp-' + Date.now(), WARNA: 'zinc', URUTAN: this.kategori.length + 1 });
+            this.saveCache();
+            this.renderPanel();
+            this.renderAll();
+            
+            this.queuePending({ action: 'saveKategori', data, userEmail: this.user?.email });
+            this.syncPending();
+            this.toast('Kategori ditambahkan', 'success');
+        },
+        
+        editKategoriInline: function(id) {
+            const k = this.kategori.find(x => x.ID === id);
+            if (!k) return;
+            const nama = prompt('Nama kategori:', k.NAMA);
+            if (!nama || !nama.trim()) return;
+            const icon = prompt('Icon:', k.ICON || 'folder') || 'folder';
+            
+            const data = { ID: id, NAMA: nama.trim(), ICON: icon.trim() };
+            const idx = this.kategori.findIndex(x => x.ID === id);
+            if (idx >= 0) this.kategori[idx] = { ...this.kategori[idx], ...data };
+            this.saveCache();
+            this.renderPanel();
+            this.renderAll();
+            
+            this.queuePending({ action: 'saveKategori', data, userEmail: this.user?.email });
+            this.syncPending();
+            this.toast('Kategori diupdate', 'success');
+        },
+        
+        deleteKategoriInline: function(id) {
+            const k = this.kategori.find(x => x.ID === id);
+            if (!k) return;
+            if (!confirm(`Hapus kategori "${k.NAMA}"?`)) return;
+            
+            this.kategori = this.kategori.filter(x => x.ID !== id);
+            this.saveCache();
+            this.renderPanel();
+            this.renderAll();
+            
+            this.queuePending({ action: 'deleteKategori', id, userEmail: this.user?.email });
+            this.syncPending();
+            this.toast('Kategori dihapus', 'success');
+        },
+        
+        // ============================================================
+        // TAB: USERS
+        // ============================================================
+        renderTabUsers: function(isSuperAdmin) {
+            if (!isSuperAdmin) {
+                return `<p class="text-xs text-center text-zinc-500 py-8">Hanya Super Admin yang bisa kelola user</p>`;
+            }
+            
+            const list = this.users.map(u => `
+                <div class="flex items-center gap-2 p-2 border border-zinc-200 dark:border-zinc-800 rounded-lg">
+                    <div class="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 flex items-center justify-center text-[10px] font-bold shrink-0">
+                        ${this.escape(String(u.NAMA || u.EMAIL).substring(0, 2).toUpperCase())}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-xs truncate">${this.escape(u.NAMA || '')}</p>
+                        <p class="text-[10px] text-zinc-500 truncate">${this.escape(u.EMAIL || '')} · ${this.escape(u.JABATAN || '')}</p>
+                    </div>
+                    <button onclick="app.editUserInline('${this.escape(u.EMAIL)}')" class="p-1 text-zinc-400 hover:text-indigo-600">
+                        <i data-lucide="pencil" class="w-3 h-3"></i>
+                    </button>
+                    <button onclick="app.deleteUserInline('${this.escape(u.EMAIL)}')" class="p-1 text-zinc-400 hover:text-red-500">
+                        <i data-lucide="trash-2" class="w-3 h-3"></i>
+                    </button>
+                </div>
+            `).join('');
+            
+            return `
+                <div class="space-y-3">
+                    <button onclick="app.addUserInline()" class="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5">
+                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Tambah User
+                    </button>
+                    <div class="space-y-1.5">
+                        ${list || '<p class="text-xs text-center text-zinc-500 py-4">Belum ada user</p>'}
+                    </div>
+                </div>
+            `;
+        },
+        
+        addUserInline: function() {
+            const email = prompt('Email:');
+            if (!email) return;
+            const nama = prompt('Nama:');
+            if (!nama) return;
+            const jabatan = prompt('Jabatan (Super Admin/Admin/Operator):', 'Operator') || 'Operator';
+            const unit = prompt('Unit:', '') || '';
+            const password = prompt('Password:');
+            if (!password) return;
+            
+            const data = { EMAIL: email.toLowerCase().trim(), NAMA: nama, JABATAN: jabatan, UNIT: unit, PASSWORD: password, STATUS: 'aktif' };
+            this.users.push({ EMAIL: data.EMAIL, NAMA: nama, JABATAN: jabatan, UNIT: unit, STATUS: 'aktif' });
+            this.saveCache();
+            this.renderPanel();
             
             fetch(this.apiURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: 'saveFeedback',
-                    data: {
-                        tipe,
-                        pesan,
-                        pengirim: this.user?.nama || 'anonymous',
-                        kontak: this.user?.email || ''
-                    }
-                })
-            })
-            .then(r => r.json())
-            .then(res => {
-                if (res.status === 'success') {
-                    this.toast('Terima kasih! Feedback terkirim.', 'success');
-                    this.closeModal('feedback-modal');
-                    document.getElementById('fb-pesan').value = '';
-                } else {
-                    this.toast(res.message || 'Gagal kirim', 'error');
-                }
-            })
-            .catch(() => this.toast('Gagal terhubung ke server', 'error'));
+                body: JSON.stringify({ action: 'saveUser', data, userEmail: this.user?.email })
+            }).then(r => r.json()).then(res => {
+                this.toast(res.status === 'success' ? 'User ditambahkan' : res.message, res.status === 'success' ? 'success' : 'error');
+            }).catch(() => this.toast('Gagal', 'error'));
         },
         
-        openFeedbackList: function() {
-            const m = document.getElementById('feedback-list-modal');
-            m.classList.remove('hidden'); m.classList.add('flex');
-            this.loadFeedback();
-        },
-        
-        loadFeedback: function() {
-            const el = document.getElementById('feedback-list');
-            if (!el) return;
-            el.innerHTML = `<div class="text-center py-8"><i data-lucide="loader-2" class="animate-spin w-6 h-6 text-zinc-400"></i></div>`;
-            lucide.createIcons();
+        editUserInline: function(email) {
+            const u = this.users.find(x => x.EMAIL === email);
+            if (!u) return;
             
-            fetch(`${this.apiURL}?action=feedback&email=${encodeURIComponent(this.user?.email || '')}`)
-                .then(r => r.json())
-                .then(res => {
-                    if (res.status === 'success') {
-                        this.feedbackList = res.data || [];
-                        this.renderFeedbackList();
-                        this.updateFeedbackBadge();
-                    } else {
-                        el.innerHTML = `<p class="text-center text-sm text-red-500">${res.message}</p>`;
-                    }
-                })
-                .catch(() => {
-                    el.innerHTML = `<p class="text-center text-sm text-red-500">Gagal memuat</p>`;
-                });
+            const nama = prompt('Nama:', u.NAMA || '');
+            if (nama === null) return;
+            const jabatan = prompt('Jabatan:', u.JABATAN || 'Operator') || 'Operator';
+            const unit = prompt('Unit:', u.UNIT || '') || '';
+            const password = prompt('Password baru (kosongkan jika tidak diubah):', '');
+            const status = prompt('Status (aktif/nonaktif):', u.STATUS || 'aktif') || 'aktif';
+            
+            const data = { EMAIL: email, NAMA: nama, JABATAN: jabatan, UNIT: unit, STATUS: status };
+            if (password) data.PASSWORD = password;
+            
+            const idx = this.users.findIndex(x => x.EMAIL === email);
+            if (idx >= 0) this.users[idx] = { ...this.users[idx], NAMA: nama, JABATAN: jabatan, UNIT: unit, STATUS: status };
+            this.saveCache();
+            this.renderPanel();
+            
+            fetch(this.apiURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'saveUser', data, userEmail: this.user?.email })
+            }).then(r => r.json()).then(res => {
+                this.toast(res.status === 'success' ? 'User diupdate' : res.message, res.status === 'success' ? 'success' : 'error');
+            }).catch(() => this.toast('Gagal', 'error'));
         },
         
-        renderFeedbackList: function() {
-            const el = document.getElementById('feedback-list');
-            if (!el) return;
-            const filter = document.getElementById('fb-filter-status').value;
-            let items = this.feedbackList;
-            if (filter) items = items.filter(f => String(f.STATUS).toLowerCase() === filter);
+        deleteUserInline: function(email) {
+            if (!confirm(`Hapus user ${email}?`)) return;
             
-            if (items.length === 0) {
-                el.innerHTML = `<div class="text-center py-8 text-zinc-400"><i data-lucide="inbox" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p class="text-sm">Belum ada feedback</p></div>`;
-                lucide.createIcons();
-                return;
+            this.users = this.users.filter(x => x.EMAIL !== email);
+            this.saveCache();
+            this.renderPanel();
+            
+            fetch(this.apiURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'deleteUser', email, userEmail: this.user?.email })
+            }).then(r => r.json()).then(res => {
+                this.toast(res.status === 'success' ? 'User dihapus' : res.message, res.status === 'success' ? 'success' : 'error');
+            }).catch(() => this.toast('Gagal', 'error'));
+        },
+        
+        // ============================================================
+        // TAB: FEEDBACK
+        // ============================================================
+        renderTabFeedback: function(isAdmin) {
+            if (!isAdmin) {
+                return `
+                    <div class="space-y-3">
+                        <p class="text-xs text-zinc-500 text-center py-4">Kirim feedback ke admin:</p>
+                        <select id="fb-tipe" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm">
+                            <option value="saran">💡 Saran</option>
+                            <option value="bug">🐛 Bug</option>
+                            <option value="lain">📝 Lainnya</option>
+                        </select>
+                        <textarea id="fb-pesan" rows="4" placeholder="Tulis pesan..." class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm resize-none"></textarea>
+                        <button onclick="app.sendFeedback()" class="w-full px-3 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold">
+                            <i data-lucide="send" class="w-3.5 h-3.5 inline mr-1"></i> Kirim
+                        </button>
+                    </div>
+                `;
+            }
+            
+            // Admin view
+            if (this.feedbackList.length === 0) {
+                return `
+                    <div class="text-center py-8 text-zinc-400">
+                        <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+                        <p class="text-xs">Belum ada feedback</p>
+                    </div>
+                `;
             }
             
             const statusColor = {
@@ -1150,102 +1488,155 @@
                 diproses: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
                 selesai: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
             };
-            
             const tipeIcon = { saran: '💡', bug: '🐛', lain: '📝' };
             
-            el.innerHTML = items.map(f => `
-                <div class="p-4 border border-zinc-200 dark:border-zinc-800 rounded-lg space-y-2 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-lg">${tipeIcon[f.TIPE] || '📝'}</span>
-                            <span class="text-xs font-mono text-zinc-400">${this.escape(f.WAKTU)}</span>
-                            <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded ${statusColor[String(f.STATUS).toLowerCase()] || statusColor.baru}">${this.escape(f.STATUS || 'baru')}</span>
+            return `
+                <div class="space-y-2">
+                    <p class="text-[10px] text-zinc-500 uppercase font-bold">${this.feedbackList.length} feedback</p>
+                    ${this.feedbackList.map(f => `
+                        <div class="p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg space-y-1.5">
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span>${tipeIcon[f.TIPE] || '📝'}</span>
+                                    <span class="text-[9px] font-mono text-zinc-400">${this.escape(f.WAKTU)}</span>
+                                    <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${statusColor[String(f.STATUS).toLowerCase()] || statusColor.baru}">${this.escape(f.STATUS || 'baru')}</span>
+                                </div>
+                                <button onclick="app.deleteFeedbackInline('${f.ID}')" class="text-zinc-400 hover:text-red-500 p-0.5">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                            <p class="text-xs whitespace-pre-wrap">${this.escape(f.PESAN)}</p>
+                            <div class="flex items-center justify-between text-[10px] text-zinc-500">
+                                <span class="truncate">${this.escape(f.PENGIRIM || 'anon')}</span>
+                                <select onchange="app.updateFeedbackStatusInline('${f.ID}', this.value)" class="text-[9px] bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-1.5 py-0.5">
+                                    <option value="baru" ${f.STATUS==='baru'?'selected':''}>Baru</option>
+                                    <option value="dibaca" ${f.STATUS==='dibaca'?'selected':''}>Dibaca</option>
+                                    <option value="diproses" ${f.STATUS==='diproses'?'selected':''}>Diproses</option>
+                                    <option value="selesai" ${f.STATUS==='selesai'?'selected':''}>Selesai</option>
+                                </select>
+                            </div>
                         </div>
-                        <button onclick="app.deleteFeedback('${f.ID}')" class="text-zinc-400 hover:text-red-500 p-1">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                        </button>
-                    </div>
-                    <p class="text-sm whitespace-pre-wrap">${this.escape(f.PESAN)}</p>
-                    <div class="flex items-center justify-between text-xs text-zinc-500">
-                        <span>Dari: <strong>${this.escape(f.PENGIRIM || 'anonymous')}</strong>${f.KONTAK ? ` (${this.escape(f.KONTAK)})` : ''}</span>
-                        <select onchange="app.updateFeedbackStatus('${f.ID}', this.value)" class="text-[10px] bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-2 py-0.5 outline-none">
-                            <option value="baru" ${f.STATUS==='baru'?'selected':''}>Baru</option>
-                            <option value="dibaca" ${f.STATUS==='dibaca'?'selected':''}>Dibaca</option>
-                            <option value="diproses" ${f.STATUS==='diproses'?'selected':''}>Diproses</option>
-                            <option value="selesai" ${f.STATUS==='selesai'?'selected':''}>Selesai</option>
-                        </select>
-                    </div>
+                    `).join('')}
                 </div>
-            `).join('');
-            lucide.createIcons();
+            `;
         },
         
-        updateFeedbackStatus: function(id, status) {
+        loadFeedback: function(silent) {
+            if (!this.user || !this.isOnline) return;
+            const isAdmin = this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin';
+            if (!isAdmin) return;
+            
+            fetch(`${this.apiURL}?action=feedback&email=${encodeURIComponent(this.user.email)}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        this.feedbackList = res.data || [];
+                        this.saveCache();
+                        if (this.panelOpen && this.currentTab === 'feedback') this.renderPanel();
+                    }
+                })
+                .catch(() => {});
+        },
+        
+        sendFeedback: function() {
+            const tipe = document.getElementById('fb-tipe').value;
+            const pesan = document.getElementById('fb-pesan').value.trim();
+            if (!pesan) { this.toast('Pesan wajib', 'error'); return; }
+            
+            fetch(this.apiURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    action: 'saveFeedback',
+                    data: { tipe, pesan, pengirim: this.user?.nama || 'anon', kontak: this.user?.email || '' }
+                })
+            }).then(r => r.json()).then(res => {
+                if (res.status === 'success') {
+                    this.toast('Terima kasih!', 'success');
+                    document.getElementById('fb-pesan').value = '';
+                } else {
+                    this.toast(res.message, 'error');
+                }
+            }).catch(() => this.toast('Gagal', 'error'));
+        },
+        
+        updateFeedbackStatusInline: function(id, status) {
+            const f = this.feedbackList.find(x => x.ID === id);
+            if (f) f.STATUS = status;
+            this.saveCache();
+            
             fetch(this.apiURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'updateFeedback', id, status, userEmail: this.user?.email })
-            })
-            .then(r => r.json())
-            .then(res => {
-                if (res.status === 'success') {
-                    const f = this.feedbackList.find(x => x.ID === id);
-                    if (f) f.STATUS = status;
-                    this.renderFeedbackList();
-                    this.updateFeedbackBadge();
-                    this.toast('Status diupdate', 'success');
-                } else {
-                    this.toast(res.message, 'error');
-                }
-            })
-            .catch(() => this.toast('Gagal update', 'error'));
+            }).catch(() => {});
         },
         
-        deleteFeedback: function(id) {
-            if (!confirm('Hapus feedback ini?')) return;
+        deleteFeedbackInline: function(id) {
+            if (!confirm('Hapus feedback?')) return;
+            this.feedbackList = this.feedbackList.filter(x => x.ID !== id);
+            this.saveCache();
+            this.renderPanel();
+            
             fetch(this.apiURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ action: 'deleteFeedback', id, userEmail: this.user?.email })
-            })
-            .then(r => r.json())
-            .then(res => {
-                if (res.status === 'success') {
-                    this.feedbackList = this.feedbackList.filter(x => x.ID !== id);
-                    this.renderFeedbackList();
-                    this.updateFeedbackBadge();
-                    this.toast('Feedback dihapus', 'success');
-                } else {
-                    this.toast(res.message, 'error');
-                }
-            })
-            .catch(() => this.toast('Gagal hapus', 'error'));
+            }).catch(() => {});
         },
         
-        updateFeedbackBadge: function() {
-            const badge = document.getElementById('feedback-badge');
-            if (!badge) return;
-            const count = this.feedbackList.filter(f => String(f.STATUS).toLowerCase() === 'baru').length;
-            if (count > 0) {
-                badge.textContent = count > 9 ? '9+' : count;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
+        // ============================================================
+        // TAB: BACKUP
+        // ============================================================
+        renderTabBackup: function(canEdit) {
+            if (!canEdit) {
+                return `<p class="text-xs text-center text-zinc-500 py-8">Login sebagai Admin untuk akses backup</p>`;
             }
+            
+            const cacheSize = (localStorage.getItem(this.KEYS.CACHE) || '').length;
+            const pendingCount = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]').length;
+            const lastSync = localStorage.getItem(this.KEYS.LAST_SYNC) || '-';
+            
+            return `
+                <div class="space-y-4">
+                    <div class="p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg space-y-2 text-xs">
+                        <div class="flex justify-between"><span class="text-zinc-500">Cache size:</span><span class="font-mono">${(cacheSize/1024).toFixed(1)} KB</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Pending ops:</span><span class="font-mono">${pendingCount}</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Last sync:</span><span class="font-mono text-[10px]">${lastSync}</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Menu count:</span><span class="font-mono">${this.menu.length}</span></div>
+                    </div>
+                    
+                    <button onclick="app.exportJSON()" class="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Backup (JSON)
+                    </button>
+                    
+                    <label class="w-full px-3 py-2 bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-black rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i data-lucide="upload" class="w-3.5 h-3.5"></i> Import Backup
+                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="app.importJSON(event)">
+                    </label>
+                    
+                    <hr class="border-zinc-200 dark:border-zinc-800">
+                    
+                    <button onclick="app.clearCache()" class="w-full px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-semibold">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 inline mr-1"></i> Clear Cache & Sync Ulang
+                    </button>
+                    
+                    <button onclick="app.factoryReset()" class="w-full px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-xs font-semibold">
+                        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 inline mr-1"></i> Reset Semua Data Lokal
+                    </button>
+                </div>
+            `;
         },
         
-        // ============================================================
-        // IMPORT / EXPORT
-        // ============================================================
         exportJSON: function() {
             const data = {
-                version: '2.0',
+                version: '3.0',
                 exportedAt: new Date().toISOString(),
                 menu: this.menu,
                 kategori: this.kategori,
-                info: this.info
+                info: this.info,
+                footer: this.footer
             };
-            
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1259,34 +1650,105 @@
         importJSON: function(event) {
             const file = event.target.files[0];
             if (!file) return;
-            
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (!data.menu || !Array.isArray(data.menu)) {
-                        this.toast('File JSON tidak valid', 'error');
-                        event.target.value = '';
-                        return;
-                    }
-                    
-                    const counts = {
-                        menu: data.menu?.length || 0,
-                        kategori: data.kategori?.length || 0
-                    };
-                    
-                    if (!confirm(`Import ${counts.menu} menu & ${counts.kategori} kategori?\n\nFitur import apply sedang dikembangkan. Untuk saat ini, gunakan Google Sheet untuk import massal.`)) {
-                        event.target.value = '';
-                        return;
-                    }
-                    
-                    this.toast('Import dalam pengembangan', 'warning');
-                } catch (err) {
+                    if (!data.menu || !Array.isArray(data.menu)) throw new Error('Invalid format');
+                    this.toast(`File berisi ${data.menu.length} menu. Apply manual via Sheet untuk saat ini.`, 'warning');
+                } catch(err) {
                     this.toast('File tidak valid: ' + err.message, 'error');
                 }
                 event.target.value = '';
             };
             reader.readAsText(file);
+        },
+        
+        clearCache: function() {
+            if (!confirm('Clear cache & sync ulang dari server?')) return;
+            localStorage.removeItem(this.KEYS.CACHE);
+            localStorage.removeItem(this.KEYS.LAST_SYNC);
+            this.menu = [];
+            this.kategori = [];
+            this.saveCache();
+            this.syncNow();
+            this.closePanel();
+        },
+        
+        factoryReset: function() {
+            if (!confirm('Reset SEMUA data lokal? Anda akan logout.')) return;
+            if (!confirm('Yakin? Tindakan ini tidak bisa dibatalkan.')) return;
+            Object.values(this.KEYS).forEach(k => localStorage.removeItem(k));
+            location.reload();
+        },
+        
+        // ============================================================
+        // TAB: PREFERENSI
+        // ============================================================
+        renderTabPrefs: function() {
+            const p = this.prefs;
+            return `
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Tampilan Default</label>
+                        <div class="flex gap-2">
+                            <button onclick="app.setPref('view','grid')" class="flex-1 px-3 py-2 rounded-lg text-xs font-semibold border ${p.view==='grid' ? 'bg-indigo-600 text-white border-indigo-600' : 'border-zinc-300 dark:border-zinc-700'}">
+                                <i data-lucide="layout-grid" class="w-3.5 h-3.5 inline mr-1"></i> Grid
+                            </button>
+                            <button onclick="app.setPref('view','list')" class="flex-1 px-3 py-2 rounded-lg text-xs font-semibold border ${p.view==='list' ? 'bg-indigo-600 text-white border-indigo-600' : 'border-zinc-300 dark:border-zinc-700'}">
+                                <i data-lucide="layout-list" class="w-3.5 h-3.5 inline mr-1"></i> List
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <label class="flex items-center justify-between p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
+                        <div>
+                            <p class="text-xs font-semibold">Tampilkan Click Counter</p>
+                            <p class="text-[10px] text-zinc-500">Statistik klik pada card</p>
+                        </div>
+                        <input type="checkbox" ${p.showClicks ? 'checked' : ''} onchange="app.setPref('showClicks', this.checked)" class="w-4 h-4 rounded">
+                    </label>
+                    
+                    <label class="flex items-center justify-between p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
+                        <div>
+                            <p class="text-xs font-semibold">Tampilkan Banner Info</p>
+                            <p class="text-[10px] text-zinc-500">Banner pengumuman di atas</p>
+                        </div>
+                        <input type="checkbox" ${p.showBanner ? 'checked' : ''} onchange="app.setPref('showBanner', this.checked)" class="w-4 h-4 rounded">
+                    </label>
+                    
+                    <label class="flex items-center justify-between p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
+                        <div>
+                            <p class="text-xs font-semibold">Auto Sync</p>
+                            <p class="text-[10px] text-zinc-500">Sync otomatis tiap ${p.autoSyncInterval} menit</p>
+                        </div>
+                        <input type="checkbox" ${p.autoSync ? 'checked' : ''} onchange="app.setPref('autoSync', this.checked)" class="w-4 h-4 rounded">
+                    </label>
+                    
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Interval Auto Sync (menit)</label>
+                        <input type="number" min="1" max="60" value="${p.autoSyncInterval}" onchange="app.setPref('autoSyncInterval', Number(this.value))" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    
+                    <hr class="border-zinc-200 dark:border-zinc-800">
+                    
+                    <div class="p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg">
+                        <p class="text-[10px] text-zinc-500 mb-2">💡 <strong>Tips:</strong> Aplikasi tidak akan refresh otomatis saat dibuka. Data ditampilkan dari cache terakhir. Klik tombol Sync (🔄) untuk memperbarui.</p>
+                    </div>
+                </div>
+            `;
+        },
+        
+        setPref: function(key, value) {
+            this.prefs[key] = value;
+            this.savePrefs();
+            this.renderPanel();
+            
+            if (key === 'view') {
+                this.updateViewIcon();
+                this.renderAll();
+            }
+            if (key === 'showClicks' || key === 'showBanner') this.renderAll();
         },
         
         // ============================================================
@@ -1295,72 +1757,35 @@
         updateUIState: function() {
             const isLoggedIn = !!this.user;
             const canEdit = isLoggedIn && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
-            const isSuperAdmin = isLoggedIn && this.user.jabatan.toLowerCase() === 'super admin';
             
-            // Profile views
             document.getElementById('form-login').classList.toggle('hidden', isLoggedIn);
             document.getElementById('view-profile').classList.toggle('hidden', !isLoggedIn);
-            document.getElementById('dashboard-header').classList.toggle('hidden', !isLoggedIn);
-            document.getElementById('feedback-link').classList.toggle('hidden', !isLoggedIn);
             
-            // Navbar
             const navBadge = document.getElementById('nav-role-badge');
             const authText = document.getElementById('btn-auth-text');
-            const editBtn = document.getElementById('btn-edit-mode');
-            const katBtn = document.getElementById('btn-kategori');
-            const fbBtn = document.getElementById('btn-feedback-admin');
-            const ieGroup = document.getElementById('import-export-group');
-            const btnTambah = document.getElementById('btn-tambah-link');
+            const btnTambah = document.getElementById('btn-tambah');
             
             if (isLoggedIn) {
                 navBadge.innerText = this.user.jabatan;
-                navBadge.className = "text-[10px] font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-bold";
-                authText.innerText = "Account";
+                navBadge.className = "text-[9px] font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-bold hidden sm:inline";
+                authText.innerText = this.user.nama.split(' ')[0];
                 
-                document.getElementById('user-display-name').innerText = this.user.nama;
                 document.getElementById('prof-name').innerText = this.user.nama;
                 document.getElementById('prof-role').innerText = this.user.jabatan;
                 document.getElementById('prof-unit').innerText = this.user.unit || '-';
                 document.getElementById('prof-email').innerText = this.user.email || '-';
                 
                 if (canEdit) {
-                    editBtn.classList.remove('hidden');
-                    editBtn.classList.add('flex');
-                    editBtn.className = this.editMode
-                        ? "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 text-white shadow-sm"
-                        : "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 hover:opacity-80 transition";
+                    btnTambah.classList.remove('hidden');
                 } else {
-                    editBtn.classList.add('hidden');
-                    editBtn.classList.remove('flex');
-                    this.editMode = false;
-                }
-                
-                // Feedback admin
-                if (isSuperAdmin || this.user.jabatan.toLowerCase() === 'admin') {
-                    fbBtn.classList.remove('hidden');
-                    fbBtn.classList.add('flex');
-                } else {
-                    fbBtn.classList.add('hidden');
-                    fbBtn.classList.remove('flex');
+                    btnTambah.classList.add('hidden');
                 }
             } else {
-                navBadge.innerText = "Guest Access";
-                navBadge.className = "text-[10px] font-mono uppercase tracking-wider text-zinc-500 font-semibold";
+                navBadge.innerText = "Guest";
+                navBadge.className = "text-[9px] font-mono uppercase tracking-wider text-zinc-500 font-semibold hidden sm:inline";
                 authText.innerText = "Login";
-                editBtn.classList.add('hidden'); editBtn.classList.remove('flex');
-                fbBtn.classList.add('hidden'); fbBtn.classList.remove('flex');
-                this.editMode = false;
-            }
-            
-            // Edit-mode only buttons
-            if (canEdit && this.editMode) {
-                katBtn.classList.remove('hidden'); katBtn.classList.add('flex');
-                ieGroup.classList.remove('hidden'); ieGroup.classList.add('flex');
-                btnTambah.classList.remove('hidden');
-            } else {
-                katBtn.classList.add('hidden'); katBtn.classList.remove('flex');
-                ieGroup.classList.add('hidden'); ieGroup.classList.remove('flex');
                 btnTambah.classList.add('hidden');
+                this.editMode = false;
             }
             
             lucide.createIcons();
@@ -1369,19 +1794,41 @@
         updateSyncIndicator: function(state) {
             const dot = document.getElementById('sync-dot');
             const text = document.getElementById('sync-text');
-            const queue = JSON.parse(localStorage.getItem(this.PENDING_KEY) || '[]');
+            const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
+            const lastSync = localStorage.getItem(this.KEYS.LAST_SYNC);
             
             const s = state || (this.isOnline ? 'synced' : 'offline');
             const states = {
-                synced: { color: 'bg-emerald-500', label: 'Synced' },
-                syncing: { color: 'bg-amber-500 sync-pulse', label: 'Syncing...' },
-                offline: { color: 'bg-zinc-400', label: 'Offline' },
-                error: { color: 'bg-red-500', label: 'Sync error' }
+                synced: { color: 'bg-emerald-500' },
+                syncing: { color: 'bg-amber-500 sync-pulse' },
+                offline: { color: 'bg-zinc-400' },
+                error: { color: 'bg-red-500' }
             };
             
             const cfg = states[s] || states.synced;
             dot.className = 'w-1.5 h-1.5 rounded-full ' + cfg.color;
-            text.innerText = queue.length > 0 && s !== 'syncing' ? `${cfg.label} (${queue.length})` : cfg.label;
+            
+            let label = 'Baru saja';
+            if (queue.length > 0) label = `Pending (${queue.length})`;
+            else if (!this.isOnline) label = 'Offline';
+            else if (lastSync) {
+                const ago = this.timeAgo(lastSync);
+                label = ago;
+            }
+            
+            text.innerText = label;
+        },
+        
+        timeAgo: function(isoString) {
+            if (!isoString) return 'Belum sync';
+            try {
+                const d = new Date(isoString.replace(' ', 'T'));
+                const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+                if (diff < 60) return 'Baru saja';
+                if (diff < 3600) return `${Math.floor(diff/60)}m lalu`;
+                if (diff < 86400) return `${Math.floor(diff/3600)}j lalu`;
+                return `${Math.floor(diff/86400)}h lalu`;
+            } catch(e) { return 'Belum sync'; }
         },
         
         openAuthModal: function() {
@@ -1396,31 +1843,29 @@
         
         toggleTheme: function() {
             const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            localStorage.setItem(this.KEYS.THEME, isDark ? 'dark' : 'light');
         },
         
         toast: function(msg, type) {
             const colors = {
-                success: 'bg-emerald-500',
-                error: 'bg-red-500',
-                warning: 'bg-amber-500',
-                info: 'bg-zinc-800 dark:bg-zinc-700'
+                success: 'bg-emerald-500', error: 'bg-red-500',
+                warning: 'bg-amber-500', info: 'bg-zinc-800 dark:bg-zinc-700'
             };
             const icons = { success: 'check-circle', error: 'alert-circle', warning: 'alert-triangle', info: 'info' };
             
             const el = document.createElement('div');
-            el.className = `toast ${colors[type] || colors.info} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 text-sm font-semibold max-w-sm`;
-            el.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="w-4 h-4 shrink-0"></i><span class="flex-1">${this.escape(msg)}</span>`;
+            el.className = `toast ${colors[type] || colors.info} text-white px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 text-xs font-semibold`;
+            el.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="w-3.5 h-3.5 shrink-0"></i><span class="flex-1">${this.escape(msg)}</span>`;
             
             document.getElementById('toast-container').appendChild(el);
             lucide.createIcons();
             
             setTimeout(() => {
-                el.style.transition = 'all 0.3s';
+                el.style.transition = 'all 0.25s';
                 el.style.opacity = '0';
                 el.style.transform = 'translateX(100%)';
-                setTimeout(() => el.remove(), 300);
-            }, 3000);
+                setTimeout(() => el.remove(), 250);
+            }, 2500);
         },
         
         // ============================================================
@@ -1436,7 +1881,7 @@
                 grid.innerHTML = list.map(ic => `
                     <div class="icon-btn ${document.getElementById('link-icon').value === ic ? 'selected' : ''}" 
                          onclick="app.selectIcon('${ic}')" title="${ic}">
-                        <i data-lucide="${ic}" class="w-5 h-5"></i>
+                        <i data-lucide="${ic}" class="w-4 h-4"></i>
                     </div>
                 `).join('');
                 lucide.createIcons();
@@ -1456,14 +1901,12 @@
         setupColorPicker: function() {
             const picker = document.getElementById('color-picker');
             if (!picker) return;
-            
             const colorMap = {
                 zinc: 'bg-zinc-400', blue: 'bg-blue-500', red: 'bg-red-500', green: 'bg-green-500',
                 emerald: 'bg-emerald-500', rose: 'bg-rose-500', yellow: 'bg-yellow-500', indigo: 'bg-indigo-500',
                 purple: 'bg-purple-500', orange: 'bg-orange-500', pink: 'bg-pink-500', sky: 'bg-sky-500',
                 teal: 'bg-teal-500', violet: 'bg-violet-500'
             };
-            
             picker.innerHTML = this.COLORS.map(c => `
                 <div class="color-dot ${colorMap[c]}" data-color="${c}" onclick="app.selectColor('${c}')" title="${c}"></div>
             `).join('');
