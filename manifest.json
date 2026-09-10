@@ -1,7 +1,7 @@
 {
   "name": "Super Admin Console",
-  "short_name": "AdminConsole",
-  "description": "Launcher & Admin Console Super App",
+  "short_name": "Console",
+  "description": "Launcher & Admin Console v3.0",
   "start_url": "./admin.html",
   "display": "standalone",
   "background_color": "#09090b",
