@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="theme-color" content="#0a0a0a">
-    <meta name="description" content="Super Admin Console v3.2">
+    <meta name="description" content="Super Admin Console v3.3">
     <title>Console</title>
     
     <link rel="manifest" href="manifest.json">
@@ -129,6 +129,8 @@
         
         @keyframes forceSpin { 100% { transform: rotate(360deg); } }
         .force-spin { animation: forceSpin 1s linear infinite; }
+        
+        .edit-mode-active { background: #fcd34d !important; color: #0a0a0a !important; box-shadow: 0 10px 15px -3px rgba(252, 211, 77, 0.3); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col relative transition-colors duration-200">
@@ -175,6 +177,9 @@
                     <button id="btn-tambah" onclick="app.openLinkModal()" class="hidden items-center gap-1 px-3 py-1.5 bg-accent hover:bg-accent-hover text-black rounded-full text-xs font-bold transition shadow-lg shadow-accent/20" title="Tambah link">
                         <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                         <span class="hidden sm:inline">Tambah</span>
+                    </button>
+                    <button id="btn-edit-mode" onclick="app.toggleEditMode()" class="hidden p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Edit Mode">
+                        <i data-lucide="pencil" class="w-4 h-4"></i>
                     </button>
                     <button onclick="app.toggleTheme()" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition">
                         <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
@@ -395,7 +400,7 @@
 
     <script>
     // ============================================================
-    // APP v3.2 — With Force Sync
+    // APP v3.3 — Fixed Edit Mode
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
@@ -443,7 +448,6 @@
                 navigator.serviceWorker.register('sw.js').catch(() => {});
             }
             
-            // Deteksi Force Sync baru selesai
             const forceSyncFlag = sessionStorage.getItem('force_sync_done');
             if (forceSyncFlag) {
                 sessionStorage.removeItem('force_sync_done');
@@ -456,7 +460,6 @@
                 }, 1200);
             }
             
-            // Theme — default DARK
             const savedTheme = localStorage.getItem(this.KEYS.THEME);
             if(savedTheme === 'light') {
                 document.documentElement.classList.remove('dark');
@@ -601,7 +604,7 @@
         },
         
         // ============================================================
-        // FORCE SYNC — Reset penuh + ambil versi terbaru
+        // FORCE SYNC
         // ============================================================
         forceSync: function() {
             if (!this.user) { this.toast('Login dulu untuk Force Sync', 'warning'); return; }
@@ -648,23 +651,19 @@
             this.toast('Memproses Force Sync...', 'info');
             this.updateSyncIndicator('syncing');
             
-            // Tombol force sync di navbar — animasi
             const btnFS = document.getElementById('btn-force-sync');
             if (btnFS) btnFS.querySelector('i').classList.add('force-spin');
             
-            // Clear all caches (Cache Storage API)
             const clearCaches = (typeof caches !== 'undefined') ? 
                 caches.keys().then(names => 
                     Promise.all(names.map(name => caches.delete(name)))
                 ) : Promise.resolve();
             
-            // Unregister service worker
             const unregisterSW = ('serviceWorker' in navigator) ?
                 navigator.serviceWorker.getRegistrations().then(regs => 
                     Promise.all(regs.map(reg => reg.unregister()))
                 ) : Promise.resolve();
             
-            // Hapus cache keys (kecuali session, prefs, theme)
             const keysToKeep = [this.KEYS.SESSION, this.KEYS.PREFS, this.KEYS.THEME];
             Object.values(this.KEYS).forEach(k => {
                 if (!keysToKeep.includes(k)) {
@@ -676,7 +675,6 @@
                 .then(() => {
                     console.log('[Force Sync] Cache & SW cleared');
                     sessionStorage.setItem('force_sync_done', Date.now().toString());
-                    
                     setTimeout(() => {
                         const url = new URL(window.location.href);
                         url.searchParams.set('_fs', Date.now());
@@ -953,14 +951,20 @@
             });
         },
         
+        // ============================================================
+        // EDIT MODE
+        // ============================================================
         toggleEditMode: function() {
-            if (!this.user) { this.toast('Login dulu', 'warning'); return; }
+            if (!this.user) { this.toast('Login dulu untuk edit', 'warning'); return; }
             const role = this.user.jabatan.toLowerCase();
-            if (role !== 'super admin' && role !== 'admin') { this.toast('Tidak punya akses', 'error'); return; }
+            if (role !== 'super admin' && role !== 'admin') { 
+                this.toast('Anda tidak punya akses edit', 'error'); 
+                return; 
+            }
             this.editMode = !this.editMode;
             this.updateUIState();
             this.renderAll();
-            this.toast(this.editMode ? 'Edit mode aktif' : 'Edit mode nonaktif', 'info');
+            this.toast(this.editMode ? '🔓 Edit mode aktif — klik card untuk edit/hapus' : '🔒 Edit mode nonaktif', 'info');
         },
         
         // ============================================================
@@ -1044,6 +1048,7 @@
             this.saveCache();
             this.renderAll();
             this.syncPending();
+            this.toast(id ? 'Link diupdate' : 'Link ditambahkan', 'success');
         },
         
         deleteLink: function(id) {
@@ -1055,6 +1060,7 @@
             this.renderAll();
             this.queuePending({ action: 'delete', id, userEmail: this.user?.email });
             this.syncPending();
+            this.toast('Link dihapus', 'success');
         },
         
         reorderMenus: function(ids) {
@@ -1106,6 +1112,7 @@
                     } else {
                         localStorage.setItem(this.KEYS.PENDING, JSON.stringify(queue.slice(i + 1)));
                         this.updateSyncIndicator('error');
+                        console.error('Sync error:', res);
                     }
                 })
                 .catch(() => this.updateSyncIndicator('offline'));
@@ -1569,7 +1576,6 @@
                         <div class="flex justify-between"><span class="text-zinc-500">Total menu</span><span class="font-mono text-white">${this.menu.length}</span></div>
                     </div>
                     
-                    <!-- FORCE SYNC -->
                     <div class="p-4 bg-accent/5 border border-accent/20 rounded-2xl">
                         <div class="flex items-start gap-3 mb-3">
                             <div class="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
@@ -1611,7 +1617,7 @@
         },
         
         exportJSON: function() {
-            const data = { version: '3.2', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
+            const data = { version: '3.3', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1723,7 +1729,7 @@
         },
         
         // ============================================================
-        // UI
+        // UI STATE
         // ============================================================
         updateUIState: function() {
             const isLoggedIn = !!this.user;
@@ -1736,6 +1742,7 @@
             const authText = document.getElementById('btn-auth-text');
             const btnTambah = document.getElementById('btn-tambah');
             const btnForceSync = document.getElementById('btn-force-sync');
+            const btnEditMode = document.getElementById('btn-edit-mode');
             
             if (isLoggedIn) {
                 navBadge.innerText = this.user.jabatan;
@@ -1745,12 +1752,22 @@
                 document.getElementById('prof-role').innerText = this.user.jabatan;
                 document.getElementById('prof-unit').innerText = this.user.unit || '-';
                 document.getElementById('prof-email').innerText = this.user.email || '-';
+                
                 if (canEdit) {
                     btnTambah.classList.remove('hidden');
                     btnForceSync.classList.remove('hidden');
+                    btnEditMode.classList.remove('hidden');
+                    
+                    // Update style tombol Edit Mode
+                    if (this.editMode) {
+                        btnEditMode.className = "p-2 text-black bg-accent rounded-xl shadow-lg shadow-accent/20 transition";
+                    } else {
+                        btnEditMode.className = "p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition";
+                    }
                 } else {
                     btnTambah.classList.add('hidden');
                     btnForceSync.classList.add('hidden');
+                    btnEditMode.classList.add('hidden');
                 }
             } else {
                 navBadge.innerText = "Guest";
@@ -1758,6 +1775,7 @@
                 authText.innerText = "Login";
                 btnTambah.classList.add('hidden');
                 btnForceSync.classList.add('hidden');
+                btnEditMode.classList.add('hidden');
                 this.editMode = false;
             }
             lucide.createIcons();
