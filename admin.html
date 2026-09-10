@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta name="theme-color" content="#18181b">
-    <meta name="description" content="Super Admin Console v3.0">
-    <title>Admin Console v3.0</title>
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="description" content="Super Admin Console v3.1">
+    <title>Console</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png">
@@ -19,11 +19,22 @@
             theme: {
                 extend: {
                     colors: {
-                        bgdark: '#09090b',
-                        panel: '#18181b',
-                        border: '#27272a',
+                        ink: {
+                            950: '#0a0a0a',
+                            900: '#141416',
+                            850: '#1a1a1c',
+                            800: '#1c1c1e',
+                            750: '#232326',
+                            700: '#2a2a2e',
+                            600: '#3a3a3f',
+                        },
+                        accent: {
+                            DEFAULT: '#fcd34d',
+                            hover: '#fbbf24',
+                            dim: '#eab308',
+                        }
                     },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
                 }
             }
         }
@@ -32,127 +43,174 @@
     
     <style>
         * { -webkit-tap-highlight-color: transparent; }
-        body { background-color: #fafafa; font-family: 'Inter', sans-serif; }
-        .dark body { background-color: #09090b; }
-        .bg-grid { background-image: radial-gradient(#a1a1aa 1px, transparent 1px); background-size: 24px 24px; opacity: 0.1; }
-        .dark .bg-grid { background-image: radial-gradient(#3f3f46 1px, transparent 1px); opacity: 0.08; }
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-        .dark .glass { background: rgba(9, 9, 11, 0.9); }
+        html, body { background-color: #0a0a0a; }
+        body { font-family: 'Inter', sans-serif; color: #e4e4e7; }
         
-        /* Compact cards */
-        .card-compact { padding: 12px; }
-        .card-compact:hover { transform: translateY(-1px); }
+        /* Subtle noise texture */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 3px 3px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* Light mode */
+        html:not(.dark) body { background-color: #f5f5f7; color: #18181b; }
+        html:not(.dark) body::before { background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px); }
+        html:not(.dark) .bg-ink-950 { background-color: #f5f5f7 !important; }
+        html:not(.dark) .bg-ink-900 { background-color: #ffffff !important; }
+        html:not(.dark) .bg-ink-800 { background-color: #ffffff !important; }
+        html:not(.dark) .bg-ink-850 { background-color: #fafafa !important; }
+        html:not(.dark) .border-ink-700 { border-color: #e4e4e7 !important; }
+        html:not(.dark) .border-ink-800 { border-color: #e4e4e7 !important; }
+        html:not(.dark) .text-white { color: #18181b !important; }
+        html:not(.dark) .text-zinc-400 { color: #71717a !important; }
+        html:not(.dark) .text-zinc-500 { color: #71717a !important; }
+        html:not(.dark) .text-zinc-300 { color: #3f3f46 !important; }
+        html:not(.dark) .text-zinc-200 { color: #27272a !important; }
+        html:not(.dark) .text-zinc-100 { color: #18181b !important; }
+        
+        /* Glass navbar */
+        .glass { background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); }
+        html:not(.dark) .glass { background: rgba(255, 255, 255, 0.85); }
+        
+        /* Glow effect untuk icon circle */
+        .icon-glow {
+            position: relative;
+        }
+        .icon-glow::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: inherit;
+            background: currentColor;
+            opacity: 0.25;
+            filter: blur(12px);
+            z-index: -1;
+        }
+        
+        /* Card hover */
+        .card-link {
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        @media (hover: hover) {
+            .card-link:hover { transform: translateY(-2px); }
+            .card-link:hover .card-inner { background: #232326; }
+        }
+        html:not(.dark) .card-link:hover .card-inner { background: #f4f4f5; }
         
         /* Sortable */
-        .sortable-ghost { opacity: 0.3; background: #818cf8 !important; }
-        .sortable-chosen { transform: scale(1.03); z-index: 100; }
+        .sortable-ghost { opacity: 0.3; background: rgba(252, 211, 77, 0.3) !important; }
+        .sortable-chosen { transform: scale(1.03) rotate(1deg); z-index: 100; }
         .drag-handle { cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
         
         /* Modal */
-        .modal-enter { animation: modalIn 0.18s ease-out; }
-        @keyframes modalIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+        .modal-enter { animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         
         /* Panel slide */
-        .panel-enter { animation: panelIn 0.22s ease-out; }
+        .panel-enter { animation: panelIn 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes panelIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .panel-exit { animation: panelOut 0.2s ease-in forwards; }
+        .panel-exit { animation: panelOut 0.22s ease-in forwards; }
         @keyframes panelOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
         
         /* Toast */
-        .toast { animation: slideIn 0.25s ease-out; }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
         /* Icon picker */
-        .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 4px; max-height: 180px; overflow-y: auto; padding: 8px; border: 1px solid #e4e4e7; border-radius: 8px; }
-        .dark .icon-grid { border-color: #27272a; }
-        .icon-btn { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; transition: all 0.12s; }
-        .icon-btn:hover { background: #f4f4f5; }
-        .dark .icon-btn:hover { background: #27272a; }
-        .icon-btn.selected { background: #4f46e5; color: white; }
+        .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; max-height: 180px; overflow-y: auto; padding: 8px; border: 1px solid #232326; border-radius: 14px; background: #141416; }
+        html:not(.dark) .icon-grid { background: #fafafa; border-color: #e4e4e7; }
+        .icon-btn { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: #a1a1aa; }
+        .icon-btn:hover { background: #232326; color: #fcd34d; }
+        html:not(.dark) .icon-btn:hover { background: #f4f4f5; }
+        .icon-btn.selected { background: #fcd34d; color: #0a0a0a; }
         
         /* Color picker */
-        .color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.12s; }
+        .color-dot { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
         .color-dot:hover { transform: scale(1.15); }
-        .color-dot.selected { border-color: #18181b; transform: scale(1.15); }
-        .dark .color-dot.selected { border-color: white; }
+        .color-dot.selected { border-color: #fcd34d; transform: scale(1.15); }
         
         /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
-        .dark ::-webkit-scrollbar-thumb { background: #3f3f46; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 3px; }
+        html:not(.dark) ::-webkit-scrollbar-thumb { background: #d4d4d8; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a3a3f; }
         
-        /* List view */
-        .list-row { transition: all 0.12s; }
-        .list-row:hover { background: #f4f4f5; }
-        .dark .list-row:hover { background: rgba(39, 39, 42, 0.5); }
-        
-        /* Sync dot pulse */
+        /* Pulse sync */
         @keyframes syncPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .sync-pulse { animation: syncPulse 1.2s ease-in-out infinite; }
-        
-        /* Panel tab active */
-        .ptab-active { background: #4f46e5; color: white; }
         
         /* Line clamp */
         .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
         .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        /* Tab active */
+        .ptab-active { background: #fcd34d; color: #0a0a0a; font-weight: 700; }
+        
+        /* Hide scrollbar for tab row */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="text-zinc-800 dark:text-zinc-200 min-h-screen flex flex-col transition-colors duration-200 relative">
+<body class="min-h-screen flex flex-col relative transition-colors duration-200">
 
-    <div class="fixed inset-0 bg-grid pointer-events-none z-0"></div>
-
-    <!-- ============ NAVBAR (COMPACT) ============ -->
-    <nav class="sticky top-0 z-40 w-full border-b border-zinc-200 dark:border-border glass">
+    <!-- ============ NAVBAR ============ -->
+    <nav class="sticky top-0 z-40 w-full glass border-b border-ink-800/50">
         <div class="max-w-[1600px] mx-auto px-3 sm:px-4">
             <div class="flex items-center justify-between h-14 gap-2">
                 
-                <!-- Left: Logo & Brand -->
-                <div class="flex items-center gap-2 min-w-0">
-                    <div class="w-7 h-7 rounded bg-zinc-900 dark:bg-white flex items-center justify-center shrink-0">
-                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-5 h-5 object-contain" alt="Logo">
+                <!-- Logo -->
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-9 h-9 rounded-2xl bg-accent flex items-center justify-center shrink-0 shadow-lg shadow-accent/20">
+                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-6 h-6 object-contain" alt="Logo">
                     </div>
                     <div class="min-w-0">
                         <div class="flex items-center gap-1.5">
-                            <h1 class="font-bold text-sm tracking-tight leading-none dark:text-white truncate">Console</h1>
+                            <h1 class="font-bold text-sm tracking-tight leading-none text-white">Console</h1>
                             <span id="nav-role-badge" class="text-[9px] font-mono uppercase tracking-wider text-zinc-500 font-semibold hidden sm:inline">Guest</span>
                         </div>
                         <div class="flex items-center gap-1.5 mt-0.5">
-                            <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            <span id="sync-text" class="text-[9px] font-mono text-zinc-400 truncate">Baru saja</span>
+                            <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span id="sync-text" class="text-[9px] font-mono text-zinc-500 truncate">Baru saja</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Center: Search -->
+                <!-- Search desktop -->
                 <div class="hidden md:flex flex-1 max-w-md mx-4">
                     <div class="relative w-full">
-                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"></i>
-                        <input type="text" id="search-input" placeholder="Cari..." 
-                            class="w-full pl-8 pr-3 py-1.5 bg-zinc-100 dark:bg-zinc-900 border border-transparent focus:border-indigo-500 rounded-lg text-xs outline-none transition">
+                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+                        <input type="text" id="search-input" placeholder="Cari menu..." 
+                            class="w-full pl-9 pr-3 py-2 bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl text-xs text-white placeholder-zinc-500 outline-none transition">
                     </div>
                 </div>
 
-                <!-- Right: Actions -->
+                <!-- Actions -->
                 <div class="flex items-center gap-1">
-                    <button onclick="app.toggleView()" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800" title="Ganti tampilan">
+                    <button onclick="app.toggleView()" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Ganti tampilan">
                         <i data-lucide="layout-grid" id="view-icon" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="app.syncNow()" id="btn-sync" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800" title="Sync sekarang">
+                    <button onclick="app.syncNow()" id="btn-sync" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Sync">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
-                    <button id="btn-tambah" onclick="app.openLinkModal()" class="hidden p-1.5 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg" title="Tambah link">
-                        <i data-lucide="plus" class="w-4 h-4"></i>
+                    <button id="btn-tambah" onclick="app.openLinkModal()" class="hidden items-center gap-1 px-3 py-1.5 bg-accent hover:bg-accent-hover text-black rounded-full text-xs font-bold transition shadow-lg shadow-accent/20" title="Tambah link">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span class="hidden sm:inline">Tambah</span>
                     </button>
-                    <button onclick="app.toggleTheme()" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                    <button onclick="app.toggleTheme()" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition">
                         <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
                         <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
                     </button>
-                    <button onclick="app.openPanel()" class="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800" title="Pengaturan">
+                    <button onclick="app.openPanel()" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Pengaturan">
                         <i data-lucide="settings-2" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="app.openAuthModal()" class="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900 text-white dark:bg-white dark:text-black hover:opacity-90 transition">
+                    <button onclick="app.openAuthModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold bg-ink-800 hover:bg-ink-750 text-white transition ml-0.5 border border-ink-700">
                         <i data-lucide="user-circle" class="w-3.5 h-3.5"></i>
                         <span id="btn-auth-text" class="hidden sm:inline">Login</span>
                     </button>
@@ -160,130 +218,122 @@
             </div>
         </div>
         
-        <!-- Mobile search bar -->
-        <div class="md:hidden px-3 pb-2">
+        <!-- Mobile search -->
+        <div class="md:hidden px-3 pb-2.5">
             <div class="relative w-full">
-                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400"></i>
-                <input type="text" id="search-input-mobile" placeholder="Cari..." 
-                    class="w-full pl-8 pr-3 py-1.5 bg-zinc-100 dark:bg-zinc-900 border border-transparent focus:border-indigo-500 rounded-lg text-xs outline-none transition">
+                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+                <input type="text" id="search-input-mobile" placeholder="Cari menu..." 
+                    class="w-full pl-9 pr-3 py-2 bg-ink-850 border border-ink-750 focus:border-accent/50 rounded-2xl text-xs text-white placeholder-zinc-500 outline-none transition">
             </div>
         </div>
     </nav>
 
-    <!-- ============ MAIN CONTENT ============ -->
-    <main class="flex-1 relative z-10 p-3 sm:p-4 max-w-[1600px] mx-auto w-full">
+    <!-- ============ MAIN ============ -->
+    <main class="flex-1 relative z-10 p-3 sm:p-5 max-w-[1600px] mx-auto w-full">
+        <div id="info-banner" class="hidden mb-4"></div>
         
-        <!-- Info banner (jika ada) -->
-        <div id="info-banner" class="hidden mb-3"></div>
-        
-        <!-- Content container -->
         <div id="content-container">
-            <div class="flex flex-col items-center justify-center py-16 text-zinc-400">
-                <i data-lucide="loader" class="w-6 h-6 animate-spin mb-2"></i>
-                <span class="text-xs font-mono">MEMUAT...</span>
+            <div class="flex flex-col items-center justify-center py-20 text-zinc-500">
+                <i data-lucide="loader" class="w-6 h-6 animate-spin mb-3 text-accent"></i>
+                <span class="text-xs font-mono uppercase tracking-wider">Memuat...</span>
             </div>
-        </div>
-        
-        <!-- Empty state placeholder -->
-        <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-zinc-400">
-            <i data-lucide="inbox" class="w-10 h-10 mb-2 opacity-50"></i>
-            <p class="text-xs">Belum ada menu</p>
         </div>
     </main>
 
-    <!-- ============ SETTINGS PANEL (SLIDE FROM RIGHT) ============ -->
+    <!-- ============ SETTINGS PANEL ============ -->
     <div id="settings-panel" class="fixed inset-0 z-50 hidden">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="app.closePanel()"></div>
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="app.closePanel()"></div>
         
-        <!-- Panel -->
-        <div id="panel-content" class="absolute right-0 top-0 bottom-0 w-full max-w-lg bg-white dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 flex flex-col panel-enter">
+        <div id="panel-content" class="absolute right-0 top-0 bottom-0 w-full max-w-lg bg-ink-900 border-l border-ink-800 flex flex-col panel-enter">
             
-            <!-- Panel header -->
-            <div class="flex items-center justify-between p-3 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="settings-2" class="w-4 h-4 text-indigo-600"></i>
-                    <h2 class="font-bold text-sm">Pengaturan</h2>
+            <div class="flex items-center justify-between p-4 border-b border-ink-800 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-accent/10 flex items-center justify-center">
+                        <i data-lucide="settings-2" class="w-4 h-4 text-accent"></i>
+                    </div>
+                    <h2 class="font-bold text-sm text-white">Pengaturan</h2>
                 </div>
-                <button onclick="app.closePanel()" class="p-1.5 text-zinc-400 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                <button onclick="app.closePanel()" class="p-2 text-zinc-400 hover:text-white rounded-xl hover:bg-ink-800 transition">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
             
-            <!-- Tabs -->
-            <div class="flex gap-1 p-2 border-b border-zinc-200 dark:border-zinc-800 overflow-x-auto shrink-0">
-                <button onclick="app.setPanelTab('info')" data-ptab="info" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+            <div class="flex gap-1 p-2 border-b border-ink-800 overflow-x-auto shrink-0 no-scrollbar">
+                <button onclick="app.setPanelTab('info')" data-ptab="info" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
                     <i data-lucide="info" class="w-3 h-3 inline mr-1"></i> Info
                 </button>
-                <button onclick="app.setPanelTab('kategori')" data-ptab="kategori" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                <button onclick="app.setPanelTab('kategori')" data-ptab="kategori" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
                     <i data-lucide="folder" class="w-3 h-3 inline mr-1"></i> Kategori
                 </button>
-                <button onclick="app.setPanelTab('users')" data-ptab="users" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                <button onclick="app.setPanelTab('users')" data-ptab="users" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
                     <i data-lucide="users" class="w-3 h-3 inline mr-1"></i> Users
                 </button>
-                <button onclick="app.setPanelTab('feedback')" data-ptab="feedback" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                <button onclick="app.setPanelTab('feedback')" data-ptab="feedback" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
                     <i data-lucide="inbox" class="w-3 h-3 inline mr-1"></i> Feedback
                 </button>
-                <button onclick="app.setPanelTab('backup')" data-ptab="backup" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                <button onclick="app.setPanelTab('backup')" data-ptab="backup" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
                     <i data-lucide="database" class="w-3 h-3 inline mr-1"></i> Backup
                 </button>
-                <button onclick="app.setPanelTab('prefs')" data-ptab="prefs" class="ptab whitespace-nowrap px-2.5 py-1 text-[10px] font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
+                <button onclick="app.setPanelTab('prefs')" data-ptab="prefs" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
                     <i data-lucide="sliders" class="w-3 h-3 inline mr-1"></i> Preferensi
                 </button>
             </div>
             
-            <!-- Panel content -->
-            <div id="panel-body" class="flex-1 overflow-y-auto p-4">
-                <!-- Content dynamic -->
-            </div>
+            <div id="panel-body" class="flex-1 overflow-y-auto p-5"></div>
         </div>
     </div>
 
     <!-- ============ MODAL: LOGIN ============ -->
-    <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden modal-enter relative">
-            <button onclick="app.closeModal('auth-modal')" class="absolute top-3 right-3 text-zinc-400 hover:text-zinc-900 dark:hover:text-white z-10 p-1">
+    <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="w-full max-w-sm bg-ink-900 border border-ink-800 rounded-3xl shadow-2xl overflow-hidden modal-enter relative">
+            <button onclick="app.closeModal('auth-modal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white z-10 p-1.5 rounded-xl hover:bg-ink-800 transition">
                 <i data-lucide="x" class="w-4 h-4"></i>
             </button>
 
-            <div id="form-login" class="p-6">
-                <div class="mb-5">
-                    <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 rounded-lg flex items-center justify-center mb-3">
-                        <i data-lucide="shield-lock" class="w-5 h-5"></i>
+            <div id="form-login" class="p-7">
+                <div class="mb-6 text-center">
+                    <div class="w-16 h-16 bg-accent/10 rounded-3xl flex items-center justify-center mb-4 mx-auto border border-accent/20">
+                        <i data-lucide="shield-lock" class="w-7 h-7 text-accent"></i>
                     </div>
-                    <h3 class="text-base font-bold text-zinc-900 dark:text-white">Authentication</h3>
-                    <p class="text-xs text-zinc-500 mt-0.5">Masuk untuk akses penuh.</p>
+                    <h3 class="text-lg font-bold text-white">Selamat Datang</h3>
+                    <p class="text-xs text-zinc-500 mt-1">Masuk untuk akses penuh</p>
                 </div>
                 <form onsubmit="event.preventDefault(); app.doLogin()" class="space-y-3">
-                    <input type="email" id="input-email" autocomplete="email" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Email">
-                    <input type="password" id="input-pass" autocomplete="current-password" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Password">
-                    <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-500">
-                        <input type="checkbox" id="remember-me" checked class="w-3 h-3 rounded">
+                    <div class="relative">
+                        <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+                        <input type="email" id="input-email" autocomplete="email" class="w-full pl-10 pr-4 py-3 bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl text-sm text-white placeholder-zinc-500 outline-none transition" placeholder="Email">
+                    </div>
+                    <div class="relative">
+                        <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+                        <input type="password" id="input-pass" autocomplete="current-password" class="w-full pl-10 pr-4 py-3 bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl text-sm text-white placeholder-zinc-500 outline-none transition" placeholder="Password">
+                    </div>
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-400 px-1">
+                        <input type="checkbox" id="remember-me" checked class="w-3.5 h-3.5 rounded accent-amber-400">
                         <span>Ingat saya di perangkat ini</span>
                     </label>
-                    <button type="submit" id="btn-submit" class="w-full bg-zinc-900 dark:bg-white text-white dark:text-black font-bold py-2.5 rounded-lg text-sm hover:opacity-90 transition active:scale-[0.98] flex justify-center items-center gap-2">Access Console</button>
+                    <button type="submit" id="btn-submit" class="w-full bg-accent hover:bg-accent-hover text-black font-bold py-3.5 rounded-2xl text-sm transition active:scale-[0.98] flex justify-center items-center gap-2 shadow-lg shadow-accent/20 mt-2">Masuk</button>
                 </form>
             </div>
 
             <div id="view-profile" class="hidden">
-                <div class="bg-zinc-50 dark:bg-zinc-800/50 p-6 border-b border-zinc-200 dark:border-zinc-700 text-center">
-                    <div class="w-16 h-16 bg-white dark:bg-zinc-700 rounded-full mx-auto mb-3 flex items-center justify-center border-4 border-zinc-200 dark:border-zinc-600 shadow-lg overflow-hidden">
-                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-10 h-10 object-contain" alt="Avatar">
+                <div class="p-7 text-center border-b border-ink-800">
+                    <div class="w-20 h-20 rounded-3xl mx-auto mb-4 flex items-center justify-center border-2 border-accent/30 bg-accent/5 shadow-lg shadow-accent/10 overflow-hidden">
+                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-12 h-12 object-contain" alt="Avatar">
                     </div>
-                    <h3 class="text-sm font-bold text-zinc-900 dark:text-white" id="prof-name">-</h3>
-                    <p class="text-indigo-600 dark:text-indigo-400 text-[10px] font-mono font-bold tracking-widest uppercase mt-0.5" id="prof-role">-</p>
+                    <h3 class="text-base font-bold text-white" id="prof-name">-</h3>
+                    <p class="inline-block mt-2 px-3 py-0.5 bg-accent/10 text-accent text-[10px] font-mono font-bold tracking-widest uppercase rounded-full border border-accent/20" id="prof-role">-</p>
                 </div>
-                <div class="p-4 space-y-2">
-                    <div class="flex justify-between text-xs py-1.5 border-b border-zinc-100 dark:border-zinc-800">
-                        <span class="text-zinc-500">Unit</span>
-                        <span class="font-semibold dark:text-zinc-300" id="prof-unit">-</span>
+                <div class="p-5 space-y-3">
+                    <div class="flex justify-between items-center text-xs py-2 border-b border-ink-800">
+                        <span class="text-zinc-500">Unit Kerja</span>
+                        <span class="font-semibold text-zinc-300" id="prof-unit">-</span>
                     </div>
-                    <div class="flex justify-between text-xs py-1.5 border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="flex justify-between items-center text-xs py-2 border-b border-ink-800">
                         <span class="text-zinc-500">Email</span>
-                        <span class="font-semibold dark:text-zinc-300 text-[10px]" id="prof-email">-</span>
+                        <span class="font-semibold text-zinc-300 text-[11px]" id="prof-email">-</span>
                     </div>
-                    <button onclick="app.doLogout()" class="w-full mt-3 bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400 font-bold py-2.5 rounded-lg text-sm transition flex items-center justify-center gap-2">
-                        <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Logout
+                    <button onclick="app.doLogout()" class="w-full mt-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold py-3 rounded-2xl text-sm transition flex items-center justify-center gap-2 border border-red-500/20">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
                     </button>
                 </div>
             </div>
@@ -291,87 +341,93 @@
     </div>
 
     <!-- ============ MODAL: LINK CRUD ============ -->
-    <div id="link-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="w-full max-w-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl overflow-hidden modal-enter max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
-                <h3 class="text-sm font-bold dark:text-white" id="link-modal-title">Tambah Link</h3>
-                <button onclick="app.closeModal('link-modal')" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+    <div id="link-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="w-full max-w-xl bg-ink-900 border border-ink-800 rounded-3xl shadow-2xl overflow-hidden modal-enter max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between p-5 border-b border-ink-800 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-accent/10 flex items-center justify-center">
+                        <i data-lucide="link" class="w-4 h-4 text-accent"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-white" id="link-modal-title">Tambah Link</h3>
+                </div>
+                <button onclick="app.closeModal('link-modal')" class="text-zinc-500 hover:text-white p-2 rounded-xl hover:bg-ink-800 transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
             </div>
             
-            <div class="p-4 overflow-y-auto space-y-3">
+            <div class="p-5 overflow-y-auto space-y-4">
                 <input type="hidden" id="link-id">
                 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Judul *</label>
-                    <input type="text" id="link-judul" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Nama link">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Judul *</label>
+                    <input type="text" id="link-judul" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition" placeholder="Nama link">
                 </div>
                 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">URL *</label>
-                    <input type="url" id="link-url" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none font-mono" placeholder="https://...">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">URL *</label>
+                    <input type="url" id="link-url" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition font-mono" placeholder="https://...">
                 </div>
                 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Deskripsi</label>
-                    <textarea id="link-deskripsi" rows="2" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none resize-none" placeholder="Deskripsi singkat"></textarea>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Deskripsi</label>
+                    <textarea id="link-deskripsi" rows="2" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition resize-none" placeholder="Deskripsi singkat"></textarea>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Kategori</label>
-                        <select id="link-kategori" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none"></select>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Kategori</label>
+                        <select id="link-kategori" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white outline-none transition"></select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Akses Role</label>
-                        <input type="text" id="link-role" class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-600 outline-none" placeholder="Super Admin,Admin">
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Akses Role</label>
+                        <input type="text" id="link-role" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition" placeholder="Super Admin">
                     </div>
                 </div>
                 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Icon</label>
-                    <input type="text" id="link-icon-search" placeholder="Cari icon..." class="w-full bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-xs focus:ring-2 focus:ring-indigo-600 outline-none mb-1.5">
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Icon</label>
+                    <input type="text" id="link-icon-search" placeholder="Cari icon..." class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 rounded-2xl px-4 py-2 text-xs text-white placeholder-zinc-500 outline-none transition mb-2">
                     <div id="icon-grid" class="icon-grid"></div>
                     <input type="hidden" id="link-icon" value="link">
                 </div>
                 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1">Warna</label>
-                    <div class="flex flex-wrap gap-1.5" id="color-picker"></div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Warna</label>
+                    <div class="flex flex-wrap gap-2" id="color-picker"></div>
                     <input type="hidden" id="link-warna" value="zinc">
                 </div>
                 
-                <div class="flex items-center gap-3 flex-wrap">
-                    <label class="flex items-center gap-1.5 cursor-pointer text-xs">
-                        <input type="checkbox" id="link-pinned" class="w-3.5 h-3.5 rounded">
+                <div class="flex items-center gap-4 pt-1">
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-300">
+                        <input type="checkbox" id="link-pinned" class="w-4 h-4 rounded accent-amber-400">
                         <span class="font-semibold">⭐ Pin</span>
                     </label>
-                    <select id="link-status" class="text-xs bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded-lg px-2 py-1 focus:ring-2 focus:ring-indigo-600 outline-none">
+                    <select id="link-status" class="text-xs bg-ink-850 border border-ink-750 focus:border-accent/50 rounded-2xl px-3 py-1.5 text-white outline-none">
                         <option value="aktif">Aktif</option>
                         <option value="arsip">Arsip</option>
                     </select>
                 </div>
             </div>
             
-            <div class="flex items-center gap-2 p-4 border-t border-zinc-200 dark:border-zinc-800 shrink-0">
-                <button onclick="app.closeModal('link-modal')" class="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg text-sm font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">Batal</button>
-                <button onclick="app.saveLink()" class="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition flex items-center justify-center gap-1.5">
-                    <i data-lucide="save" class="w-3.5 h-3.5"></i> Simpan
+            <div class="flex items-center gap-3 p-5 border-t border-ink-800 shrink-0">
+                <button onclick="app.closeModal('link-modal')" class="flex-1 px-4 py-2.5 border border-ink-750 hover:bg-ink-850 text-white rounded-2xl text-sm font-semibold transition">Batal</button>
+                <button onclick="app.saveLink()" class="flex-1 px-4 py-2.5 bg-accent hover:bg-accent-hover text-black rounded-2xl text-sm font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-accent/20">
+                    <i data-lucide="save" class="w-4 h-4"></i> Simpan
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ============ TOAST ============ -->
-    <div id="toast-container" class="fixed top-16 right-3 z-[60] space-y-1.5 max-w-xs"></div>
+    <!-- Toast -->
+    <div id="toast-container" class="fixed top-20 right-3 z-[60] space-y-2 max-w-xs"></div>
 
     <script>
     // ============================================================
-    // APP v3.0 — Compact + Persistent + Panel
+    // APP v3.1
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
         
-        // State
         user: null,
         menu: [],
         kategori: [],
@@ -385,7 +441,6 @@
         currentTab: 'info',
         panelOpen: false,
         
-        // Storage keys (v3)
         KEYS: {
             SESSION: 'sa3_session',
             CACHE: 'sa3_cache',
@@ -395,96 +450,75 @@
             THEME: 'sa3_theme'
         },
         
-        // Preferensi default
         prefs: {
-            view: 'grid',           // 'grid' | 'list'
+            view: 'grid',
             compact: true,
             autoSync: false,
-            autoSyncInterval: 5,    // menit
+            autoSyncInterval: 5,
             showClicks: true,
             showBanner: true
         },
         
-        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','github','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','hash','at-sign','regex','info','help-circle','alert-circle','alert-triangle'],
+        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','hash','at-sign','regex','info','help-circle','alert-circle','alert-triangle','save','grip-vertical','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','folder-cog','shield-lock','sliders','send','check-circle','alert-triangle'],
         
-        COLORS: ['zinc','blue','red','green','emerald','rose','yellow','indigo','purple','orange','pink','sky','teal','violet'],
+        COLORS: ['zinc','blue','red','green','emerald','rose','yellow','amber','indigo','purple','orange','pink','sky','teal','violet'],
         
-        // ============================================================
-        // INIT
-        // ============================================================
         init: function() {
-            // Service worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').catch(() => {});
             }
             
-            // Theme (persistent)
+            // Theme — default DARK
             const savedTheme = localStorage.getItem(this.KEYS.THEME);
-            if(savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            if(savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
                 document.documentElement.classList.add('dark');
             }
             
-            // Prefs
             try {
                 const p = JSON.parse(localStorage.getItem(this.KEYS.PREFS) || '{}');
                 this.prefs = { ...this.prefs, ...p };
             } catch(e) {}
             
-            // Session (NO auto validation — direct from storage)
             try {
                 const sess = JSON.parse(localStorage.getItem(this.KEYS.SESSION) || 'null');
                 if (sess && sess.user) this.user = sess.user;
             } catch(e) { localStorage.removeItem(this.KEYS.SESSION); }
             
-            // Load cache
             this.loadFromCache();
-            
-            // Update UI
             this.updateUIState();
             this.renderAll();
             this.updateSyncIndicator();
+            this.updateViewIcon();
             
-            // Search listeners
             ['search-input','search-input-mobile'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.addEventListener('input', (e) => this.renderAll(e.target.value.toLowerCase()));
+                if (el) el.addEventListener('input', (e) => this.renderMenu(e.target.value.toLowerCase()));
             });
             
-            // Icon/Color picker
             this.setupIconPicker();
             this.setupColorPicker();
             
-            // Network listeners
             window.addEventListener('online', () => { 
-                this.isOnline = true; 
-                this.updateSyncIndicator(); 
+                this.isOnline = true; this.updateSyncIndicator(); 
                 if (this.prefs.autoSync) this.syncNow(true); 
                 this.syncPending();
             });
             window.addEventListener('offline', () => { 
-                this.isOnline = false; 
-                this.updateSyncIndicator(); 
+                this.isOnline = false; this.updateSyncIndicator(); 
             });
             
-            // Storage sync antar tab
             window.addEventListener('storage', (e) => {
-                if (e.key === this.KEYS.CACHE) {
-                    this.loadFromCache();
-                    this.renderAll();
-                }
+                if (e.key === this.KEYS.CACHE) { this.loadFromCache(); this.renderAll(); }
             });
             
-            // Auto sync kalau diaktifkan
             if (this.prefs.autoSync) {
-                setInterval(() => {
-                    if (this.isOnline) this.syncNow(true);
-                }, this.prefs.autoSyncInterval * 60 * 1000);
+                setInterval(() => { if (this.isOnline) this.syncNow(true); }, this.prefs.autoSyncInterval * 60 * 1000);
             }
             
-            // Render panel default tab
             this.renderPanel();
             
-            // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('search-input').focus(); }
                 if (e.key === 'Escape') { this.closeModal('auth-modal'); this.closeModal('link-modal'); this.closePanel(); }
@@ -493,9 +527,7 @@
             lucide.createIcons();
         },
         
-        // ============================================================
         // STORAGE
-        // ============================================================
         loadFromCache: function() {
             try {
                 const cached = JSON.parse(localStorage.getItem(this.KEYS.CACHE) || '{}');
@@ -505,92 +537,65 @@
                 this.footer = cached.footer || [];
                 this.users = cached.users || [];
                 this.feedbackList = cached.feedback || [];
-            } catch(e) {
-                console.error('Cache parse error:', e);
-            }
+            } catch(e) {}
         },
         
         saveCache: function() {
             localStorage.setItem(this.KEYS.CACHE, JSON.stringify({
-                menu: this.menu,
-                kategori: this.kategori,
-                info: this.info,
-                footer: this.footer,
-                users: this.users,
-                feedback: this.feedbackList,
+                menu: this.menu, kategori: this.kategori, info: this.info,
+                footer: this.footer, users: this.users, feedback: this.feedbackList,
                 cachedAt: new Date().toISOString()
             }));
         },
         
         saveSession: function() {
             if (this.user) {
-                localStorage.setItem(this.KEYS.SESSION, JSON.stringify({
-                    user: this.user,
-                    savedAt: new Date().toISOString()
-                }));
+                localStorage.setItem(this.KEYS.SESSION, JSON.stringify({ user: this.user, savedAt: new Date().toISOString() }));
             } else {
                 localStorage.removeItem(this.KEYS.SESSION);
             }
         },
         
-        savePrefs: function() {
-            localStorage.setItem(this.KEYS.PREFS, JSON.stringify(this.prefs));
-        },
+        savePrefs: function() { localStorage.setItem(this.KEYS.PREFS, JSON.stringify(this.prefs)); },
         
-        // ============================================================
-        // SYNC (MANUAL)
-        // ============================================================
+        // SYNC
         syncNow: function(silent) {
             if (!this.isOnline) {
                 if (!silent) this.toast('Offline — tidak bisa sync', 'warning');
-                this.updateSyncIndicator('offline');
-                return;
+                this.updateSyncIndicator('offline'); return;
             }
             
             this.updateSyncIndicator('syncing');
             const btn = document.getElementById('btn-sync');
-            if (btn && !silent) {
-                btn.querySelector('i').classList.add('animate-spin');
-            }
+            if (btn && !silent) btn.querySelector('i').classList.add('animate-spin');
             
             fetch(`${this.apiURL}?action=bootstrap`)
                 .then(r => r.json())
                 .then(res => {
                     if (res.status !== 'success') throw new Error(res.message);
-                    
                     const d = res.data;
                     if (d.menu) this.menu = d.menu;
                     if (d.kategori) this.kategori = d.kategori;
                     if (d.info) this.info = d.info;
                     if (d.footer) this.footer = d.footer;
                     if (d.users) this.users = d.users;
-                    
                     this.saveCache();
                     localStorage.setItem(this.KEYS.LAST_SYNC, res.serverTime);
-                    
                     this.renderAll();
                     this.updateSyncIndicator('synced');
-                    
-                    if (!silent) this.toast('✓ Data tersinkron', 'success');
-                    
-                    // Load feedback badge kalau admin
+                    if (!silent) this.toast('Data tersinkron', 'success');
                     if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) {
                         this.loadFeedback(silent);
                     }
                 })
                 .catch(err => {
-                    console.error('Sync error:', err);
                     this.updateSyncIndicator('error');
                     if (!silent) this.toast('Sync gagal: ' + err.message, 'error');
                 })
-                .finally(() => {
-                    if (btn) btn.querySelector('i').classList.remove('animate-spin');
-                });
+                .finally(() => { if (btn) btn.querySelector('i').classList.remove('animate-spin'); });
         },
         
-        // ============================================================
         // RENDER
-        // ============================================================
         renderAll: function(searchQuery) {
             this.renderMenu(searchQuery);
             this.renderInfoBanner();
@@ -600,30 +605,27 @@
         renderInfoBanner: function() {
             const banner = document.getElementById('info-banner');
             if (!banner) return;
-            
             const info = this.info;
             const showBanner = this.prefs.showBanner && info && (info.STATUS === 'ON' || info.STATUS === 'on' || info.STATUS === true);
             
-            if (!showBanner || !info.PESAN) {
-                banner.classList.add('hidden');
-                return;
-            }
+            if (!showBanner || !info.PESAN) { banner.classList.add('hidden'); return; }
             
             const colorMap = {
-                green: 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-300',
-                blue: 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300',
-                red: 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300',
-                yellow: 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300',
-                indigo: 'bg-indigo-50 border-indigo-200 text-indigo-800 dark:bg-indigo-900/20 dark:border-indigo-800 dark:text-indigo-300'
+                green: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
+                blue: 'bg-blue-500/10 border-blue-500/30 text-blue-300',
+                red: 'bg-red-500/10 border-red-500/30 text-red-300',
+                yellow: 'bg-accent/10 border-accent/30 text-accent',
+                indigo: 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
             };
+            const cls = colorMap[info.WARNA] || colorMap.yellow;
             
-            const cls = colorMap[info.WARNA] || colorMap.blue;
-            
-            banner.className = `mb-3 p-3 border rounded-lg flex items-start gap-2 ${cls}`;
+            banner.className = `mb-4 p-3.5 border rounded-2xl flex items-start gap-3 ${cls}`;
             banner.innerHTML = `
-                <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
-                <div class="flex-1 text-xs leading-relaxed">${this.escape(info.PESAN)}</div>
-                <button onclick="document.getElementById('info-banner').classList.add('hidden')" class="text-current opacity-60 hover:opacity-100 shrink-0">
+                <div class="w-7 h-7 rounded-xl bg-current/10 flex items-center justify-center shrink-0">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                </div>
+                <div class="flex-1 text-xs leading-relaxed pt-0.5">${this.escape(info.PESAN)}</div>
+                <button onclick="document.getElementById('info-banner').classList.add('hidden')" class="opacity-60 hover:opacity-100 shrink-0 p-1">
                     <i data-lucide="x" class="w-3.5 h-3.5"></i>
                 </button>
             `;
@@ -638,13 +640,11 @@
             let items = this.menu.filter(item => {
                 if (item.DELETED === true || item.DELETED === 'TRUE') return false;
                 if (item.STATUS === 'arsip') return false;
-                
                 if (q && !(
                     String(item.JUDUL).toLowerCase().includes(q) ||
                     String(item.DESKRIPSI || '').toLowerCase().includes(q) ||
                     String(item.URL).toLowerCase().includes(q)
                 )) return false;
-                
                 const reqRole = String(item.AKSES_ROLE || '').trim();
                 if (!reqRole) return true;
                 const roles = reqRole.split(',').map(r => r.trim().toLowerCase()).filter(Boolean);
@@ -655,8 +655,10 @@
             
             if (items.length === 0) {
                 container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-16 text-zinc-400">
-                        <i data-lucide="inbox" class="w-10 h-10 mb-2 opacity-50"></i>
+                    <div class="flex flex-col items-center justify-center py-20 text-zinc-600">
+                        <div class="w-16 h-16 rounded-3xl bg-ink-850 flex items-center justify-center mb-4 border border-ink-800">
+                            <i data-lucide="inbox" class="w-7 h-7 opacity-50"></i>
+                        </div>
                         <p class="text-xs">${q ? 'Tidak ada hasil untuk "' + this.escape(q) + '"' : 'Belum ada menu'}</p>
                     </div>
                 `;
@@ -664,7 +666,6 @@
                 return;
             }
             
-            // Group by kategori
             const groups = {};
             this.kategori.forEach(k => groups[k.NAMA] = []);
             groups['Lain-lain'] = groups['Lain-lain'] || [];
@@ -675,7 +676,6 @@
                 groups[kat].push(item);
             });
             
-            // Sort kategori
             const sortedKatNames = Object.keys(groups).sort((a, b) => {
                 const ka = this.kategori.find(k => k.NAMA === a);
                 const kb = this.kategori.find(k => k.NAMA === b);
@@ -700,15 +700,17 @@
                 const katIcon = katInfo?.ICON || 'folder';
                 
                 html += `
-                    <div class="mb-5">
-                        <h3 class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-2 flex items-center gap-1.5">
-                            <i data-lucide="${katIcon}" class="w-3 h-3"></i>
-                            ${this.escape(katName)}
-                            <span class="text-[9px] bg-zinc-100 dark:bg-zinc-800 px-1 py-0.5 rounded font-mono">${katItems.length}</span>
-                        </h3>
+                    <div class="mb-6">
+                        <div class="flex items-center gap-2 mb-3 px-1">
+                            <div class="w-6 h-6 rounded-lg bg-ink-850 border border-ink-800 flex items-center justify-center">
+                                <i data-lucide="${katIcon}" class="w-3 h-3 text-accent"></i>
+                            </div>
+                            <h3 class="text-[11px] font-bold uppercase tracking-widest text-zinc-400">${this.escape(katName)}</h3>
+                            <span class="text-[9px] bg-ink-850 border border-ink-800 px-1.5 py-0.5 rounded-full font-mono text-zinc-500">${katItems.length}</span>
+                        </div>
                         ${isListView 
-                            ? `<div class="menu-list flex flex-col gap-1">${katItems.map(item => this.renderListRow(item)).join('')}</div>`
-                            : `<div class="menu-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">${katItems.map(item => this.renderCard(item)).join('')}</div>`
+                            ? `<div class="menu-list flex flex-col gap-1.5">${katItems.map(item => this.renderListRow(item)).join('')}</div>`
+                            : `<div class="menu-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">${katItems.map(item => this.renderCard(item)).join('')}</div>`
                         }
                     </div>
                 `;
@@ -716,85 +718,91 @@
             
             container.innerHTML = html;
             this.setupSortable();
+            lucide.createIcons();
         },
         
         renderCard: function(item) {
             const isPinned = item.PINNED === true || item.PINNED === 'TRUE';
-            const colorClasses = this.getColorClasses(item.WARNA);
+            const colorMap = this.getColorConfig(item.WARNA);
             const icon = item.ICON || 'link';
             const isEdit = this.editMode;
             const safeUrl = this.safeUrl(item.URL);
             const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
             
             return `
-                <div class="menu-card group relative flex flex-col p-3 bg-white dark:bg-panel border border-zinc-200 dark:border-zinc-800 rounded-lg hover:border-indigo-500/40 hover:shadow-sm transition-all duration-150" data-id="${item.ID}">
-                    ${isEdit ? `
-                        <div class="drag-handle absolute top-1 left-1 p-0.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400">
-                            <i data-lucide="grip-vertical" class="w-3 h-3"></i>
-                        </div>
-                        <div class="absolute top-1 right-1 flex gap-0.5">
-                            <button onclick="app.editLink('${item.ID}')" class="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500" title="Edit">
-                                <i data-lucide="pencil" class="w-3 h-3"></i>
-                            </button>
-                            <button onclick="app.deleteLink('${item.ID}')" class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500" title="Hapus">
-                                <i data-lucide="trash-2" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-                    ` : ''}
-                    
-                    ${isPinned && !isEdit ? `<div class="absolute top-1 right-1 text-amber-400 text-xs">⭐</div>` : ''}
-                    
-                    <a href="${isEdit ? 'javascript:void(0)' : safeUrl}" ${!isEdit ? 'target="_blank" rel="noopener"' : ''} 
-                       onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
-                       class="flex flex-col flex-1 ${isEdit ? 'pointer-events-none' : ''}">
-                        <div class="flex items-start justify-between mb-2 ${isEdit ? 'mt-4' : ''}">
-                            <div class="w-8 h-8 rounded-md flex items-center justify-center ${colorClasses}">
-                                <i data-lucide="${icon}" class="w-4 h-4"></i>
+                <div class="menu-card card-link group relative" data-id="${item.ID}">
+                    <div class="card-inner relative flex flex-col p-4 bg-ink-800 border border-ink-700/60 rounded-3xl transition-all duration-200">
+                        
+                        ${isEdit ? `
+                            <div class="drag-handle absolute top-2.5 left-2.5 p-1 rounded-lg hover:bg-ink-750 text-zinc-500 z-10">
+                                <i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i>
                             </div>
-                            ${!isEdit ? `<i data-lucide="arrow-up-right" class="w-3 h-3 text-zinc-300 group-hover:text-indigo-500 transition"></i>` : ''}
-                        </div>
-                        <h4 class="font-semibold text-xs text-zinc-800 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition line-clamp-1 leading-tight">${this.escape(item.JUDUL)}</h4>
-                        <p class="text-[10px] text-zinc-500 mt-0.5 line-clamp-1 leading-tight flex-1">${this.escape(item.DESKRIPSI || '')}</p>
-                        ${showClicks ? `<div class="mt-1.5 text-[9px] text-zinc-400 font-mono">${item.CLICKS} clicks</div>` : ''}
-                    </a>
+                            <div class="absolute top-2.5 right-2.5 flex gap-1 z-10">
+                                <button onclick="event.stopPropagation();app.editLink('${item.ID}')" class="p-1.5 rounded-lg bg-ink-750/80 hover:bg-ink-700 text-zinc-400 hover:text-accent" title="Edit">
+                                    <i data-lucide="pencil" class="w-3 h-3"></i>
+                                </button>
+                                <button onclick="event.stopPropagation();app.deleteLink('${item.ID}')" class="p-1.5 rounded-lg bg-ink-750/80 hover:bg-red-500/20 text-zinc-400 hover:text-red-400" title="Hapus">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                        
+                        <a href="${isEdit ? 'javascript:void(0)' : safeUrl}" ${!isEdit ? 'target="_blank" rel="noopener"' : ''} 
+                           onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
+                           class="flex flex-col items-center text-center ${isEdit ? 'pointer-events-none' : ''}">
+                            
+                            <!-- Icon circle with glow -->
+                            <div class="relative mt-1 mb-3">
+                                <div class="w-14 h-14 rounded-full flex items-center justify-center ${colorMap.bg} ${colorMap.glow}">
+                                    <i data-lucide="${icon}" class="w-6 h-6 ${colorMap.text}"></i>
+                                </div>
+                                ${isPinned ? `<div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center text-[10px] shadow-lg shadow-accent/30">⭐</div>` : ''}
+                            </div>
+                            
+                            <h4 class="font-semibold text-xs text-white leading-tight line-clamp-2 group-hover:text-accent transition min-h-[2rem]">${this.escape(item.JUDUL)}</h4>
+                            ${item.DESKRIPSI ? `<p class="text-[10px] text-zinc-500 mt-1 line-clamp-1 leading-tight">${this.escape(item.DESKRIPSI)}</p>` : ''}
+                            
+                            ${showClicks ? `<div class="mt-2 inline-flex items-center gap-1 px-2 py-0.5 bg-ink-850 border border-ink-700 rounded-full text-[9px] text-zinc-500 font-mono">${item.CLICKS}×</div>` : ''}
+                        </a>
+                    </div>
                 </div>
             `;
         },
         
         renderListRow: function(item) {
             const isPinned = item.PINNED === true || item.PINNED === 'TRUE';
-            const colorClasses = this.getColorClasses(item.WARNA);
+            const colorMap = this.getColorConfig(item.WARNA);
             const icon = item.ICON || 'link';
             const isEdit = this.editMode;
             const safeUrl = this.safeUrl(item.URL);
             const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
             
             return `
-                <div class="list-row group flex items-center gap-2 p-2 bg-white dark:bg-panel border border-zinc-200 dark:border-zinc-800 rounded-lg" data-id="${item.ID}">
-                    ${isEdit ? `<div class="drag-handle p-0.5 text-zinc-400"><i data-lucide="grip-vertical" class="w-3 h-3"></i></div>` : ''}
+                <div class="list-row group flex items-center gap-3 p-3 bg-ink-800 border border-ink-700/60 rounded-2xl hover:border-accent/30 transition" data-id="${item.ID}">
+                    ${isEdit ? `<div class="drag-handle p-1 text-zinc-500 cursor-grab"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></div>` : ''}
                     
                     <a href="${isEdit ? 'javascript:void(0)' : safeUrl}" ${!isEdit ? 'target="_blank" rel="noopener"' : ''} 
                        onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
-                       class="flex items-center gap-2 flex-1 min-w-0 ${isEdit ? 'pointer-events-none' : ''}">
-                        <div class="w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${colorClasses}">
-                            <i data-lucide="${icon}" class="w-3.5 h-3.5"></i>
+                       class="flex items-center gap-3 flex-1 min-w-0 ${isEdit ? 'pointer-events-none' : ''}">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${colorMap.bg} ${colorMap.glow}">
+                            <i data-lucide="${icon}" class="w-4 h-4 ${colorMap.text}"></i>
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-1.5">
-                                ${isPinned ? '<span class="text-amber-400 text-[10px]">⭐</span>' : ''}
-                                <h4 class="font-semibold text-xs text-zinc-800 dark:text-zinc-100 truncate">${this.escape(item.JUDUL)}</h4>
+                                ${isPinned ? '<span class="text-[10px]">⭐</span>' : ''}
+                                <h4 class="font-semibold text-xs text-white truncate group-hover:text-accent transition">${this.escape(item.JUDUL)}</h4>
                             </div>
-                            <p class="text-[10px] text-zinc-500 truncate">${this.escape(item.DESKRIPSI || item.URL)}</p>
+                            <p class="text-[10px] text-zinc-500 truncate mt-0.5">${this.escape(item.DESKRIPSI || item.URL)}</p>
                         </div>
-                        ${showClicks ? `<span class="text-[9px] text-zinc-400 font-mono shrink-0">${item.CLICKS}</span>` : ''}
+                        ${showClicks ? `<span class="text-[9px] text-zinc-500 font-mono shrink-0 px-2 py-0.5 bg-ink-850 border border-ink-700 rounded-full">${item.CLICKS}×</span>` : ''}
                     </a>
                     
                     ${isEdit ? `
-                        <div class="flex gap-0.5 shrink-0">
-                            <button onclick="app.editLink('${item.ID}')" class="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500">
+                        <div class="flex gap-1 shrink-0">
+                            <button onclick="app.editLink('${item.ID}')" class="p-1.5 rounded-lg hover:bg-ink-750 text-zinc-400 hover:text-accent">
                                 <i data-lucide="pencil" class="w-3 h-3"></i>
                             </button>
-                            <button onclick="app.deleteLink('${item.ID}')" class="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500">
+                            <button onclick="app.deleteLink('${item.ID}')" class="p-1.5 rounded-lg hover:bg-red-500/20 text-zinc-400 hover:text-red-400">
                                 <i data-lucide="trash-2" class="w-3 h-3"></i>
                             </button>
                         </div>
@@ -803,44 +811,32 @@
             `;
         },
         
-        // ============================================================
-        // VIEW TOGGLE
-        // ============================================================
+        // VIEW
         toggleView: function() {
             this.prefs.view = this.prefs.view === 'grid' ? 'list' : 'grid';
             this.savePrefs();
             this.updateViewIcon();
-            this.renderAll();
-            
-            const q = document.getElementById('search-input')?.value?.toLowerCase() || 
-                      document.getElementById('search-input-mobile')?.value?.toLowerCase() || '';
-            this.renderMenu(q);
+            this.renderMenu(document.getElementById('search-input')?.value?.toLowerCase() || '');
             lucide.createIcons();
-            this.toast(this.prefs.view === 'list' ? '📋 Tampilan list' : '🔲 Tampilan grid', 'info');
+            this.toast(this.prefs.view === 'list' ? 'Tampilan list' : 'Tampilan grid', 'info');
         },
         
         updateViewIcon: function() {
             const icon = document.getElementById('view-icon');
             if (!icon) return;
-            const newIcon = this.prefs.view === 'grid' ? 'layout-grid' : 'layout-list';
-            icon.setAttribute('data-lucide', newIcon);
+            icon.setAttribute('data-lucide', this.prefs.view === 'grid' ? 'layout-grid' : 'layout-list');
             lucide.createIcons();
         },
         
-        // ============================================================
         // SORTABLE
-        // ============================================================
         setupSortable: function() {
             this.sortables.forEach(s => { try { s.destroy(); } catch(e) {} });
             this.sortables = [];
             if (!this.editMode) return;
-            
             document.querySelectorAll('.menu-grid, .menu-list').forEach(grid => {
                 const sortable = Sortable.create(grid, {
-                    animation: 180,
-                    handle: '.drag-handle',
-                    ghostClass: 'sortable-ghost',
-                    chosenClass: 'sortable-chosen',
+                    animation: 180, handle: '.drag-handle',
+                    ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
                     onEnd: () => {
                         const allIds = [];
                         document.querySelectorAll('.menu-grid, .menu-list').forEach(g => {
@@ -853,28 +849,19 @@
             });
         },
         
-        // ============================================================
-        // EDIT MODE
-        // ============================================================
         toggleEditMode: function() {
             if (!this.user) { this.toast('Login dulu', 'warning'); return; }
             const role = this.user.jabatan.toLowerCase();
-            if (role !== 'super admin' && role !== 'admin') {
-                this.toast('Tidak punya akses', 'error');
-                return;
-            }
+            if (role !== 'super admin' && role !== 'admin') { this.toast('Tidak punya akses', 'error'); return; }
             this.editMode = !this.editMode;
             this.updateUIState();
             this.renderAll();
-            this.toast(this.editMode ? '🔓 Edit mode aktif' : '🔒 Edit mode nonaktif', 'info');
+            this.toast(this.editMode ? 'Edit mode aktif' : 'Edit mode nonaktif', 'info');
         },
         
-        // ============================================================
         // LINK CRUD
-        // ============================================================
         openLinkModal: function(id) {
             if (!this.user) { this.toast('Login dulu', 'warning'); return; }
-            
             const modal = document.getElementById('link-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -904,12 +891,13 @@
                 document.getElementById('link-kategori').value = this.kategori[0]?.NAMA || 'Lain-lain';
                 document.getElementById('link-role').value = '';
                 document.getElementById('link-icon').value = 'link';
-                document.getElementById('link-warna').value = 'zinc';
+                document.getElementById('link-warna').value = 'yellow';
                 document.getElementById('link-pinned').checked = false;
                 document.getElementById('link-status').value = 'aktif';
                 this.selectIcon('link');
-                this.selectColor('zinc');
+                this.selectColor('yellow');
             }
+            this.renderKategoriOptions();
             lucide.createIcons();
         },
         
@@ -930,7 +918,6 @@
             };
             
             if (!data.judul || !data.url) { this.toast('Judul & URL wajib', 'error'); return; }
-            
             try {
                 const u = new URL(data.url);
                 if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error();
@@ -940,9 +927,7 @@
             
             if (!id) {
                 const tempId = 'tmp-' + Date.now();
-                data.ID = tempId;
-                data.CLICKS = 0;
-                data.DELETED = false;
+                data.ID = tempId; data.CLICKS = 0; data.DELETED = false;
                 this.menu.push(data);
                 this.queuePending({ action: 'add', tempId, data, userEmail: this.user?.email });
             } else {
@@ -950,7 +935,6 @@
                 if (idx >= 0) this.menu[idx] = { ...this.menu[idx], ...data };
                 this.queuePending({ action: 'update', id, data, userEmail: this.user?.email });
             }
-            
             this.saveCache();
             this.renderAll();
             this.syncPending();
@@ -960,7 +944,6 @@
             const item = this.menu.find(m => m.ID === id);
             if (!item) return;
             if (!confirm(`Hapus "${item.JUDUL}"?`)) return;
-            
             this.menu = this.menu.filter(m => m.ID !== id);
             this.saveCache();
             this.renderAll();
@@ -978,9 +961,7 @@
             this.syncPending();
         },
         
-        // ============================================================
-        // PENDING QUEUE
-        // ============================================================
+        // PENDING
         queuePending: function(op) {
             const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
             queue.push({ ...op, queuedAt: Date.now() });
@@ -990,7 +971,6 @@
         
         syncPending: function() {
             if (!this.isOnline) { this.updateSyncIndicator('offline'); return; }
-            
             const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
             if (queue.length === 0) { this.updateSyncIndicator(); return; }
             
@@ -1000,7 +980,6 @@
                     this.updateSyncIndicator();
                     return;
                 }
-                
                 const op = queue[i];
                 fetch(this.apiURL, {
                     method: 'POST',
@@ -1017,14 +996,12 @@
                         }
                         processNext(i + 1);
                     } else {
-                        console.error('Sync error:', res);
                         localStorage.setItem(this.KEYS.PENDING, JSON.stringify(queue.slice(i + 1)));
                         this.updateSyncIndicator('error');
                     }
                 })
                 .catch(() => this.updateSyncIndicator('offline'));
             };
-            
             processNext(0);
         },
         
@@ -1039,19 +1016,16 @@
             }).catch(() => {});
         },
         
-        // ============================================================
         // AUTH
-        // ============================================================
         doLogin: function() {
             const email = document.getElementById('input-email').value.trim();
             const pass = document.getElementById('input-pass').value;
             const remember = document.getElementById('remember-me').checked;
             const btn = document.getElementById('btn-submit');
-            
             if (!email || !pass) { this.toast('Email & password wajib', 'error'); return; }
             
             const orig = btn.innerHTML;
-            btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-3.5 h-3.5"></i> Memverifikasi...`;
+            btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-4 h-4"></i> Memverifikasi...`;
             btn.disabled = true;
             lucide.createIcons();
             
@@ -1069,21 +1043,13 @@
                     this.renderAll();
                     this.closeModal('auth-modal');
                     this.toast('Selamat datang, ' + res.nama, 'success');
-                    
-                    if (remember) {
-                        this.trackLogin();
-                        this.loadFeedback(true);
-                    }
+                    if (remember) { this.trackLogin(); this.loadFeedback(true); }
                 } else {
                     this.toast(res.message || 'Login gagal', 'error');
                 }
             })
             .catch(() => this.toast('Server tidak dapat dijangkau', 'error'))
-            .finally(() => {
-                btn.innerHTML = orig;
-                btn.disabled = false;
-                lucide.createIcons();
-            });
+            .finally(() => { btn.innerHTML = orig; btn.disabled = false; lucide.createIcons(); });
         },
         
         doLogout: function() {
@@ -1108,9 +1074,7 @@
             }).catch(() => {});
         },
         
-        // ============================================================
         // PANEL
-        // ============================================================
         openPanel: function() {
             const panel = document.getElementById('settings-panel');
             panel.classList.remove('hidden');
@@ -1128,22 +1092,15 @@
                 panel.classList.add('hidden');
                 content.classList.remove('panel-exit');
                 this.panelOpen = false;
-            }, 180);
+            }, 200);
         },
         
-        setPanelTab: function(tab) {
-            this.currentTab = tab;
-            this.renderPanel();
-        },
+        setPanelTab: function(tab) { this.currentTab = tab; this.renderPanel(); },
         
         renderPanel: function() {
-            // Update tab styles
             document.querySelectorAll('.ptab').forEach(t => {
-                if (t.dataset.ptab === this.currentTab) {
-                    t.classList.add('ptab-active');
-                } else {
-                    t.classList.remove('ptab-active');
-                }
+                if (t.dataset.ptab === this.currentTab) t.classList.add('ptab-active');
+                else t.classList.remove('ptab-active');
             });
             
             const body = document.getElementById('panel-body');
@@ -1159,83 +1116,59 @@
                 backup: () => this.renderTabBackup(canEdit),
                 prefs: () => this.renderTabPrefs()
             };
-            
             body.innerHTML = (tabs[this.currentTab] || tabs.info)();
             lucide.createIcons();
         },
         
-        // ============================================================
-        // TAB: INFO
-        // ============================================================
         renderTabInfo: function(canEdit) {
             const info = this.info || {};
             const disabled = canEdit ? '' : 'disabled';
-            const disabledClass = canEdit ? '' : 'opacity-60 cursor-not-allowed';
+            const dis = canEdit ? '' : 'opacity-50 cursor-not-allowed';
+            
+            const inputCls = `w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white outline-none transition ${dis}`;
+            const labelCls = "block text-[10px] font-bold uppercase text-zinc-500 mb-1.5";
             
             return `
                 <div class="space-y-4">
-                    <div class="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                        <p class="text-[10px] text-blue-700 dark:text-blue-300">
-                            <i data-lucide="info" class="w-3 h-3 inline"></i>
+                    <div class="p-3.5 bg-accent/5 border border-accent/20 rounded-2xl">
+                        <p class="text-[11px] text-accent leading-relaxed">
+                            <i data-lucide="info" class="w-3 h-3 inline mr-1"></i>
                             Banner muncul di atas halaman utama.
                         </p>
                     </div>
                     
                     <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Status Banner</label>
-                        <select id="info-status" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass}">
+                        <label class="${labelCls}">Status Banner</label>
+                        <select id="info-status" ${disabled} class="${inputCls}">
                             <option value="ON" ${info.STATUS === 'ON' ? 'selected' : ''}>ON</option>
                             <option value="OFF" ${info.STATUS !== 'ON' ? 'selected' : ''}>OFF</option>
                         </select>
                     </div>
                     
                     <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Pesan Banner</label>
-                        <textarea id="info-pesan" rows="3" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass} resize-none">${this.escape(info.PESAN || '')}</textarea>
+                        <label class="${labelCls}">Pesan Banner</label>
+                        <textarea id="info-pesan" rows="3" ${disabled} class="${inputCls} resize-none">${this.escape(info.PESAN || '')}</textarea>
                     </div>
                     
                     <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Warna</label>
-                        <select id="info-warna" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass}">
+                        <label class="${labelCls}">Warna</label>
+                        <select id="info-warna" ${disabled} class="${inputCls}">
                             ${['blue','green','red','yellow','indigo'].map(c => `<option value="${c}" ${info.WARNA === c ? 'selected' : ''}>${c}</option>`).join('')}
                         </select>
                     </div>
                     
-                    <hr class="border-zinc-200 dark:border-zinc-800">
+                    <hr class="border-ink-800">
                     
                     <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Versi Aplikasi</label>
-                        <input type="text" id="info-versi" value="${this.escape(info.VERSI || '1.0')}" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass}">
-                    </div>
-                    
-                    <hr class="border-zinc-200 dark:border-zinc-800">
-                    <h4 class="text-[10px] font-bold uppercase text-zinc-500">Popup (Opsional)</h4>
-                    
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Status Popup</label>
-                        <select id="info-popup-status" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass}">
-                            <option value="ON" ${info.POPUP_STATUS === 'ON' ? 'selected' : ''}>ON</option>
-                            <option value="OFF" ${info.POPUP_STATUS !== 'ON' ? 'selected' : ''}>OFF</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Judul Popup</label>
-                        <input type="text" id="info-popup-judul" value="${this.escape(info.POPUP_JUDUL || '')}" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass}">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Pesan Popup</label>
-                        <textarea id="info-popup-pesan" rows="3" ${disabled} class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm ${disabledClass} resize-none">${this.escape(info.POPUP_PESAN || '')}</textarea>
+                        <label class="${labelCls}">Versi Aplikasi</label>
+                        <input type="text" id="info-versi" value="${this.escape(info.VERSI || '1.0')}" ${disabled} class="${inputCls}">
                     </div>
                     
                     ${canEdit ? `
-                        <button onclick="app.saveInfo()" class="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-1.5">
-                            <i data-lucide="save" class="w-3.5 h-3.5"></i> Simpan Info
+                        <button onclick="app.saveInfo()" class="w-full px-4 py-3 bg-accent hover:bg-accent-hover text-black rounded-2xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition">
+                            <i data-lucide="save" class="w-4 h-4"></i> Simpan Info
                         </button>
-                    ` : `
-                        <p class="text-[10px] text-center text-zinc-500">Login sebagai Admin untuk mengedit</p>
-                    `}
+                    ` : `<p class="text-[11px] text-center text-zinc-500 py-2">Login sebagai Admin untuk mengedit</p>`}
                 </div>
             `;
         },
@@ -1245,36 +1178,29 @@
                 STATUS: document.getElementById('info-status').value,
                 PESAN: document.getElementById('info-pesan').value.trim(),
                 WARNA: document.getElementById('info-warna').value,
-                VERSI: document.getElementById('info-versi').value.trim(),
-                POPUP_STATUS: document.getElementById('info-popup-status').value,
-                POPUP_JUDUL: document.getElementById('info-popup-judul').value.trim(),
-                POPUP_PESAN: document.getElementById('info-popup-pesan').value.trim()
+                VERSI: document.getElementById('info-versi').value.trim()
             };
-            
-            // Update lokal
             this.info = { ...this.info, ...data };
             this.saveCache();
             this.renderInfoBanner();
-            
             this.queuePending({ action: 'saveInfo', data, userEmail: this.user?.email });
             this.syncPending();
             this.toast('Info disimpan', 'success');
         },
         
-        // ============================================================
-        // TAB: KATEGORI
-        // ============================================================
         renderTabKategori: function(canEdit) {
             const list = this.kategori.map(k => `
-                <div class="flex items-center gap-2 p-2 border border-zinc-200 dark:border-zinc-800 rounded-lg">
-                    <i data-lucide="${k.ICON || 'folder'}" class="w-3.5 h-3.5 text-zinc-500"></i>
-                    <span class="flex-1 font-semibold text-xs">${this.escape(k.NAMA)}</span>
+                <div class="flex items-center gap-3 p-3 bg-ink-850 border border-ink-750 rounded-2xl">
+                    <div class="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+                        <i data-lucide="${k.ICON || 'folder'}" class="w-4 h-4 text-accent"></i>
+                    </div>
+                    <span class="flex-1 font-semibold text-xs text-white">${this.escape(k.NAMA)}</span>
                     ${canEdit ? `
-                        <button onclick="app.editKategoriInline('${k.ID}')" class="p-1 text-zinc-400 hover:text-indigo-600">
-                            <i data-lucide="pencil" class="w-3 h-3"></i>
+                        <button onclick="app.editKategoriInline('${k.ID}')" class="p-1.5 text-zinc-500 hover:text-accent rounded-lg hover:bg-ink-800">
+                            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                         </button>
-                        <button onclick="app.deleteKategoriInline('${k.ID}')" class="p-1 text-zinc-400 hover:text-red-500">
-                            <i data-lucide="trash-2" class="w-3 h-3"></i>
+                        <button onclick="app.deleteKategoriInline('${k.ID}')" class="p-1.5 text-zinc-500 hover:text-red-400 rounded-lg hover:bg-ink-800">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                         </button>
                     ` : ''}
                 </div>
@@ -1283,13 +1209,12 @@
             return `
                 <div class="space-y-3">
                     ${canEdit ? `
-                        <button onclick="app.addKategoriInline()" class="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah Kategori
+                        <button onclick="app.addKategoriInline()" class="w-full px-4 py-3 bg-accent hover:bg-accent-hover text-black rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Tambah Kategori
                         </button>
                     ` : ''}
-                    
-                    <div class="space-y-1.5">
-                        ${list || '<p class="text-xs text-center text-zinc-500 py-4">Belum ada kategori</p>'}
+                    <div class="space-y-2">
+                        ${list || '<p class="text-xs text-center text-zinc-500 py-6">Belum ada kategori</p>'}
                     </div>
                 </div>
             `;
@@ -1298,14 +1223,12 @@
         addKategoriInline: function() {
             const nama = prompt('Nama kategori baru:');
             if (!nama || !nama.trim()) return;
-            const icon = prompt('Icon (Lucide name, contoh: folder):', 'folder') || 'folder';
-            
+            const icon = prompt('Icon (Lucide name):', 'folder') || 'folder';
             const data = { ID: null, NAMA: nama.trim(), ICON: icon.trim() };
             this.kategori.push({ ...data, ID: 'tmp-' + Date.now(), WARNA: 'zinc', URUTAN: this.kategori.length + 1 });
             this.saveCache();
             this.renderPanel();
             this.renderAll();
-            
             this.queuePending({ action: 'saveKategori', data, userEmail: this.user?.email });
             this.syncPending();
             this.toast('Kategori ditambahkan', 'success');
@@ -1317,14 +1240,12 @@
             const nama = prompt('Nama kategori:', k.NAMA);
             if (!nama || !nama.trim()) return;
             const icon = prompt('Icon:', k.ICON || 'folder') || 'folder';
-            
             const data = { ID: id, NAMA: nama.trim(), ICON: icon.trim() };
             const idx = this.kategori.findIndex(x => x.ID === id);
             if (idx >= 0) this.kategori[idx] = { ...this.kategori[idx], ...data };
             this.saveCache();
             this.renderPanel();
             this.renderAll();
-            
             this.queuePending({ action: 'saveKategori', data, userEmail: this.user?.email });
             this.syncPending();
             this.toast('Kategori diupdate', 'success');
@@ -1334,181 +1255,136 @@
             const k = this.kategori.find(x => x.ID === id);
             if (!k) return;
             if (!confirm(`Hapus kategori "${k.NAMA}"?`)) return;
-            
             this.kategori = this.kategori.filter(x => x.ID !== id);
             this.saveCache();
             this.renderPanel();
             this.renderAll();
-            
             this.queuePending({ action: 'deleteKategori', id, userEmail: this.user?.email });
             this.syncPending();
             this.toast('Kategori dihapus', 'success');
         },
         
-        // ============================================================
-        // TAB: USERS
-        // ============================================================
         renderTabUsers: function(isSuperAdmin) {
-            if (!isSuperAdmin) {
-                return `<p class="text-xs text-center text-zinc-500 py-8">Hanya Super Admin yang bisa kelola user</p>`;
-            }
+            if (!isSuperAdmin) return `<div class="text-center py-12"><i data-lucide="shield-alert" class="w-10 h-10 text-zinc-700 mx-auto mb-3"></i><p class="text-xs text-zinc-500">Hanya Super Admin</p></div>`;
             
             const list = this.users.map(u => `
-                <div class="flex items-center gap-2 p-2 border border-zinc-200 dark:border-zinc-800 rounded-lg">
-                    <div class="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 flex items-center justify-center text-[10px] font-bold shrink-0">
+                <div class="flex items-center gap-3 p-3 bg-ink-850 border border-ink-750 rounded-2xl">
+                    <div class="w-9 h-9 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-[11px] font-bold text-accent shrink-0">
                         ${this.escape(String(u.NAMA || u.EMAIL).substring(0, 2).toUpperCase())}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-semibold text-xs truncate">${this.escape(u.NAMA || '')}</p>
+                        <p class="font-semibold text-xs text-white truncate">${this.escape(u.NAMA || '')}</p>
                         <p class="text-[10px] text-zinc-500 truncate">${this.escape(u.EMAIL || '')} · ${this.escape(u.JABATAN || '')}</p>
                     </div>
-                    <button onclick="app.editUserInline('${this.escape(u.EMAIL)}')" class="p-1 text-zinc-400 hover:text-indigo-600">
-                        <i data-lucide="pencil" class="w-3 h-3"></i>
+                    <button onclick="app.editUserInline('${this.escape(u.EMAIL)}')" class="p-1.5 text-zinc-500 hover:text-accent rounded-lg hover:bg-ink-800">
+                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                     </button>
-                    <button onclick="app.deleteUserInline('${this.escape(u.EMAIL)}')" class="p-1 text-zinc-400 hover:text-red-500">
-                        <i data-lucide="trash-2" class="w-3 h-3"></i>
+                    <button onclick="app.deleteUserInline('${this.escape(u.EMAIL)}')" class="p-1.5 text-zinc-500 hover:text-red-400 rounded-lg hover:bg-ink-800">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
             `).join('');
             
             return `
                 <div class="space-y-3">
-                    <button onclick="app.addUserInline()" class="w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5">
-                        <i data-lucide="user-plus" class="w-3.5 h-3.5"></i> Tambah User
+                    <button onclick="app.addUserInline()" class="w-full px-4 py-3 bg-accent hover:bg-accent-hover text-black rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i> Tambah User
                     </button>
-                    <div class="space-y-1.5">
-                        ${list || '<p class="text-xs text-center text-zinc-500 py-4">Belum ada user</p>'}
-                    </div>
+                    <div class="space-y-2">${list || '<p class="text-xs text-center text-zinc-500 py-6">Belum ada user</p>'}</div>
                 </div>
             `;
         },
         
         addUserInline: function() {
-            const email = prompt('Email:');
-            if (!email) return;
-            const nama = prompt('Nama:');
-            if (!nama) return;
+            const email = prompt('Email:'); if (!email) return;
+            const nama = prompt('Nama:'); if (!nama) return;
             const jabatan = prompt('Jabatan (Super Admin/Admin/Operator):', 'Operator') || 'Operator';
             const unit = prompt('Unit:', '') || '';
-            const password = prompt('Password:');
-            if (!password) return;
-            
+            const password = prompt('Password:'); if (!password) return;
             const data = { EMAIL: email.toLowerCase().trim(), NAMA: nama, JABATAN: jabatan, UNIT: unit, PASSWORD: password, STATUS: 'aktif' };
             this.users.push({ EMAIL: data.EMAIL, NAMA: nama, JABATAN: jabatan, UNIT: unit, STATUS: 'aktif' });
             this.saveCache();
             this.renderPanel();
-            
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'saveUser', data, userEmail: this.user?.email })
-            }).then(r => r.json()).then(res => {
-                this.toast(res.status === 'success' ? 'User ditambahkan' : res.message, res.status === 'success' ? 'success' : 'error');
-            }).catch(() => this.toast('Gagal', 'error'));
+            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveUser', data, userEmail: this.user?.email }) })
+                .then(r => r.json()).then(res => this.toast(res.status === 'success' ? 'User ditambahkan' : res.message, res.status === 'success' ? 'success' : 'error'));
         },
         
         editUserInline: function(email) {
             const u = this.users.find(x => x.EMAIL === email);
             if (!u) return;
-            
-            const nama = prompt('Nama:', u.NAMA || '');
-            if (nama === null) return;
+            const nama = prompt('Nama:', u.NAMA || ''); if (nama === null) return;
             const jabatan = prompt('Jabatan:', u.JABATAN || 'Operator') || 'Operator';
             const unit = prompt('Unit:', u.UNIT || '') || '';
-            const password = prompt('Password baru (kosongkan jika tidak diubah):', '');
+            const password = prompt('Password baru (kosong = tidak diubah):', '');
             const status = prompt('Status (aktif/nonaktif):', u.STATUS || 'aktif') || 'aktif';
-            
             const data = { EMAIL: email, NAMA: nama, JABATAN: jabatan, UNIT: unit, STATUS: status };
             if (password) data.PASSWORD = password;
-            
             const idx = this.users.findIndex(x => x.EMAIL === email);
             if (idx >= 0) this.users[idx] = { ...this.users[idx], NAMA: nama, JABATAN: jabatan, UNIT: unit, STATUS: status };
             this.saveCache();
             this.renderPanel();
-            
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'saveUser', data, userEmail: this.user?.email })
-            }).then(r => r.json()).then(res => {
-                this.toast(res.status === 'success' ? 'User diupdate' : res.message, res.status === 'success' ? 'success' : 'error');
-            }).catch(() => this.toast('Gagal', 'error'));
+            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveUser', data, userEmail: this.user?.email }) })
+                .then(r => r.json()).then(res => this.toast(res.status === 'success' ? 'User diupdate' : res.message, res.status === 'success' ? 'success' : 'error'));
         },
         
         deleteUserInline: function(email) {
             if (!confirm(`Hapus user ${email}?`)) return;
-            
             this.users = this.users.filter(x => x.EMAIL !== email);
             this.saveCache();
             this.renderPanel();
-            
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'deleteUser', email, userEmail: this.user?.email })
-            }).then(r => r.json()).then(res => {
-                this.toast(res.status === 'success' ? 'User dihapus' : res.message, res.status === 'success' ? 'success' : 'error');
-            }).catch(() => this.toast('Gagal', 'error'));
+            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteUser', email, userEmail: this.user?.email }) })
+                .then(r => r.json()).then(res => this.toast(res.status === 'success' ? 'User dihapus' : res.message, res.status === 'success' ? 'success' : 'error'));
         },
         
-        // ============================================================
-        // TAB: FEEDBACK
-        // ============================================================
         renderTabFeedback: function(isAdmin) {
             if (!isAdmin) {
                 return `
                     <div class="space-y-3">
-                        <p class="text-xs text-zinc-500 text-center py-4">Kirim feedback ke admin:</p>
-                        <select id="fb-tipe" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm">
+                        <p class="text-xs text-zinc-400 mb-2">Kirim feedback ke admin:</p>
+                        <select id="fb-tipe" class="w-full bg-ink-850 border border-ink-750 rounded-2xl px-4 py-2.5 text-sm text-white outline-none">
                             <option value="saran">💡 Saran</option>
                             <option value="bug">🐛 Bug</option>
                             <option value="lain">📝 Lainnya</option>
                         </select>
-                        <textarea id="fb-pesan" rows="4" placeholder="Tulis pesan..." class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm resize-none"></textarea>
-                        <button onclick="app.sendFeedback()" class="w-full px-3 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold">
-                            <i data-lucide="send" class="w-3.5 h-3.5 inline mr-1"></i> Kirim
+                        <textarea id="fb-pesan" rows="4" placeholder="Tulis pesan..." class="w-full bg-ink-850 border border-ink-750 rounded-2xl px-4 py-3 text-sm text-white placeholder-zinc-500 resize-none outline-none"></textarea>
+                        <button onclick="app.sendFeedback()" class="w-full px-4 py-3 bg-accent hover:bg-accent-hover text-black rounded-2xl text-xs font-bold flex items-center justify-center gap-2">
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i> Kirim
                         </button>
                     </div>
                 `;
             }
             
-            // Admin view
             if (this.feedbackList.length === 0) {
-                return `
-                    <div class="text-center py-8 text-zinc-400">
-                        <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
-                        <p class="text-xs">Belum ada feedback</p>
-                    </div>
-                `;
+                return `<div class="text-center py-12 text-zinc-600"><i data-lucide="inbox" class="w-10 h-10 mx-auto mb-3 opacity-50"></i><p class="text-xs">Belum ada feedback</p></div>`;
             }
             
             const statusColor = {
-                baru: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-                dibaca: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-                diproses: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-                selesai: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                baru: 'bg-red-500/20 text-red-400 border-red-500/30',
+                dibaca: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+                diproses: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+                selesai: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
             };
             const tipeIcon = { saran: '💡', bug: '🐛', lain: '📝' };
             
             return `
                 <div class="space-y-2">
-                    <p class="text-[10px] text-zinc-500 uppercase font-bold">${this.feedbackList.length} feedback</p>
+                    <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest px-1 mb-2">${this.feedbackList.length} feedback</p>
                     ${this.feedbackList.map(f => `
-                        <div class="p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg space-y-1.5">
+                        <div class="p-3.5 bg-ink-850 border border-ink-750 rounded-2xl space-y-2">
                             <div class="flex items-start justify-between gap-2">
                                 <div class="flex items-center gap-1.5 flex-wrap">
-                                    <span>${tipeIcon[f.TIPE] || '📝'}</span>
-                                    <span class="text-[9px] font-mono text-zinc-400">${this.escape(f.WAKTU)}</span>
-                                    <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${statusColor[String(f.STATUS).toLowerCase()] || statusColor.baru}">${this.escape(f.STATUS || 'baru')}</span>
+                                    <span class="text-sm">${tipeIcon[f.TIPE] || '📝'}</span>
+                                    <span class="text-[9px] font-mono text-zinc-500">${this.escape(f.WAKTU)}</span>
+                                    <span class="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full border ${statusColor[String(f.STATUS).toLowerCase()] || statusColor.baru}">${this.escape(f.STATUS || 'baru')}</span>
                                 </div>
-                                <button onclick="app.deleteFeedbackInline('${f.ID}')" class="text-zinc-400 hover:text-red-500 p-0.5">
+                                <button onclick="app.deleteFeedbackInline('${f.ID}')" class="text-zinc-500 hover:text-red-400 p-1">
                                     <i data-lucide="trash-2" class="w-3 h-3"></i>
                                 </button>
                             </div>
-                            <p class="text-xs whitespace-pre-wrap">${this.escape(f.PESAN)}</p>
-                            <div class="flex items-center justify-between text-[10px] text-zinc-500">
+                            <p class="text-xs text-zinc-300 whitespace-pre-wrap leading-relaxed">${this.escape(f.PESAN)}</p>
+                            <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-1 border-t border-ink-800">
                                 <span class="truncate">${this.escape(f.PENGIRIM || 'anon')}</span>
-                                <select onchange="app.updateFeedbackStatusInline('${f.ID}', this.value)" class="text-[9px] bg-zinc-50 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 rounded px-1.5 py-0.5">
+                                <select onchange="app.updateFeedbackStatusInline('${f.ID}', this.value)" class="text-[10px] bg-ink-900 border border-ink-750 rounded-lg px-2 py-1 text-white outline-none">
                                     <option value="baru" ${f.STATUS==='baru'?'selected':''}>Baru</option>
                                     <option value="dibaca" ${f.STATUS==='dibaca'?'selected':''}>Dibaca</option>
                                     <option value="diproses" ${f.STATUS==='diproses'?'selected':''}>Diproses</option>
@@ -1525,7 +1401,6 @@
             if (!this.user || !this.isOnline) return;
             const isAdmin = this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin';
             if (!isAdmin) return;
-            
             fetch(`${this.apiURL}?action=feedback&email=${encodeURIComponent(this.user.email)}`)
                 .then(r => r.json())
                 .then(res => {
@@ -1534,29 +1409,20 @@
                         this.saveCache();
                         if (this.panelOpen && this.currentTab === 'feedback') this.renderPanel();
                     }
-                })
-                .catch(() => {});
+                }).catch(() => {});
         },
         
         sendFeedback: function() {
             const tipe = document.getElementById('fb-tipe').value;
             const pesan = document.getElementById('fb-pesan').value.trim();
             if (!pesan) { this.toast('Pesan wajib', 'error'); return; }
-            
             fetch(this.apiURL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({
-                    action: 'saveFeedback',
-                    data: { tipe, pesan, pengirim: this.user?.nama || 'anon', kontak: this.user?.email || '' }
-                })
+                body: JSON.stringify({ action: 'saveFeedback', data: { tipe, pesan, pengirim: this.user?.nama || 'anon', kontak: this.user?.email || '' } })
             }).then(r => r.json()).then(res => {
-                if (res.status === 'success') {
-                    this.toast('Terima kasih!', 'success');
-                    document.getElementById('fb-pesan').value = '';
-                } else {
-                    this.toast(res.message, 'error');
-                }
+                if (res.status === 'success') { this.toast('Terima kasih!', 'success'); document.getElementById('fb-pesan').value = ''; }
+                else this.toast(res.message, 'error');
             }).catch(() => this.toast('Gagal', 'error'));
         },
         
@@ -1564,12 +1430,7 @@
             const f = this.feedbackList.find(x => x.ID === id);
             if (f) f.STATUS = status;
             this.saveCache();
-            
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'updateFeedback', id, status, userEmail: this.user?.email })
-            }).catch(() => {});
+            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'updateFeedback', id, status, userEmail: this.user?.email }) }).catch(() => {});
         },
         
         deleteFeedbackInline: function(id) {
@@ -1577,21 +1438,11 @@
             this.feedbackList = this.feedbackList.filter(x => x.ID !== id);
             this.saveCache();
             this.renderPanel();
-            
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'deleteFeedback', id, userEmail: this.user?.email })
-            }).catch(() => {});
+            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteFeedback', id, userEmail: this.user?.email }) }).catch(() => {});
         },
         
-        // ============================================================
-        // TAB: BACKUP
-        // ============================================================
         renderTabBackup: function(canEdit) {
-            if (!canEdit) {
-                return `<p class="text-xs text-center text-zinc-500 py-8">Login sebagai Admin untuk akses backup</p>`;
-            }
+            if (!canEdit) return `<div class="text-center py-12"><i data-lucide="lock" class="w-10 h-10 text-zinc-700 mx-auto mb-3"></i><p class="text-xs text-zinc-500">Login sebagai Admin</p></div>`;
             
             const cacheSize = (localStorage.getItem(this.KEYS.CACHE) || '').length;
             const pendingCount = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]').length;
@@ -1599,44 +1450,37 @@
             
             return `
                 <div class="space-y-4">
-                    <div class="p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg space-y-2 text-xs">
-                        <div class="flex justify-between"><span class="text-zinc-500">Cache size:</span><span class="font-mono">${(cacheSize/1024).toFixed(1)} KB</span></div>
-                        <div class="flex justify-between"><span class="text-zinc-500">Pending ops:</span><span class="font-mono">${pendingCount}</span></div>
-                        <div class="flex justify-between"><span class="text-zinc-500">Last sync:</span><span class="font-mono text-[10px]">${lastSync}</span></div>
-                        <div class="flex justify-between"><span class="text-zinc-500">Menu count:</span><span class="font-mono">${this.menu.length}</span></div>
+                    <div class="p-4 bg-ink-850 border border-ink-750 rounded-2xl space-y-2.5 text-xs">
+                        <div class="flex justify-between"><span class="text-zinc-500">Cache size</span><span class="font-mono text-white">${(cacheSize/1024).toFixed(1)} KB</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Pending ops</span><span class="font-mono text-white">${pendingCount}</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Last sync</span><span class="font-mono text-white text-[10px]">${lastSync}</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Total menu</span><span class="font-mono text-white">${this.menu.length}</span></div>
                     </div>
                     
-                    <button onclick="app.exportJSON()" class="w-full px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Backup (JSON)
+                    <button onclick="app.exportJSON()" class="w-full px-4 py-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition">
+                        <i data-lucide="download" class="w-4 h-4"></i> Export Backup
                     </button>
                     
-                    <label class="w-full px-3 py-2 bg-zinc-800 hover:bg-zinc-900 dark:bg-zinc-100 dark:hover:bg-white text-white dark:text-black rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer">
-                        <i data-lucide="upload" class="w-3.5 h-3.5"></i> Import Backup
+                    <label class="w-full px-4 py-3 bg-ink-850 hover:bg-ink-750 text-white border border-ink-750 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition">
+                        <i data-lucide="upload" class="w-4 h-4"></i> Import Backup
                         <input type="file" id="import-file" accept=".json" class="hidden" onchange="app.importJSON(event)">
                     </label>
                     
-                    <hr class="border-zinc-200 dark:border-zinc-800">
+                    <hr class="border-ink-800">
                     
-                    <button onclick="app.clearCache()" class="w-full px-3 py-2 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-semibold">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5 inline mr-1"></i> Clear Cache & Sync Ulang
+                    <button onclick="app.clearCache()" class="w-full px-4 py-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-2xl text-xs font-bold transition">
+                        <i data-lucide="refresh-cw" class="w-4 h-4 inline mr-1"></i> Clear Cache & Sync
                     </button>
                     
-                    <button onclick="app.factoryReset()" class="w-full px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-xs font-semibold">
-                        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 inline mr-1"></i> Reset Semua Data Lokal
+                    <button onclick="app.factoryReset()" class="w-full px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-2xl text-xs font-bold transition">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 inline mr-1"></i> Reset Semua Data
                     </button>
                 </div>
             `;
         },
         
         exportJSON: function() {
-            const data = {
-                version: '3.0',
-                exportedAt: new Date().toISOString(),
-                menu: this.menu,
-                kategori: this.kategori,
-                info: this.info,
-                footer: this.footer
-            };
+            const data = { version: '3.1', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1654,86 +1498,80 @@
             reader.onload = (e) => {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (!data.menu || !Array.isArray(data.menu)) throw new Error('Invalid format');
-                    this.toast(`File berisi ${data.menu.length} menu. Apply manual via Sheet untuk saat ini.`, 'warning');
-                } catch(err) {
-                    this.toast('File tidak valid: ' + err.message, 'error');
-                }
+                    if (!data.menu) throw new Error('Invalid');
+                    this.toast(`File ${data.menu.length} menu. Apply manual via Sheet.`, 'warning');
+                } catch(err) { this.toast('File tidak valid', 'error'); }
                 event.target.value = '';
             };
             reader.readAsText(file);
         },
         
         clearCache: function() {
-            if (!confirm('Clear cache & sync ulang dari server?')) return;
+            if (!confirm('Clear cache & sync ulang?')) return;
             localStorage.removeItem(this.KEYS.CACHE);
             localStorage.removeItem(this.KEYS.LAST_SYNC);
-            this.menu = [];
-            this.kategori = [];
+            this.menu = []; this.kategori = [];
             this.saveCache();
             this.syncNow();
             this.closePanel();
         },
         
         factoryReset: function() {
-            if (!confirm('Reset SEMUA data lokal? Anda akan logout.')) return;
-            if (!confirm('Yakin? Tindakan ini tidak bisa dibatalkan.')) return;
+            if (!confirm('Reset SEMUA data lokal?')) return;
+            if (!confirm('Yakin? Tidak bisa dibatalkan.')) return;
             Object.values(this.KEYS).forEach(k => localStorage.removeItem(k));
             location.reload();
         },
         
-        // ============================================================
-        // TAB: PREFERENSI
-        // ============================================================
         renderTabPrefs: function() {
             const p = this.prefs;
+            const cardCls = "flex items-center justify-between p-4 bg-ink-850 border border-ink-750 rounded-2xl cursor-pointer";
+            
             return `
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Tampilan Default</label>
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-2 px-1">Tampilan Default</label>
                         <div class="flex gap-2">
-                            <button onclick="app.setPref('view','grid')" class="flex-1 px-3 py-2 rounded-lg text-xs font-semibold border ${p.view==='grid' ? 'bg-indigo-600 text-white border-indigo-600' : 'border-zinc-300 dark:border-zinc-700'}">
-                                <i data-lucide="layout-grid" class="w-3.5 h-3.5 inline mr-1"></i> Grid
+                            <button onclick="app.setPref('view','grid')" class="flex-1 px-4 py-3 rounded-2xl text-xs font-bold border transition ${p.view==='grid' ? 'bg-accent text-black border-accent shadow-lg shadow-accent/20' : 'border-ink-750 text-zinc-400 hover:border-ink-700'}">
+                                <i data-lucide="layout-grid" class="w-4 h-4 inline mr-1"></i> Grid
                             </button>
-                            <button onclick="app.setPref('view','list')" class="flex-1 px-3 py-2 rounded-lg text-xs font-semibold border ${p.view==='list' ? 'bg-indigo-600 text-white border-indigo-600' : 'border-zinc-300 dark:border-zinc-700'}">
-                                <i data-lucide="layout-list" class="w-3.5 h-3.5 inline mr-1"></i> List
+                            <button onclick="app.setPref('view','list')" class="flex-1 px-4 py-3 rounded-2xl text-xs font-bold border transition ${p.view==='list' ? 'bg-accent text-black border-accent shadow-lg shadow-accent/20' : 'border-ink-750 text-zinc-400 hover:border-ink-700'}">
+                                <i data-lucide="layout-list" class="w-4 h-4 inline mr-1"></i> List
                             </button>
                         </div>
                     </div>
                     
-                    <label class="flex items-center justify-between p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
+                    <label class="${cardCls}">
                         <div>
-                            <p class="text-xs font-semibold">Tampilkan Click Counter</p>
-                            <p class="text-[10px] text-zinc-500">Statistik klik pada card</p>
+                            <p class="text-xs font-semibold text-white">Click Counter</p>
+                            <p class="text-[10px] text-zinc-500 mt-0.5">Tampilkan jumlah klik</p>
                         </div>
-                        <input type="checkbox" ${p.showClicks ? 'checked' : ''} onchange="app.setPref('showClicks', this.checked)" class="w-4 h-4 rounded">
+                        <input type="checkbox" ${p.showClicks ? 'checked' : ''} onchange="app.setPref('showClicks', this.checked)" class="w-4 h-4 rounded accent-amber-400">
                     </label>
                     
-                    <label class="flex items-center justify-between p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
+                    <label class="${cardCls}">
                         <div>
-                            <p class="text-xs font-semibold">Tampilkan Banner Info</p>
-                            <p class="text-[10px] text-zinc-500">Banner pengumuman di atas</p>
+                            <p class="text-xs font-semibold text-white">Banner Info</p>
+                            <p class="text-[10px] text-zinc-500 mt-0.5">Tampilkan pengumuman</p>
                         </div>
-                        <input type="checkbox" ${p.showBanner ? 'checked' : ''} onchange="app.setPref('showBanner', this.checked)" class="w-4 h-4 rounded">
+                        <input type="checkbox" ${p.showBanner ? 'checked' : ''} onchange="app.setPref('showBanner', this.checked)" class="w-4 h-4 rounded accent-amber-400">
                     </label>
                     
-                    <label class="flex items-center justify-between p-3 border border-zinc-200 dark:border-zinc-800 rounded-lg cursor-pointer">
+                    <label class="${cardCls}">
                         <div>
-                            <p class="text-xs font-semibold">Auto Sync</p>
-                            <p class="text-[10px] text-zinc-500">Sync otomatis tiap ${p.autoSyncInterval} menit</p>
+                            <p class="text-xs font-semibold text-white">Auto Sync</p>
+                            <p class="text-[10px] text-zinc-500 mt-0.5">Sync tiap ${p.autoSyncInterval} menit</p>
                         </div>
-                        <input type="checkbox" ${p.autoSync ? 'checked' : ''} onchange="app.setPref('autoSync', this.checked)" class="w-4 h-4 rounded">
+                        <input type="checkbox" ${p.autoSync ? 'checked' : ''} onchange="app.setPref('autoSync', this.checked)" class="w-4 h-4 rounded accent-amber-400">
                     </label>
                     
                     <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Interval Auto Sync (menit)</label>
-                        <input type="number" min="1" max="60" value="${p.autoSyncInterval}" onchange="app.setPref('autoSyncInterval', Number(this.value))" class="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded-lg px-3 py-2 text-sm">
+                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1.5 px-1">Interval (menit)</label>
+                        <input type="number" min="1" max="60" value="${p.autoSyncInterval}" onchange="app.setPref('autoSyncInterval', Number(this.value))" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 rounded-2xl px-4 py-2.5 text-sm text-white outline-none">
                     </div>
                     
-                    <hr class="border-zinc-200 dark:border-zinc-800">
-                    
-                    <div class="p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg">
-                        <p class="text-[10px] text-zinc-500 mb-2">💡 <strong>Tips:</strong> Aplikasi tidak akan refresh otomatis saat dibuka. Data ditampilkan dari cache terakhir. Klik tombol Sync (🔄) untuk memperbarui.</p>
+                    <div class="p-4 bg-accent/5 border border-accent/20 rounded-2xl">
+                        <p class="text-[11px] text-accent leading-relaxed">💡 Aplikasi tidak refresh otomatis saat dibuka. Klik tombol Sync untuk memperbarui.</p>
                     </div>
                 </div>
             `;
@@ -1743,17 +1581,17 @@
             this.prefs[key] = value;
             this.savePrefs();
             this.renderPanel();
-            
-            if (key === 'view') {
-                this.updateViewIcon();
-                this.renderAll();
-            }
+            if (key === 'view') { this.updateViewIcon(); this.renderAll(); }
             if (key === 'showClicks' || key === 'showBanner') this.renderAll();
         },
         
-        // ============================================================
-        // UI HELPERS
-        // ============================================================
+        renderKategoriOptions: function() {
+            const sel = document.getElementById('link-kategori');
+            if (!sel) return;
+            sel.innerHTML = this.kategori.map(k => `<option value="${this.escape(k.NAMA)}">${this.escape(k.NAMA)}</option>`).join('') + `<option value="Lain-lain">Lain-lain</option>`;
+        },
+        
+        // UI
         updateUIState: function() {
             const isLoggedIn = !!this.user;
             const canEdit = isLoggedIn && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
@@ -1767,19 +1605,13 @@
             
             if (isLoggedIn) {
                 navBadge.innerText = this.user.jabatan;
-                navBadge.className = "text-[9px] font-mono uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-bold hidden sm:inline";
+                navBadge.className = "text-[9px] font-mono uppercase tracking-wider text-accent font-bold hidden sm:inline";
                 authText.innerText = this.user.nama.split(' ')[0];
-                
                 document.getElementById('prof-name').innerText = this.user.nama;
                 document.getElementById('prof-role').innerText = this.user.jabatan;
                 document.getElementById('prof-unit').innerText = this.user.unit || '-';
                 document.getElementById('prof-email').innerText = this.user.email || '-';
-                
-                if (canEdit) {
-                    btnTambah.classList.remove('hidden');
-                } else {
-                    btnTambah.classList.add('hidden');
-                }
+                if (canEdit) btnTambah.classList.remove('hidden'); else btnTambah.classList.add('hidden');
             } else {
                 navBadge.innerText = "Guest";
                 navBadge.className = "text-[9px] font-mono uppercase tracking-wider text-zinc-500 font-semibold hidden sm:inline";
@@ -1787,7 +1619,6 @@
                 btnTambah.classList.add('hidden');
                 this.editMode = false;
             }
-            
             lucide.createIcons();
         },
         
@@ -1799,23 +1630,18 @@
             
             const s = state || (this.isOnline ? 'synced' : 'offline');
             const states = {
-                synced: { color: 'bg-emerald-500' },
-                syncing: { color: 'bg-amber-500 sync-pulse' },
-                offline: { color: 'bg-zinc-400' },
-                error: { color: 'bg-red-500' }
+                synced: { color: 'bg-emerald-400' },
+                syncing: { color: 'bg-accent sync-pulse' },
+                offline: { color: 'bg-zinc-600' },
+                error: { color: 'bg-red-400' }
             };
-            
             const cfg = states[s] || states.synced;
             dot.className = 'w-1.5 h-1.5 rounded-full ' + cfg.color;
             
             let label = 'Baru saja';
             if (queue.length > 0) label = `Pending (${queue.length})`;
             else if (!this.isOnline) label = 'Offline';
-            else if (lastSync) {
-                const ago = this.timeAgo(lastSync);
-                label = ago;
-            }
-            
+            else if (lastSync) label = this.timeAgo(lastSync);
             text.innerText = label;
         },
         
@@ -1848,34 +1674,31 @@
         
         toast: function(msg, type) {
             const colors = {
-                success: 'bg-emerald-500', error: 'bg-red-500',
-                warning: 'bg-amber-500', info: 'bg-zinc-800 dark:bg-zinc-700'
+                success: 'bg-emerald-500 text-white',
+                error: 'bg-red-500 text-white',
+                warning: 'bg-amber-500 text-black',
+                info: 'bg-ink-800 text-white border border-ink-700'
             };
             const icons = { success: 'check-circle', error: 'alert-circle', warning: 'alert-triangle', info: 'info' };
             
             const el = document.createElement('div');
-            el.className = `toast ${colors[type] || colors.info} text-white px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 text-xs font-semibold`;
-            el.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="w-3.5 h-3.5 shrink-0"></i><span class="flex-1">${this.escape(msg)}</span>`;
-            
+            el.className = `toast ${colors[type] || colors.info} px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-semibold backdrop-blur`;
+            el.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="w-4 h-4 shrink-0"></i><span class="flex-1">${this.escape(msg)}</span>`;
             document.getElementById('toast-container').appendChild(el);
             lucide.createIcons();
             
             setTimeout(() => {
-                el.style.transition = 'all 0.25s';
+                el.style.transition = 'all 0.3s';
                 el.style.opacity = '0';
-                el.style.transform = 'translateX(100%)';
-                setTimeout(() => el.remove(), 250);
-            }, 2500);
+                el.style.transform = 'translateX(120%)';
+                setTimeout(() => el.remove(), 300);
+            }, 2800);
         },
         
-        // ============================================================
-        // ICON & COLOR PICKER
-        // ============================================================
         setupIconPicker: function() {
             const grid = document.getElementById('icon-grid');
             const search = document.getElementById('link-icon-search');
             if (!grid) return;
-            
             const render = (filter) => {
                 const list = filter ? this.ICONS.filter(i => i.includes(filter.toLowerCase())) : this.ICONS;
                 grid.innerHTML = list.map(ic => `
@@ -1886,7 +1709,6 @@
                 `).join('');
                 lucide.createIcons();
             };
-            
             search.addEventListener('input', e => render(e.target.value));
             render('');
         },
@@ -1902,10 +1724,10 @@
             const picker = document.getElementById('color-picker');
             if (!picker) return;
             const colorMap = {
-                zinc: 'bg-zinc-400', blue: 'bg-blue-500', red: 'bg-red-500', green: 'bg-green-500',
-                emerald: 'bg-emerald-500', rose: 'bg-rose-500', yellow: 'bg-yellow-500', indigo: 'bg-indigo-500',
-                purple: 'bg-purple-500', orange: 'bg-orange-500', pink: 'bg-pink-500', sky: 'bg-sky-500',
-                teal: 'bg-teal-500', violet: 'bg-violet-500'
+                zinc: 'bg-zinc-500', blue: 'bg-blue-500', red: 'bg-red-500', green: 'bg-green-500',
+                emerald: 'bg-emerald-500', rose: 'bg-rose-500', yellow: 'bg-yellow-400', amber: 'bg-amber-400',
+                indigo: 'bg-indigo-500', purple: 'bg-purple-500', orange: 'bg-orange-500', pink: 'bg-pink-500',
+                sky: 'bg-sky-500', teal: 'bg-teal-500', violet: 'bg-violet-500'
             };
             picker.innerHTML = this.COLORS.map(c => `
                 <div class="color-dot ${colorMap[c]}" data-color="${c}" onclick="app.selectColor('${c}')" title="${c}"></div>
@@ -1919,26 +1741,26 @@
             if (target) target.classList.add('selected');
         },
         
-        // ============================================================
-        // UTILS
-        // ============================================================
-        getColorClasses: function(color) {
+        // COLOR CONFIG (with glow)
+        getColorConfig: function(color) {
             const map = {
-                blue: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20',
-                red: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20',
-                green: 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20',
-                emerald: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20',
-                rose: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20',
-                yellow: 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20',
-                indigo: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20',
-                purple: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20',
-                orange: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20',
-                pink: 'text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-900/20',
-                sky: 'text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20',
-                teal: 'text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/20',
-                violet: 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-900/20'
+                zinc:    { bg: 'bg-zinc-500/15',   text: 'text-zinc-300',   glow: 'shadow-[0_0_20px_-4px_rgba(161,161,170,0.5)]' },
+                blue:    { bg: 'bg-blue-500/15',   text: 'text-blue-400',   glow: 'shadow-[0_0_20px_-4px_rgba(59,130,246,0.6)]' },
+                red:     { bg: 'bg-red-500/15',    text: 'text-red-400',    glow: 'shadow-[0_0_20px_-4px_rgba(239,68,68,0.6)]' },
+                green:   { bg: 'bg-green-500/15',  text: 'text-green-400',  glow: 'shadow-[0_0_20px_-4px_rgba(34,197,94,0.6)]' },
+                emerald: { bg: 'bg-emerald-500/15',text: 'text-emerald-400',glow: 'shadow-[0_0_20px_-4px_rgba(16,185,129,0.6)]' },
+                rose:    { bg: 'bg-rose-500/15',   text: 'text-rose-400',   glow: 'shadow-[0_0_20px_-4px_rgba(244,63,94,0.6)]' },
+                yellow:  { bg: 'bg-yellow-400/15', text: 'text-yellow-300', glow: 'shadow-[0_0_20px_-4px_rgba(250,204,21,0.7)]' },
+                amber:   { bg: 'bg-amber-400/15',  text: 'text-amber-300',  glow: 'shadow-[0_0_20px_-4px_rgba(251,191,36,0.7)]' },
+                indigo:  { bg: 'bg-indigo-500/15', text: 'text-indigo-400', glow: 'shadow-[0_0_20px_-4px_rgba(99,102,241,0.6)]' },
+                purple:  { bg: 'bg-purple-500/15', text: 'text-purple-400', glow: 'shadow-[0_0_20px_-4px_rgba(168,85,247,0.6)]' },
+                orange:  { bg: 'bg-orange-500/15', text: 'text-orange-400', glow: 'shadow-[0_0_20px_-4px_rgba(249,115,22,0.6)]' },
+                pink:    { bg: 'bg-pink-500/15',   text: 'text-pink-400',   glow: 'shadow-[0_0_20px_-4px_rgba(236,72,153,0.6)]' },
+                sky:     { bg: 'bg-sky-500/15',    text: 'text-sky-400',    glow: 'shadow-[0_0_20px_-4px_rgba(14,165,233,0.6)]' },
+                teal:    { bg: 'bg-teal-500/15',   text: 'text-teal-400',   glow: 'shadow-[0_0_20px_-4px_rgba(20,184,166,0.6)]' },
+                violet:  { bg: 'bg-violet-500/15', text: 'text-violet-400', glow: 'shadow-[0_0_20px_-4px_rgba(139,92,246,0.6)]' }
             };
-            return map[color] || 'text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800';
+            return map[color] || map.zinc;
         },
         
         escape: function(str) {
