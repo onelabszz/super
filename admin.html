@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="theme-color" content="#0a0b10">
-    <meta name="description" content="Console v4.0">
+    <meta name="description" content="Console v4.1">
     <title>Console</title>
     
     <link rel="manifest" href="manifest.json">
@@ -32,7 +32,7 @@
                             DEFAULT: '#a5b4fc',
                             hover: '#c4caff',
                             dim: '#818cf8',
-                            soft: 'rgba(165, 180, 252, 0.12)',
+                            soft: '#2a2f47',
                         }
                     },
                     fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
@@ -47,7 +47,6 @@
         html, body { background-color: #0a0b10; }
         body { font-family: 'Inter', sans-serif; color: #e4e4e7; overflow-x: hidden; }
         
-        /* Subtle grain */
         body::before {
             content: '';
             position: fixed; inset: 0;
@@ -56,7 +55,6 @@
             pointer-events: none; z-index: 0;
         }
         
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #252a3a; border-radius: 3px; }
@@ -84,13 +82,12 @@
         
         .backdrop {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
+            background: #000000;
             z-index: 55;
             opacity: 0; pointer-events: none;
             transition: opacity 0.25s;
         }
-        .backdrop.show { opacity: 1; pointer-events: auto; }
+        .backdrop.show { opacity: 0.7; pointer-events: auto; }
         
         @media (min-width: 1024px) { .backdrop { display: none !important; } }
         
@@ -104,9 +101,13 @@
             transition: all 0.15s;
             cursor: pointer;
             position: relative;
+            background: transparent;
+            border: none;
+            text-align: left;
+            width: 100%;
         }
         .nav-item:hover { background: #181c26; color: #e4e4e7; }
-        .nav-item.active { background: rgba(165, 180, 252, 0.1); color: #a5b4fc; font-weight: 600; }
+        .nav-item.active { background: #1e2230; color: #a5b4fc; font-weight: 600; }
         .nav-item.active::before {
             content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
             width: 3px; height: 20px;
@@ -130,7 +131,7 @@
             position: relative;
         }
         @media (hover: hover) {
-            .link-card:hover { transform: translateY(-2px); border-color: rgba(165, 180, 252, 0.3); }
+            .link-card:hover { transform: translateY(-2px); border-color: #3a4054; }
         }
         .link-card:active { transform: scale(0.98); }
         
@@ -141,14 +142,6 @@
             display: flex; align-items: center; justify-content: center;
             position: relative;
             margin-bottom: 10px;
-        }
-        .icon-circle::after {
-            content: ''; position: absolute; inset: -3px;
-            border-radius: 50%;
-            background: inherit;
-            opacity: 0.35;
-            filter: blur(14px);
-            z-index: -1;
         }
         
         /* Buttons */
@@ -166,10 +159,10 @@
         .btn-primary { background: #a5b4fc; color: #0a0b10; }
         .btn-primary:hover { background: #c4caff; }
         .btn-primary:active { transform: scale(0.97); }
-        .btn-ghost { background: transparent; color: #a1a1aa; border: 1px solid #1e2230; }
+        .btn-ghost { background: #14171f; color: #a1a1aa; border: 1px solid #1e2230; }
         .btn-ghost:hover { background: #181c26; color: #e4e4e7; border-color: #252a3a; }
-        .btn-danger { background: rgba(252, 165, 165, 0.1); color: #fca5a5; border: 1px solid rgba(252, 165, 165, 0.2); }
-        .btn-danger:hover { background: rgba(252, 165, 165, 0.15); }
+        .btn-danger { background: #2a1a1f; color: #fca5a5; border: 1px solid #4a2028; }
+        .btn-danger:hover { background: #3a1f26; }
         .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
         
         /* Icon button */
@@ -198,28 +191,28 @@
             outline: none;
             transition: all 0.15s;
         }
-        .input:focus { border-color: rgba(165, 180, 252, 0.5); box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.1); }
+        .input:focus { border-color: #4a5490; background: #181c26; }
         .input::placeholder { color: #52525b; }
         .input:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        /* Modal */
+        /* Modal — SOLID */
         .modal {
             position: fixed; inset: 0; z-index: 70;
             display: none; align-items: center; justify-content: center;
             padding: 16px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.85);
         }
         .modal.show { display: flex; }
         .modal-box {
             background: #0d0f14;
             border: 1px solid #1e2230;
             border-radius: 18px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
             max-height: 92vh;
             width: 100%;
             display: flex; flex-direction: column;
             overflow: hidden;
+            position: relative;
             animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         }
         @keyframes modalIn {
@@ -227,7 +220,7 @@
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
         
-        /* Toast */
+        /* Toast — SOLID */
         #toast-container {
             position: fixed; top: 76px; right: 14px; z-index: 80;
             display: flex; flex-direction: column; gap: 8px;
@@ -239,16 +232,16 @@
             border-radius: 12px;
             font-size: 12.5px; font-weight: 600;
             display: flex; align-items: center; gap: 10px;
-            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.6);
             animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: auto;
             border: 1px solid;
         }
         @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .toast-success { background: rgba(110, 231, 183, 0.12); color: #6ee7b7; border-color: rgba(110, 231, 183, 0.25); }
-        .toast-error { background: rgba(252, 165, 165, 0.12); color: #fca5a5; border-color: rgba(252, 165, 165, 0.25); }
-        .toast-warning { background: rgba(252, 211, 77, 0.12); color: #fcd34d; border-color: rgba(252, 211, 77, 0.25); }
-        .toast-info { background: rgba(165, 180, 252, 0.12); color: #a5b4fc; border-color: rgba(165, 180, 252, 0.25); }
+        .toast-success { background: #133328; color: #86efac; border-color: #1e5a3f; }
+        .toast-error { background: #331820; color: #fca5a5; border-color: #5a1e2a; }
+        .toast-warning { background: #332b13; color: #fcd34d; border-color: #5a4a1e; }
+        .toast-info { background: #1e2230; color: #a5b4fc; border-color: #3a4054; }
         
         /* Sync status */
         .sync-dot {
@@ -260,7 +253,7 @@
         .sync-dot.error { background: #fca5a5; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         
-        /* Grid/List view for links */
+        /* Links grid */
         .links-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -279,12 +272,11 @@
             border: 1px solid #1e2230;
             border-radius: 12px;
             transition: all 0.15s;
-            cursor: pointer;
         }
-        .link-row:hover { background: #181c26; border-color: rgba(165, 180, 252, 0.3); }
+        .link-row:hover { background: #181c26; border-color: #3a4054; }
         
         /* Sortable */
-        .sortable-ghost { opacity: 0.3; background: rgba(165, 180, 252, 0.2) !important; border-radius: 12px; }
+        .sortable-ghost { opacity: 0.3; background: #2a2f47 !important; border-radius: 12px; }
         .drag-handle { cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
         
@@ -295,24 +287,29 @@
             padding: 0 2px;
         }
         
-        /* Light mode tweaks */
+        /* Light mode */
         html:not(.dark) body { background: #f4f5f8; color: #1e2230; }
         html:not(.dark) body::before { background-image: radial-gradient(rgba(0,0,0,0.015) 1px, transparent 1px); }
         html:not(.dark) .sidebar { background: #ffffff; border-color: #e4e4e7; }
         html:not(.dark) .nav-item { color: #52525b; }
         html:not(.dark) .nav-item:hover { background: #f4f4f5; color: #18181b; }
-        html:not(.dark) .nav-item.active { background: rgba(129, 140, 248, 0.1); color: #6366f1; }
+        html:not(.dark) .nav-item.active { background: #eef0ff; color: #6366f1; }
         html:not(.dark) .nav-item.active::before { background: #6366f1; }
         html:not(.dark) .card, html:not(.dark) .link-card, html:not(.dark) .link-row { background: #ffffff; border-color: #e4e4e7; }
         html:not(.dark) .input { background: #ffffff; border-color: #e4e4e7; color: #18181b; }
+        html:not(.dark) .input:focus { background: #f9fafb; }
         html:not(.dark) .modal-box { background: #ffffff; border-color: #e4e4e7; }
         html:not(.dark) .icon-btn:hover { background: #f4f4f5; color: #18181b; }
-        html:not(.dark) .btn-ghost { border-color: #e4e4e7; color: #52525b; }
+        html:not(.dark) .btn-ghost { background: #ffffff; border-color: #e4e4e7; color: #52525b; }
         html:not(.dark) .btn-ghost:hover { background: #f4f4f5; color: #18181b; }
         html:not(.dark) .text-white { color: #18181b; }
         html:not(.dark) .text-zinc-400 { color: #71717a; }
         html:not(.dark) .text-zinc-500 { color: #71717a; }
-        html:not(.dark) .border-ink-750, html:not(.dark) .border-ink-700 { border-color: #e4e4e7; }
+        html:not(.dark) .border-ink-750, html:not(.dark) .border-ink-700, html:not(.dark) .border-ink-800 { border-color: #e4e4e7; }
+        html:not(.dark) .bg-ink-850 { background: #fafafa; }
+        html:not(.dark) .bg-ink-800 { background: #ffffff; }
+        html:not(.dark) .bg-ink-900 { background: #ffffff; }
+        html:not(.dark) .bg-ink-950\/85 { background: rgba(255,255,255,0.95) !important; }
     </style>
 </head>
 <body>
@@ -322,9 +319,8 @@
 
     <!-- SIDEBAR -->
     <aside id="sidebar" class="sidebar">
-        <!-- Header -->
         <div class="flex items-center justify-between p-4 border-b border-ink-750">
-            <div class="flex items-center gap-2.5">
+            <div class="flex items-center gap-2.5 min-w-0">
                 <div class="w-9 h-9 rounded-xl bg-accent flex items-center justify-center shrink-0">
                     <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-6 h-6 object-contain" alt="Logo">
                 </div>
@@ -338,76 +334,68 @@
             </button>
         </div>
         
-        <!-- Nav -->
         <nav class="flex-1 overflow-y-auto p-3 space-y-1">
-            <button onclick="app.navigate('dashboard')" data-nav="dashboard" class="nav-item w-full">
+            <button onclick="app.navigate('dashboard')" data-nav="dashboard" class="nav-item">
                 <i data-lucide="home" class="w-4 h-4 shrink-0"></i>
                 <span>Dashboard</span>
             </button>
-            <button onclick="app.navigate('info')" data-nav="info" class="nav-item w-full">
+            <button onclick="app.navigate('info')" data-nav="info" class="nav-item">
                 <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
                 <span>Info & Banner</span>
             </button>
-            <button onclick="app.navigate('kategori')" data-nav="kategori" class="nav-item w-full">
+            <button onclick="app.navigate('kategori')" data-nav="kategori" class="nav-item">
                 <i data-lucide="folder" class="w-4 h-4 shrink-0"></i>
                 <span>Kategori</span>
             </button>
-            <button onclick="app.navigate('users')" data-nav="users" class="nav-item w-full">
+            <button onclick="app.navigate('users')" data-nav="users" class="nav-item">
                 <i data-lucide="users" class="w-4 h-4 shrink-0"></i>
                 <span>Users</span>
             </button>
-            <button onclick="app.navigate('feedback')" data-nav="feedback" class="nav-item w-full">
+            <button onclick="app.navigate('feedback')" data-nav="feedback" class="nav-item">
                 <i data-lucide="inbox" class="w-4 h-4 shrink-0"></i>
                 <span>Feedback</span>
-                <span id="nav-feedback-badge" class="ml-auto text-[10px] bg-red-500/20 text-red-400 font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
+                <span id="nav-feedback-badge" class="ml-auto text-[10px] bg-red-500 text-white font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
             </button>
             
             <div class="my-3 border-t border-ink-750"></div>
             <p class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">Sistem</p>
             
-            <button onclick="app.navigate('backup')" data-nav="backup" class="nav-item w-full">
+            <button onclick="app.navigate('backup')" data-nav="backup" class="nav-item">
                 <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
                 <span>Backup & Sync</span>
             </button>
-            <button onclick="app.navigate('prefs')" data-nav="prefs" class="nav-item w-full">
+            <button onclick="app.navigate('prefs')" data-nav="prefs" class="nav-item">
                 <i data-lucide="sliders" class="w-4 h-4 shrink-0"></i>
                 <span>Preferensi</span>
             </button>
-            <button onclick="app.navigate('diagnostic')" data-nav="diagnostic" class="nav-item w-full">
+            <button onclick="app.navigate('diagnostic')" data-nav="diagnostic" class="nav-item">
                 <i data-lucide="activity" class="w-4 h-4 shrink-0"></i>
                 <span>Diagnostik</span>
             </button>
         </nav>
         
-        <!-- Footer -->
         <div class="p-3 border-t border-ink-750 space-y-2">
             <div id="sidebar-auth-area"></div>
         </div>
     </aside>
 
-    <!-- MAIN AREA -->
+    <!-- MAIN -->
     <div id="main-area" class="main-area min-h-screen flex flex-col">
         
-        <!-- TOP BAR -->
-        <header class="sticky top-0 z-40 border-b border-ink-750 bg-ink-950/85" style="backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);">
+        <header class="sticky top-0 z-40 border-b border-ink-750 bg-ink-950">
             <div class="h-14 flex items-center gap-2 px-3">
-                <!-- Hamburger -->
                 <button onclick="app.toggleSidebar()" class="icon-btn">
                     <i data-lucide="menu" class="w-5 h-5"></i>
                 </button>
                 
-                <!-- Title -->
                 <h2 id="page-title" class="font-semibold text-sm text-white truncate">Dashboard</h2>
                 
-                <!-- Search (desktop only) -->
-                <div class="hidden md:flex flex-1 max-w-md mx-auto relative">
+                <div class="hidden md:flex flex-1 max-w-md mx-auto relative" id="search-desktop">
                     <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
                     <input type="text" id="search-input" placeholder="Cari menu..." class="input pl-9 py-1.5 text-xs">
                 </div>
                 
-                <!-- Actions -->
                 <div class="flex items-center gap-0.5 ml-auto">
-                    <!-- Sync status -->
                     <div class="hidden sm:flex items-center gap-1.5 mr-1.5 px-2 py-1 rounded-md bg-ink-850 text-[10px]">
                         <span id="sync-dot" class="sync-dot"></span>
                         <span id="sync-text" class="text-zinc-500 font-mono">Synced</span>
@@ -417,7 +405,7 @@
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
                     
-                    <button onclick="app.toggleView()" class="icon-btn" title="Ganti tampilan">
+                    <button onclick="app.toggleView()" id="btn-view" class="icon-btn" title="Ganti tampilan">
                         <i data-lucide="layout-grid" id="view-icon" class="w-4 h-4"></i>
                     </button>
                     
@@ -433,8 +421,7 @@
                 </div>
             </div>
             
-            <!-- Mobile search -->
-            <div class="md:hidden px-3 pb-2.5">
+            <div class="md:hidden px-3 pb-2.5" id="search-mobile-wrapper">
                 <div class="relative">
                     <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
                     <input type="text" id="search-input-mobile" placeholder="Cari menu..." class="input pl-9 py-2 text-xs">
@@ -442,7 +429,6 @@
             </div>
         </header>
         
-        <!-- CONTENT -->
         <main id="page-content" class="flex-1 p-3 sm:p-5 pb-16"></main>
     </div>
 
@@ -559,7 +545,7 @@
                 <div class="flex items-center gap-3 pt-1">
                     <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-300">
                         <input type="checkbox" id="link-pinned" class="w-4 h-4 rounded">
-                        <span class="font-medium">⭐ Pin ke atas</span>
+                        <span class="font-medium">⭐ Pin</span>
                     </label>
                     <select id="link-status" class="input py-1.5 w-auto text-xs">
                         <option value="aktif">Aktif</option>
@@ -580,7 +566,7 @@
 
     <script>
     // ============================================================
-    // APP v4.0
+    // APP v4.1 — Solid Theme + Bug Fix
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
@@ -595,9 +581,9 @@
             LAST_SYNC: 'sa4_lastsync', PREFS: 'sa4_prefs', THEME: 'sa4_theme'
         },
         
-        prefs: { view: 'grid', showClicks: true, showBanner: true, autoSync: false, autoSyncInterval: 5 },
+        prefs: { view: 'grid', showClicks: true, showBanner: true },
         
-        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','info','help-circle','alert-circle','alert-triangle','save','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock','menu','chevron-right','chevron-down'],
+        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','info','help-circle','alert-circle','alert-triangle','save','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock','menu','chevron-right','chevron-down','megaphone'],
         
         COLORS: ['indigo','sky','emerald','rose','amber','purple','teal','pink','orange','red','green','blue','violet','zinc'],
         
@@ -649,6 +635,9 @@
                 if (e.key === 'Escape') { this.closeModal('auth-modal'); this.closeModal('link-modal'); this.closeSidebar(); }
             });
             
+            // Auto-fix pending queue yang nyangkut
+            setTimeout(() => this.fixTempPendingItems(), 500);
+            
             setTimeout(() => {
                 if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) this.loadFeedback(true);
             }, 1500);
@@ -664,14 +653,12 @@
             const backdrop = document.getElementById('sidebar-backdrop');
             const mainArea = document.getElementById('main-area');
             
-            // Desktop: toggle collapse
             if (window.innerWidth >= 1024) {
                 sidebar.classList.toggle('collapsed');
                 mainArea.classList.toggle('expanded');
                 return;
             }
             
-            // Mobile: overlay
             this.sidebarOpen = !this.sidebarOpen;
             sidebar.classList.toggle('open', this.sidebarOpen);
             backdrop.classList.toggle('show', this.sidebarOpen);
@@ -690,12 +677,10 @@
         navigate: function(view) {
             this.currentView = view;
             
-            // Update nav active state
             document.querySelectorAll('.nav-item').forEach(n => {
                 n.classList.toggle('active', n.dataset.nav === view);
             });
             
-            // Update title
             const titles = {
                 dashboard: 'Dashboard', info: 'Info & Banner', kategori: 'Kategori',
                 users: 'Users', feedback: 'Feedback', backup: 'Backup & Sync',
@@ -703,14 +688,14 @@
             };
             document.getElementById('page-title').textContent = titles[view] || 'Dashboard';
             
-            // Show/hide search
-            const searchDesktop = document.getElementById('search-input')?.parentElement;
-            const searchMobile = document.getElementById('search-input-mobile')?.parentElement.parentElement;
+            // Toggle search & view button
+            const searchDesktop = document.getElementById('search-desktop');
+            const searchMobile = document.getElementById('search-mobile-wrapper');
+            const btnView = document.getElementById('btn-view');
             const show = view === 'dashboard';
             if (searchDesktop) searchDesktop.classList.toggle('hidden', !show);
             if (searchMobile) searchMobile.classList.toggle('hidden', !show);
-            const viewBtn = document.querySelector('button[onclick="app.toggleView()"]');
-            if (viewBtn) viewBtn.style.display = show ? '' : 'none';
+            if (btnView) btnView.style.display = show ? '' : 'none';
             
             this.renderCurrentView();
             this.closeSidebar();
@@ -761,6 +746,37 @@
         savePrefs: function() { localStorage.setItem(this.KEYS.PREFS, JSON.stringify(this.prefs)); },
         
         // ============================================================
+        // AUTO FIX TEMP PENDING
+        // ============================================================
+        fixTempPendingItems: function() {
+            const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
+            if (queue.length === 0) return;
+            
+            let fixed = 0;
+            const newQueue = queue.map(op => {
+                // Update ke temp ID → convert jadi add
+                if (op.action === 'update' && String(op.id).startsWith('tmp-')) {
+                    fixed++;
+                    return {
+                        action: 'add',
+                        tempId: op.id,
+                        data: op.data,
+                        userEmail: op.userEmail,
+                        queuedAt: op.queuedAt
+                    };
+                }
+                return op;
+            });
+            
+            if (fixed > 0) {
+                localStorage.setItem(this.KEYS.PENDING, JSON.stringify(newQueue));
+                console.log('[FIX] Converted', fixed, 'update-ops → add-ops');
+                this.toast('Memperbaiki ' + fixed + ' pending...', 'info');
+                this.syncPending();
+            }
+        },
+        
+        // ============================================================
         // DASHBOARD
         // ============================================================
         renderDashboard: function(q) {
@@ -784,14 +800,11 @@
             });
             
             let html = '';
-            
-            // Banner
             const banner = this.renderBanner();
             
-            // Toolbar info
             if (this.user && (userRole === 'super admin' || userRole === 'admin')) {
                 html += `
-                    <div class="flex items-center justify-between mb-4 gap-3">
+                    <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
                         <p class="text-xs text-zinc-500">
                             ${this.editMode ? '<span class="text-accent font-semibold">Edit mode aktif</span>' : `${items.length} link aktif`}
                         </p>
@@ -818,7 +831,6 @@
                 return banner + html;
             }
             
-            // Group by kategori
             const groups = {};
             this.kategori.forEach(k => groups[k.NAMA] = []);
             groups['Lain-lain'] = groups['Lain-lain'] || [];
@@ -874,11 +886,11 @@
             if (!show) return '';
             
             const colorMap = {
-                green: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-300',
-                blue: 'border-sky-500/30 bg-sky-500/5 text-sky-300',
-                red: 'border-red-500/30 bg-red-500/5 text-red-300',
-                yellow: 'border-amber-500/30 bg-amber-500/5 text-amber-300',
-                indigo: 'border-accent/30 bg-accent-soft text-accent'
+                green: 'border-emerald-500 bg-emerald-900/30 text-emerald-300',
+                blue: 'border-sky-500 bg-sky-900/30 text-sky-300',
+                red: 'border-red-500 bg-red-900/30 text-red-300',
+                yellow: 'border-amber-500 bg-amber-900/30 text-amber-300',
+                indigo: 'border-accent bg-accent-soft text-accent'
             };
             const cls = colorMap[info.WARNA] || colorMap.indigo;
             
@@ -907,7 +919,7 @@
             const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
             
             return `
-                <div class="link-card card ${isEdit ? '' : ''}" data-id="${item.ID}">
+                <div class="link-card card" data-id="${item.ID}">
                     ${isEdit ? `
                         <div class="drag-handle absolute top-2 left-2 p-1 rounded-md text-zinc-500 z-10">
                             <i data-lucide="grip-vertical" class="w-3 h-3"></i>
@@ -926,7 +938,7 @@
                        ${!isEdit ? 'target="_blank" rel="noopener"' : ''}
                        onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
                        class="flex flex-col items-center flex-1 w-full ${isEdit ? 'pointer-events-none' : ''}">
-                        <div class="icon-circle ${c.bg}" style="${c.glow}">
+                        <div class="icon-circle ${c.bg}">
                             <i data-lucide="${icon}" class="w-5 h-5 ${c.text}"></i>
                         </div>
                         <h4 class="text-xs font-semibold text-white line-clamp-2 leading-snug min-h-[2rem]">${this.escape(item.JUDUL)}</h4>
@@ -976,20 +988,20 @@
         
         colorConfig: function(color) {
             const m = {
-                indigo:  { bg: 'bg-indigo-500/15',  text: 'text-indigo-300',  glow: '' },
-                sky:     { bg: 'bg-sky-500/15',     text: 'text-sky-300',     glow: '' },
-                emerald: { bg: 'bg-emerald-500/15', text: 'text-emerald-300', glow: '' },
-                rose:    { bg: 'bg-rose-500/15',    text: 'text-rose-300',    glow: '' },
-                amber:   { bg: 'bg-amber-500/15',   text: 'text-amber-300',   glow: '' },
-                purple:  { bg: 'bg-purple-500/15',  text: 'text-purple-300',  glow: '' },
-                teal:    { bg: 'bg-teal-500/15',    text: 'text-teal-300',    glow: '' },
-                pink:    { bg: 'bg-pink-500/15',    text: 'text-pink-300',    glow: '' },
-                orange:  { bg: 'bg-orange-500/15',  text: 'text-orange-300',  glow: '' },
-                red:     { bg: 'bg-red-500/15',     text: 'text-red-300',     glow: '' },
-                green:   { bg: 'bg-green-500/15',   text: 'text-green-300',   glow: '' },
-                blue:    { bg: 'bg-blue-500/15',    text: 'text-blue-300',    glow: '' },
-                violet:  { bg: 'bg-violet-500/15',  text: 'text-violet-300',  glow: '' },
-                zinc:    { bg: 'bg-zinc-500/15',    text: 'text-zinc-300',    glow: '' }
+                indigo:  { bg: 'bg-indigo-500/20',  text: 'text-indigo-300' },
+                sky:     { bg: 'bg-sky-500/20',     text: 'text-sky-300' },
+                emerald: { bg: 'bg-emerald-500/20', text: 'text-emerald-300' },
+                rose:    { bg: 'bg-rose-500/20',    text: 'text-rose-300' },
+                amber:   { bg: 'bg-amber-500/20',   text: 'text-amber-300' },
+                purple:  { bg: 'bg-purple-500/20',  text: 'text-purple-300' },
+                teal:    { bg: 'bg-teal-500/20',    text: 'text-teal-300' },
+                pink:    { bg: 'bg-pink-500/20',    text: 'text-pink-300' },
+                orange:  { bg: 'bg-orange-500/20',  text: 'text-orange-300' },
+                red:     { bg: 'bg-red-500/20',     text: 'text-red-300' },
+                green:   { bg: 'bg-green-500/20',   text: 'text-green-300' },
+                blue:    { bg: 'bg-blue-500/20',    text: 'text-blue-300' },
+                violet:  { bg: 'bg-violet-500/20',  text: 'text-violet-300' },
+                zinc:    { bg: 'bg-zinc-500/20',    text: 'text-zinc-300' }
             };
             return m[color] || m.indigo;
         },
@@ -1041,9 +1053,7 @@
                             <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
                                 <i data-lucide="package" class="w-4 h-4 text-accent"></i>
                             </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-white">Versi Aplikasi</h3>
-                            </div>
+                            <h3 class="text-sm font-semibold text-white">Versi Aplikasi</h3>
                         </div>
                         <input type="text" id="info-versi" value="${this.escape(info.VERSI || '1.0')}" ${d} class="input">
                     </div>
@@ -1261,10 +1271,10 @@
             }
             
             const statusColor = {
-                baru: 'bg-red-500/15 text-red-300 border-red-500/25',
-                dibaca: 'bg-amber-500/15 text-amber-300 border-amber-500/25',
-                diproses: 'bg-sky-500/15 text-sky-300 border-sky-500/25',
-                selesai: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/25'
+                baru: 'bg-red-900/50 text-red-300 border-red-700',
+                dibaca: 'bg-amber-900/50 text-amber-300 border-amber-700',
+                diproses: 'bg-sky-900/50 text-sky-300 border-sky-700',
+                selesai: 'bg-emerald-900/50 text-emerald-300 border-emerald-700'
             };
             const tipeIcon = { saran: '💡', bug: '🐛', lain: '📝' };
             
@@ -1411,7 +1421,7 @@
         },
         
         exportJSON: function() {
-            const data = { version: '4.0', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info };
+            const data = { version: '4.1', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1493,7 +1503,7 @@
                     </div>
                     
                     <div class="card p-4">
-                        <h3 class="text-sm font-semibold text-white mb-3">Data Terakhir</h3>
+                        <h3 class="text-sm font-semibold text-white mb-3">Sync</h3>
                         <button onclick="app.syncNow()" class="btn btn-ghost w-full py-2.5">
                             <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                             <span>Sync Sekarang</span>
@@ -1546,8 +1556,18 @@
                             <div class="flex justify-between"><span class="text-zinc-500">User</span><span>${this.user?.email || '-'}</span></div>
                             <div class="flex justify-between"><span class="text-zinc-500">Role</span><span>${this.user?.jabatan || '-'}</span></div>
                             <div class="flex justify-between"><span class="text-zinc-500">Cache</span><span>${(localStorage.getItem(this.KEYS.CACHE) || '').length} B</span></div>
-                            <div class="flex justify-between"><span class="text-zinc-500">SW</span><span>${'serviceWorker' in navigator ? 'available' : 'none'}</span></div>
+                            <div class="flex justify-between"><span class="text-zinc-500">Menu</span><span>${this.menu.length} items</span></div>
+                            <div class="flex justify-between"><span class="text-zinc-500">Kategori</span><span>${this.kategori.length} items</span></div>
                         </div>
+                    </div>
+                    
+                    <div class="card p-4">
+                        <h3 class="text-sm font-semibold text-white mb-3">Test POST</h3>
+                        <button onclick="app.testPost()" class="btn btn-ghost w-full py-2.5 mb-2">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span>Test Add Menu</span>
+                        </button>
+                        <p class="text-[10px] text-zinc-500">Kirim test POST ke backend, lihat response di Console.</p>
                     </div>
                 </div>
             `;
@@ -1557,21 +1577,50 @@
             const out = document.getElementById('diagnostic-output');
             out.innerHTML = '<p class="text-xs text-zinc-500 mt-2">Testing...</p>';
             
-            const tests = [];
-            tests.push(fetch(`${this.apiURL}?action=ping`).then(r => r.json()).then(d => ({ name: 'Ping', status: d.status, data: d })).catch(e => ({ name: 'Ping', status: 'error', error: e.message })));
-            tests.push(fetch(`${this.apiURL}?action=bootstrap`).then(r => r.json()).then(d => ({ name: 'Bootstrap', status: d.status, data: { menu: d.data?.menu?.length } })).catch(e => ({ name: 'Bootstrap', status: 'error', error: e.message })));
+            const tests = [
+                fetch(`${this.apiURL}?action=ping`).then(r => r.json()).then(d => ({ name: 'Ping', ok: d.status === 'success', data: d })).catch(e => ({ name: 'Ping', ok: false, error: e.message })),
+                fetch(`${this.apiURL}?action=bootstrap`).then(r => r.json()).then(d => ({ name: 'Bootstrap', ok: d.status === 'success', data: { menu: d.data?.menu?.length || 0, kategori: d.data?.kategori?.length || 0 } })).catch(e => ({ name: 'Bootstrap', ok: false, error: e.message }))
+            ];
             
             Promise.all(tests).then(results => {
                 out.innerHTML = results.map(r => `
-                    <div class="mt-2 p-2 rounded-lg border ${r.status === 'success' ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-red-500/30 bg-red-500/5'}">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold ${r.status === 'success' ? 'text-emerald-300' : 'text-red-300'}">${r.name}</span>
-                            <span class="text-[10px] font-mono">${r.status}</span>
+                    <div class="mt-2 p-3 rounded-lg border ${r.ok ? 'border-emerald-700 bg-emerald-900/30' : 'border-red-700 bg-red-900/30'}">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-semibold ${r.ok ? 'text-emerald-300' : 'text-red-300'}">${r.name}</span>
+                            <span class="text-[10px] font-mono ${r.ok ? 'text-emerald-400' : 'text-red-400'}">${r.ok ? '✓ OK' : '✗ FAIL'}</span>
                         </div>
-                        <pre class="text-[9px] text-zinc-400 mt-1 whitespace-pre-wrap">${this.escape(JSON.stringify(r.data || r.error, null, 2).substring(0, 300))}</pre>
+                        <pre class="text-[9px] text-zinc-400 whitespace-pre-wrap">${this.escape(JSON.stringify(r.data || r.error, null, 2).substring(0, 400))}</pre>
                     </div>
                 `).join('');
             });
+        },
+        
+        testPost: async function() {
+            try {
+                const res = await fetch(this.apiURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'add',
+                        data: { judul: 'DIAG ' + Date.now(), url: 'https://example.com/' + Date.now(), icon: 'link', warna: 'indigo' },
+                        userEmail: this.user?.email
+                    })
+                });
+                const text = await res.text();
+                console.log('HTTP Status:', res.status);
+                console.log('Response Body:', text);
+                
+                try {
+                    const json = JSON.parse(text);
+                    if (json.status === 'success') this.toast('✓ Backend OK — POST berhasil', 'success');
+                    else this.toast('Backend error: ' + json.message, 'error');
+                } catch(e) {
+                    this.toast('Response bukan JSON — cek Console', 'error');
+                }
+            } catch(err) {
+                console.error('POST error:', err);
+                this.toast('POST gagal: ' + err.message, 'error');
+            }
         },
         
         updateApiUrl: function() {
@@ -1642,12 +1691,12 @@
             const role = this.user.jabatan.toLowerCase();
             if (role !== 'super admin' && role !== 'admin') { this.toast('Tidak punya akses', 'error'); return; }
             
-            if (!confirm('Force Sync?\n\nAkan:\n• Hapus cache lokal\n• Update file ke versi terbaru\n• Reload halaman\n\nSession login TETAP tersimpan.')) return;
+            if (!confirm('Force Sync?\n\n• Hapus cache lokal\n• Update file ke versi terbaru\n• Reload halaman\n\nSession login tetap tersimpan.')) return;
             
             const pending = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
             if (pending.length > 0) {
-                if (!confirm(`Ada ${pending.length} pending. Sync dulu?`)) {
-                    // Lanjut
+                if (!confirm(`Ada ${pending.length} pending. Sync dulu sebelum force?`)) {
+                    // Lanjut force
                 } else {
                     this.syncPending();
                     setTimeout(() => this._doForceSync(), 2500);
@@ -1734,7 +1783,7 @@
                         console.error('[SYNC] Server error:', res);
                         localStorage.setItem(this.KEYS.PENDING, JSON.stringify(queue.slice(i + 1)));
                         this.updateSyncIndicator('error');
-                        this.toast('Gagal simpan: ' + (res.message || 'Unknown'), 'error');
+                        this.toast('Gagal: ' + (res.message || 'Unknown'), 'error');
                     }
                 })
                 .catch(err => {
@@ -1810,7 +1859,7 @@
         },
         
         // ============================================================
-        // LINK CRUD
+        // LINK CRUD — FIXED
         // ============================================================
         openLinkModal: function(id) {
             if (!this.user) { this.toast('Login dulu', 'warning'); return; }
@@ -1879,22 +1928,33 @@
             
             this.closeModal('link-modal');
             
-            if (!id) {
+            // FIX: Cek apakah ID adalah temp ID (belum sync)
+            const isTempId = !id || String(id).startsWith('tmp-');
+            
+            if (isTempId) {
+                // ADD — item baru atau retry item yang belum sync
+                if (id) {
+                    // Hapus yang lama (retry)
+                    this.menu = this.menu.filter(m => m.ID !== id);
+                }
                 const tempId = 'tmp-' + Date.now();
-                data.ID = tempId; data.CLICKS = 0; data.DELETED = false;
+                data.ID = tempId;
+                data.CLICKS = 0;
+                data.DELETED = false;
                 this.menu.push(data);
                 this.queuePending({ action: 'add', tempId, data, userEmail: this.user?.email });
+                this.toast('Link ditambahkan', 'success');
             } else {
+                // UPDATE — item sudah punya ID asli
                 const idx = this.menu.findIndex(m => m.ID === id);
                 if (idx >= 0) this.menu[idx] = { ...this.menu[idx], ...data };
                 this.queuePending({ action: 'update', id, data, userEmail: this.user?.email });
+                this.toast('Link diupdate', 'success');
             }
+            
             this.saveCache();
             this.renderCurrentView();
-            
-            // Immediate sync attempt
             this.syncPending();
-            this.toast(id ? 'Link diupdate' : 'Link ditambahkan', 'success');
         },
         
         deleteLink: function(id) {
@@ -1980,7 +2040,6 @@
             const authText = document.getElementById('btn-auth-text');
             if (authText) authText.textContent = this.user ? this.user.nama.split(' ')[0] : 'Login';
             
-            // Update profile views
             document.getElementById('form-login').classList.toggle('hidden', !!this.user);
             document.getElementById('view-profile').classList.toggle('hidden', !this.user);
             
@@ -2138,7 +2197,6 @@
         }
     };
     
-    // Restore API URL if saved
     const savedUrl = localStorage.getItem('sa4_apiurl');
     if (savedUrl) app.apiURL = savedUrl;
     
