@@ -4,158 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="theme-color" content="#0a0b10">
-    <meta name="description" content="Console v4.1">
     <title>Console</title>
-    
-    <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        ink: {
-                            950: '#0a0b10',
-                            900: '#0d0f14',
-                            850: '#14171f',
-                            800: '#181c26',
-                            750: '#1e2230',
-                            700: '#252a3a',
-                            600: '#3a4054',
-                        },
-                        accent: {
-                            DEFAULT: '#a5b4fc',
-                            hover: '#c4caff',
-                            dim: '#818cf8',
-                            soft: '#2a2f47',
-                        }
-                    },
-                    fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
-                }
-            }
-        }
+        tailwind.config = { darkMode: 'class', theme: { extend: {
+            colors: {
+                ink: { 950:'#0a0b10', 900:'#0d0f14', 850:'#14171f', 800:'#181c26', 750:'#1e2230', 700:'#252a3a', 600:'#3a4054' },
+                accent: { DEFAULT:'#a5b4fc', hover:'#c4caff', soft:'#2a2f47' }
+            },
+            fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+        }}}
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
         * { -webkit-tap-highlight-color: transparent; }
-        html, body { background-color: #0a0b10; }
+        html, body { background: #0a0b10; }
         body { font-family: 'Inter', sans-serif; color: #e4e4e7; overflow-x: hidden; }
-        
-        body::before {
-            content: '';
-            position: fixed; inset: 0;
-            background-image: radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
-            background-size: 3px 3px;
-            pointer-events: none; z-index: 0;
-        }
-        
         ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #252a3a; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3a4054; }
-        
-        /* Sidebar */
-        .sidebar {
-            position: fixed; top: 0; left: 0; bottom: 0;
-            width: 260px;
-            background: #0d0f14;
-            border-right: 1px solid #1e2230;
-            transform: translateX(-100%);
-            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 60;
-            display: flex; flex-direction: column;
-        }
+        .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; background: #0d0f14; border-right: 1px solid #1e2230; transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.16,1,0.3,1); z-index: 60; display: flex; flex-direction: column; }
         .sidebar.open { transform: translateX(0); }
-        
         @media (min-width: 1024px) {
             .sidebar { transform: translateX(0); }
             .sidebar.collapsed { transform: translateX(-100%); }
-            .main-area { margin-left: 260px; transition: margin 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+            .main-area { margin-left: 260px; transition: margin 0.28s cubic-bezier(0.16,1,0.3,1); }
             .main-area.expanded { margin-left: 0; }
         }
-        
-        .backdrop {
-            position: fixed; inset: 0;
-            background: #000000;
-            z-index: 55;
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.25s;
-        }
-        .backdrop.show { opacity: 0.7; pointer-events: auto; }
-        
+        .backdrop { position: fixed; inset: 0; background: #000; z-index: 55; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+        .backdrop.show { opacity: 0.75; pointer-events: auto; }
         @media (min-width: 1024px) { .backdrop { display: none !important; } }
-        
-        /* Nav items */
-        .nav-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 12px;
-            border-radius: 10px;
-            font-size: 13px; font-weight: 500;
-            color: #a1a1aa;
-            transition: all 0.15s;
-            cursor: pointer;
-            position: relative;
-            background: transparent;
-            border: none;
-            text-align: left;
-            width: 100%;
-        }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; color: #a1a1aa; transition: all 0.15s; cursor: pointer; position: relative; background: transparent; border: none; text-align: left; width: 100%; }
         .nav-item:hover { background: #181c26; color: #e4e4e7; }
         .nav-item.active { background: #1e2230; color: #a5b4fc; font-weight: 600; }
-        .nav-item.active::before {
-            content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-            width: 3px; height: 20px;
-            background: #a5b4fc; border-radius: 0 3px 3px 0;
-        }
-        
-        /* Card */
-        .card {
-            background: #14171f;
-            border: 1px solid #1e2230;
-            border-radius: 14px;
-            transition: all 0.2s;
-        }
-        
-        /* Link card */
-        .link-card {
-            display: flex; flex-direction: column; align-items: center;
-            padding: 14px 10px;
-            text-align: center;
-            cursor: pointer;
-            position: relative;
-        }
-        @media (hover: hover) {
-            .link-card:hover { transform: translateY(-2px); border-color: #3a4054; }
-        }
+        .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; }
+        .card { background: #14171f; border: 1px solid #1e2230; border-radius: 14px; }
+        .link-card { display: flex; flex-direction: column; align-items: center; padding: 14px 10px; text-align: center; cursor: pointer; position: relative; transition: all 0.2s; }
+        @media (hover: hover) { .link-card:hover { transform: translateY(-2px); border-color: #3a4054; } }
         .link-card:active { transform: scale(0.98); }
-        
-        /* Icon circle */
-        .icon-circle {
-            width: 46px; height: 46px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-            margin-bottom: 10px;
-        }
-        
-        /* Buttons */
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            gap: 6px;
-            padding: 8px 14px;
-            border-radius: 10px;
-            font-size: 13px; font-weight: 600;
-            transition: all 0.15s;
-            cursor: pointer;
-            border: none;
-            white-space: nowrap;
-        }
+        .icon-circle { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; transition: all 0.15s; cursor: pointer; border: none; white-space: nowrap; }
         .btn-primary { background: #a5b4fc; color: #0a0b10; }
         .btn-primary:hover { background: #c4caff; }
         .btn-primary:active { transform: scale(0.97); }
@@ -164,164 +54,68 @@
         .btn-danger { background: #2a1a1f; color: #fca5a5; border: 1px solid #4a2028; }
         .btn-danger:hover { background: #3a1f26; }
         .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
-        
-        /* Icon button */
-        .icon-btn {
-            width: 34px; height: 34px;
-            display: inline-flex; align-items: center; justify-content: center;
-            border-radius: 9px;
-            color: #a1a1aa;
-            transition: all 0.15s;
-            cursor: pointer;
-            background: transparent; border: none;
-            flex-shrink: 0;
-        }
+        .icon-btn { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; color: #a1a1aa; transition: all 0.15s; cursor: pointer; background: transparent; border: none; flex-shrink: 0; }
         .icon-btn:hover { background: #181c26; color: #e4e4e7; }
         .icon-btn:active { transform: scale(0.94); }
-        
-        /* Input */
-        .input {
-            width: 100%;
-            background: #14171f;
-            border: 1px solid #1e2230;
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 13px;
-            color: #e4e4e7;
-            outline: none;
-            transition: all 0.15s;
-        }
+        .input { width: 100%; background: #14171f; border: 1px solid #1e2230; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #e4e4e7; outline: none; transition: all 0.15s; }
         .input:focus { border-color: #4a5490; background: #181c26; }
         .input::placeholder { color: #52525b; }
         .input:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        /* Modal — SOLID */
-        .modal {
-            position: fixed; inset: 0; z-index: 70;
-            display: none; align-items: center; justify-content: center;
-            padding: 16px;
-            background: rgba(0,0,0,0.85);
-        }
+        .modal { position: fixed; inset: 0; z-index: 70; display: none; align-items: center; justify-content: center; padding: 16px; background: #000; }
         .modal.show { display: flex; }
-        .modal-box {
-            background: #0d0f14;
-            border: 1px solid #1e2230;
-            border-radius: 18px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
-            max-height: 92vh;
-            width: 100%;
-            display: flex; flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.96) translateY(8px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        
-        /* Toast — SOLID */
-        #toast-container {
-            position: fixed; top: 76px; right: 14px; z-index: 80;
-            display: flex; flex-direction: column; gap: 8px;
-            max-width: 320px;
-            pointer-events: none;
-        }
-        .toast {
-            padding: 12px 14px;
-            border-radius: 12px;
-            font-size: 12.5px; font-weight: 600;
-            display: flex; align-items: center; gap: 10px;
-            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.6);
-            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            pointer-events: auto;
-            border: 1px solid;
-        }
+        .modal-box { background: #0d0f14; border: 1px solid #1e2230; border-radius: 18px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.9); max-height: 92vh; width: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; animation: modalIn 0.22s cubic-bezier(0.16,1,0.3,1); }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        #toast-container { position: fixed; top: 76px; right: 14px; z-index: 80; display: flex; flex-direction: column; gap: 8px; max-width: 320px; pointer-events: none; }
+        .toast { padding: 12px 14px; border-radius: 12px; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.7); animation: slideIn 0.3s cubic-bezier(0.16,1,0.3,1); pointer-events: auto; border: 1px solid; }
         @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .toast-success { background: #133328; color: #86efac; border-color: #1e5a3f; }
         .toast-error { background: #331820; color: #fca5a5; border-color: #5a1e2a; }
         .toast-warning { background: #332b13; color: #fcd34d; border-color: #5a4a1e; }
         .toast-info { background: #1e2230; color: #a5b4fc; border-color: #3a4054; }
-        
-        /* Sync status */
-        .sync-dot {
-            width: 6px; height: 6px; border-radius: 50%;
-            background: #6ee7b7; flex-shrink: 0;
-        }
+        .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; flex-shrink: 0; }
         .sync-dot.syncing { background: #a5b4fc; animation: pulse 1.2s ease-in-out infinite; }
         .sync-dot.offline { background: #52525b; }
         .sync-dot.error { background: #fca5a5; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        
-        /* Links grid */
-        .links-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 10px;
-        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
         @media (min-width: 640px) { .links-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
         @media (min-width: 1024px) { .links-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } }
-        
-        .links-list {
-            display: flex; flex-direction: column; gap: 6px;
-        }
-        .link-row {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 12px;
-            background: #14171f;
-            border: 1px solid #1e2230;
-            border-radius: 12px;
-            transition: all 0.15s;
-        }
+        .links-list { display: flex; flex-direction: column; gap: 6px; }
+        .link-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: #14171f; border: 1px solid #1e2230; border-radius: 12px; transition: all 0.15s; }
         .link-row:hover { background: #181c26; border-color: #3a4054; }
-        
-        /* Sortable */
         .sortable-ghost { opacity: 0.3; background: #2a2f47 !important; border-radius: 12px; }
         .drag-handle { cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
-        
-        /* Section header */
-        .section-header {
-            display: flex; align-items: center; gap: 8px;
-            margin-bottom: 12px;
-            padding: 0 2px;
-        }
-        
-        /* Light mode */
+        .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 0 2px; }
+        #debug-panel { position: fixed; bottom: 0; left: 0; right: 0; max-height: 40vh; background: #0a0b10; border-top: 2px solid #a5b4fc; color: #a5b4fc; font-family: monospace; font-size: 10px; padding: 8px; overflow-y: auto; z-index: 9999; display: none; }
+        #debug-panel.show { display: block; }
+        #debug-panel .log-line { padding: 3px 0; border-bottom: 1px solid #1e2230; word-break: break-all; }
+        #debug-panel .log-error { color: #fca5a5; }
+        #debug-panel .log-success { color: #86efac; }
+        #debug-panel .log-info { color: #a5b4fc; }
         html:not(.dark) body { background: #f4f5f8; color: #1e2230; }
-        html:not(.dark) body::before { background-image: radial-gradient(rgba(0,0,0,0.015) 1px, transparent 1px); }
-        html:not(.dark) .sidebar { background: #ffffff; border-color: #e4e4e7; }
+        html:not(.dark) .sidebar { background: #fff; border-color: #e4e4e7; }
         html:not(.dark) .nav-item { color: #52525b; }
         html:not(.dark) .nav-item:hover { background: #f4f4f5; color: #18181b; }
         html:not(.dark) .nav-item.active { background: #eef0ff; color: #6366f1; }
-        html:not(.dark) .nav-item.active::before { background: #6366f1; }
-        html:not(.dark) .card, html:not(.dark) .link-card, html:not(.dark) .link-row { background: #ffffff; border-color: #e4e4e7; }
-        html:not(.dark) .input { background: #ffffff; border-color: #e4e4e7; color: #18181b; }
-        html:not(.dark) .input:focus { background: #f9fafb; }
-        html:not(.dark) .modal-box { background: #ffffff; border-color: #e4e4e7; }
+        html:not(.dark) .card, html:not(.dark) .link-card, html:not(.dark) .link-row { background: #fff; border-color: #e4e4e7; }
+        html:not(.dark) .input { background: #fff; border-color: #e4e4e7; color: #18181b; }
+        html:not(.dark) .modal-box { background: #fff; border-color: #e4e4e7; }
         html:not(.dark) .icon-btn:hover { background: #f4f4f5; color: #18181b; }
-        html:not(.dark) .btn-ghost { background: #ffffff; border-color: #e4e4e7; color: #52525b; }
-        html:not(.dark) .btn-ghost:hover { background: #f4f4f5; color: #18181b; }
+        html:not(.dark) .btn-ghost { background: #fff; border-color: #e4e4e7; color: #52525b; }
         html:not(.dark) .text-white { color: #18181b; }
-        html:not(.dark) .text-zinc-400 { color: #71717a; }
-        html:not(.dark) .text-zinc-500 { color: #71717a; }
+        html:not(.dark) .text-zinc-400, html:not(.dark) .text-zinc-500 { color: #71717a; }
         html:not(.dark) .border-ink-750, html:not(.dark) .border-ink-700, html:not(.dark) .border-ink-800 { border-color: #e4e4e7; }
-        html:not(.dark) .bg-ink-850 { background: #fafafa; }
-        html:not(.dark) .bg-ink-800 { background: #ffffff; }
-        html:not(.dark) .bg-ink-900 { background: #ffffff; }
-        html:not(.dark) .bg-ink-950\/85 { background: rgba(255,255,255,0.95) !important; }
+        html:not(.dark) .bg-ink-850, html:not(.dark) .bg-ink-800, html:not(.dark) .bg-ink-900, html:not(.dark) .bg-ink-950 { background: #fff; }
+        html:not(.dark) #debug-panel { background: #fff; color: #4f46e5; border-color: #4f46e5; }
     </style>
 </head>
 <body>
-
-    <!-- SIDEBAR BACKDROP -->
     <div id="sidebar-backdrop" class="backdrop" onclick="app.closeSidebar()"></div>
-
-    <!-- SIDEBAR -->
     <aside id="sidebar" class="sidebar">
         <div class="flex items-center justify-between p-4 border-b border-ink-750">
             <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-9 h-9 rounded-xl bg-accent flex items-center justify-center shrink-0">
+                <div id="app-logo" class="w-9 h-9 rounded-xl bg-accent flex items-center justify-center shrink-0">
                     <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-6 h-6 object-contain" alt="Logo">
                 </div>
                 <div class="min-w-0">
@@ -329,98 +123,43 @@
                     <p class="text-[10px] text-zinc-500 truncate" id="sidebar-user-info">Guest</p>
                 </div>
             </div>
-            <button onclick="app.closeSidebar()" class="icon-btn lg:hidden">
-                <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
+            <button onclick="app.closeSidebar()" class="icon-btn lg:hidden"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
-        
         <nav class="flex-1 overflow-y-auto p-3 space-y-1">
-            <button onclick="app.navigate('dashboard')" data-nav="dashboard" class="nav-item">
-                <i data-lucide="home" class="w-4 h-4 shrink-0"></i>
-                <span>Dashboard</span>
-            </button>
-            <button onclick="app.navigate('info')" data-nav="info" class="nav-item">
-                <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
-                <span>Info & Banner</span>
-            </button>
-            <button onclick="app.navigate('kategori')" data-nav="kategori" class="nav-item">
-                <i data-lucide="folder" class="w-4 h-4 shrink-0"></i>
-                <span>Kategori</span>
-            </button>
-            <button onclick="app.navigate('users')" data-nav="users" class="nav-item">
-                <i data-lucide="users" class="w-4 h-4 shrink-0"></i>
-                <span>Users</span>
-            </button>
-            <button onclick="app.navigate('feedback')" data-nav="feedback" class="nav-item">
-                <i data-lucide="inbox" class="w-4 h-4 shrink-0"></i>
-                <span>Feedback</span>
-                <span id="nav-feedback-badge" class="ml-auto text-[10px] bg-red-500 text-white font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
-            </button>
-            
+            <button onclick="app.navigate('dashboard')" data-nav="dashboard" class="nav-item"><i data-lucide="home" class="w-4 h-4 shrink-0"></i><span>Dashboard</span></button>
+            <button onclick="app.navigate('info')" data-nav="info" class="nav-item"><i data-lucide="info" class="w-4 h-4 shrink-0"></i><span>Info & Banner</span></button>
+            <button onclick="app.navigate('kategori')" data-nav="kategori" class="nav-item"><i data-lucide="folder" class="w-4 h-4 shrink-0"></i><span>Kategori</span></button>
+            <button onclick="app.navigate('users')" data-nav="users" class="nav-item"><i data-lucide="users" class="w-4 h-4 shrink-0"></i><span>Users</span></button>
+            <button onclick="app.navigate('feedback')" data-nav="feedback" class="nav-item"><i data-lucide="inbox" class="w-4 h-4 shrink-0"></i><span>Feedback</span><span id="nav-feedback-badge" class="ml-auto text-[10px] bg-red-500 text-white font-bold px-1.5 py-0.5 rounded-full hidden">0</span></button>
             <div class="my-3 border-t border-ink-750"></div>
             <p class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">Sistem</p>
-            
-            <button onclick="app.navigate('backup')" data-nav="backup" class="nav-item">
-                <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
-                <span>Backup & Sync</span>
-            </button>
-            <button onclick="app.navigate('prefs')" data-nav="prefs" class="nav-item">
-                <i data-lucide="sliders" class="w-4 h-4 shrink-0"></i>
-                <span>Preferensi</span>
-            </button>
-            <button onclick="app.navigate('diagnostic')" data-nav="diagnostic" class="nav-item">
-                <i data-lucide="activity" class="w-4 h-4 shrink-0"></i>
-                <span>Diagnostik</span>
-            </button>
+            <button onclick="app.navigate('backup')" data-nav="backup" class="nav-item"><i data-lucide="database" class="w-4 h-4 shrink-0"></i><span>Backup & Sync</span></button>
+            <button onclick="app.navigate('prefs')" data-nav="prefs" class="nav-item"><i data-lucide="sliders" class="w-4 h-4 shrink-0"></i><span>Preferensi</span></button>
+            <button onclick="app.navigate('diagnostic')" data-nav="diagnostic" class="nav-item"><i data-lucide="activity" class="w-4 h-4 shrink-0"></i><span>Diagnostik</span></button>
         </nav>
-        
-        <div class="p-3 border-t border-ink-750 space-y-2">
-            <div id="sidebar-auth-area"></div>
-        </div>
+        <div class="p-3 border-t border-ink-750 space-y-2"><div id="sidebar-auth-area"></div></div>
     </aside>
 
-    <!-- MAIN -->
     <div id="main-area" class="main-area min-h-screen flex flex-col">
-        
-        <header class="sticky top-0 z-40 border-b border-ink-750 bg-ink-950">
+        <header class="sticky top-0 z-40 border-b border-ink-750" style="background:#0a0b10;">
             <div class="h-14 flex items-center gap-2 px-3">
-                <button onclick="app.toggleSidebar()" class="icon-btn">
-                    <i data-lucide="menu" class="w-5 h-5"></i>
-                </button>
-                
+                <button onclick="app.toggleSidebar()" class="icon-btn"><i data-lucide="menu" class="w-5 h-5"></i></button>
                 <h2 id="page-title" class="font-semibold text-sm text-white truncate">Dashboard</h2>
-                
                 <div class="hidden md:flex flex-1 max-w-md mx-auto relative" id="search-desktop">
                     <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
                     <input type="text" id="search-input" placeholder="Cari menu..." class="input pl-9 py-1.5 text-xs">
                 </div>
-                
                 <div class="flex items-center gap-0.5 ml-auto">
                     <div class="hidden sm:flex items-center gap-1.5 mr-1.5 px-2 py-1 rounded-md bg-ink-850 text-[10px]">
                         <span id="sync-dot" class="sync-dot"></span>
                         <span id="sync-text" class="text-zinc-500 font-mono">Synced</span>
                     </div>
-                    
-                    <button onclick="app.syncNow()" id="btn-sync" class="icon-btn" title="Sync">
-                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                    </button>
-                    
-                    <button onclick="app.toggleView()" id="btn-view" class="icon-btn" title="Ganti tampilan">
-                        <i data-lucide="layout-grid" id="view-icon" class="w-4 h-4"></i>
-                    </button>
-                    
-                    <button onclick="app.toggleTheme()" class="icon-btn">
-                        <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
-                        <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
-                    </button>
-                    
-                    <button onclick="app.openAuthModal()" class="btn btn-primary btn-sm ml-1">
-                        <i data-lucide="user-circle" class="w-3.5 h-3.5"></i>
-                        <span id="btn-auth-text" class="hidden sm:inline">Login</span>
-                    </button>
+                    <button onclick="app.syncNow()" id="btn-sync" class="icon-btn" title="Sync"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+                    <button onclick="app.toggleView()" id="btn-view" class="icon-btn" title="Ganti tampilan"><i data-lucide="layout-grid" id="view-icon" class="w-4 h-4"></i></button>
+                    <button onclick="app.toggleTheme()" class="icon-btn"><i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i><i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i></button>
+                    <button onclick="app.openAuthModal()" class="btn btn-primary btn-sm ml-1"><i data-lucide="user-circle" class="w-3.5 h-3.5"></i><span id="btn-auth-text" class="hidden sm:inline">Login</span></button>
                 </div>
             </div>
-            
             <div class="md:hidden px-3 pb-2.5" id="search-mobile-wrapper">
                 <div class="relative">
                     <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
@@ -428,20 +167,14 @@
                 </div>
             </div>
         </header>
-        
         <main id="page-content" class="flex-1 p-3 sm:p-5 pb-16"></main>
     </div>
 
-    <!-- TOASTS -->
     <div id="toast-container"></div>
 
-    <!-- MODAL: LOGIN -->
     <div id="auth-modal" class="modal">
         <div class="modal-box max-w-sm">
-            <button onclick="app.closeModal('auth-modal')" class="icon-btn absolute top-3 right-3 z-10">
-                <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
-            
+            <button onclick="app.closeModal('auth-modal')" class="icon-btn absolute top-3 right-3 z-10"><i data-lucide="x" class="w-4 h-4"></i></button>
             <div id="form-login" class="p-6">
                 <div class="text-center mb-6">
                     <div class="w-14 h-14 rounded-2xl bg-accent-soft border border-accent/20 flex items-center justify-center mx-auto mb-3">
@@ -453,17 +186,10 @@
                 <form onsubmit="event.preventDefault(); app.doLogin()" class="space-y-3">
                     <input type="email" id="input-email" placeholder="Email" autocomplete="email" class="input">
                     <input type="password" id="input-pass" placeholder="Password" autocomplete="current-password" class="input">
-                    <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-400">
-                        <input type="checkbox" id="remember-me" checked class="w-3.5 h-3.5 rounded">
-                        <span>Ingat saya</span>
-                    </label>
-                    <button type="submit" id="btn-submit" class="btn btn-primary w-full py-3 mt-1">
-                        <i data-lucide="log-in" class="w-4 h-4"></i>
-                        <span>Masuk</span>
-                    </button>
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-400"><input type="checkbox" id="remember-me" checked class="w-3.5 h-3.5 rounded"><span>Ingat saya</span></label>
+                    <button type="submit" id="btn-submit" class="btn btn-primary w-full py-3 mt-1"><i data-lucide="log-in" class="w-4 h-4"></i><span>Masuk</span></button>
                 </form>
             </div>
-            
             <div id="view-profile" class="hidden">
                 <div class="p-6 text-center border-b border-ink-750">
                     <div class="w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center border border-accent/20 bg-accent-soft">
@@ -473,148 +199,129 @@
                     <p class="inline-block mt-1.5 px-2.5 py-0.5 bg-accent-soft text-accent text-[10px] font-mono font-bold uppercase rounded-full" id="prof-role">-</p>
                 </div>
                 <div class="p-4 space-y-3">
-                    <div class="flex justify-between text-xs py-2 border-b border-ink-750">
-                        <span class="text-zinc-500">Unit</span>
-                        <span class="font-medium text-zinc-300" id="prof-unit">-</span>
-                    </div>
-                    <div class="flex justify-between text-xs py-2 border-b border-ink-750">
-                        <span class="text-zinc-500">Email</span>
-                        <span class="font-medium text-zinc-300 text-[11px]" id="prof-email">-</span>
-                    </div>
-                    <button onclick="app.doLogout()" class="btn btn-danger w-full py-2.5 mt-2">
-                        <i data-lucide="log-out" class="w-4 h-4"></i>
-                        <span>Logout</span>
-                    </button>
+                    <div class="flex justify-between text-xs py-2 border-b border-ink-750"><span class="text-zinc-500">Unit</span><span class="font-medium text-zinc-300" id="prof-unit">-</span></div>
+                    <div class="flex justify-between text-xs py-2 border-b border-ink-750"><span class="text-zinc-500">Email</span><span class="font-medium text-zinc-300 text-[11px]" id="prof-email">-</span></div>
+                    <button onclick="app.doLogout()" class="btn btn-danger w-full py-2.5 mt-2"><i data-lucide="log-out" class="w-4 h-4"></i><span>Logout</span></button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: LINK CRUD -->
     <div id="link-modal" class="modal">
         <div class="modal-box max-w-lg">
             <div class="flex items-center justify-between p-4 border-b border-ink-750 shrink-0">
                 <h3 class="text-sm font-semibold text-white" id="link-modal-title">Tambah Link</h3>
-                <button onclick="app.closeModal('link-modal')" class="icon-btn">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
+                <button onclick="app.closeModal('link-modal')" class="icon-btn"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
-            
             <div class="p-4 overflow-y-auto space-y-3 flex-1">
                 <input type="hidden" id="link-id">
-                
-                <div>
-                    <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Judul *</label>
-                    <input type="text" id="link-judul" placeholder="Nama link" class="input">
-                </div>
-                
-                <div>
-                    <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">URL *</label>
-                    <input type="url" id="link-url" placeholder="https://..." class="input font-mono text-xs">
-                </div>
-                
-                <div>
-                    <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Deskripsi</label>
-                    <textarea id="link-deskripsi" rows="2" placeholder="Deskripsi singkat" class="input resize-none"></textarea>
-                </div>
-                
+                <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Judul *</label><input type="text" id="link-judul" placeholder="Nama link" class="input"></div>
+                <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">URL *</label><input type="url" id="link-url" placeholder="https://..." class="input font-mono text-xs"></div>
+                <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Deskripsi</label><textarea id="link-deskripsi" rows="2" placeholder="Deskripsi singkat" class="input resize-none"></textarea></div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Kategori</label>
-                        <select id="link-kategori" class="input"></select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Akses Role</label>
-                        <input type="text" id="link-role" placeholder="Kosong = publik" class="input">
-                    </div>
+                    <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Kategori</label><select id="link-kategori" class="input"></select></div>
+                    <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Akses Role</label><input type="text" id="link-role" placeholder="Kosong = publik" class="input"></div>
                 </div>
-                
                 <div>
                     <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Icon</label>
                     <input type="text" id="link-icon-search" placeholder="Cari icon..." class="input text-xs py-2 mb-2">
                     <div id="icon-grid" class="grid grid-cols-8 sm:grid-cols-10 gap-1.5 max-h-32 overflow-y-auto p-2 border border-ink-750 rounded-lg bg-ink-900"></div>
                     <input type="hidden" id="link-icon" value="link">
                 </div>
-                
                 <div>
                     <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Warna</label>
                     <div class="flex flex-wrap gap-1.5" id="color-picker"></div>
                     <input type="hidden" id="link-warna" value="indigo">
                 </div>
-                
                 <div class="flex items-center gap-3 pt-1">
-                    <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-300">
-                        <input type="checkbox" id="link-pinned" class="w-4 h-4 rounded">
-                        <span class="font-medium">⭐ Pin</span>
-                    </label>
-                    <select id="link-status" class="input py-1.5 w-auto text-xs">
-                        <option value="aktif">Aktif</option>
-                        <option value="arsip">Arsip</option>
-                    </select>
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-300"><input type="checkbox" id="link-pinned" class="w-4 h-4 rounded"><span class="font-medium">⭐ Pin</span></label>
+                    <select id="link-status" class="input py-1.5 w-auto text-xs"><option value="aktif">Aktif</option><option value="arsip">Arsip</option></select>
                 </div>
             </div>
-            
             <div class="flex items-center gap-2 p-4 border-t border-ink-750 shrink-0">
                 <button onclick="app.closeModal('link-modal')" class="btn btn-ghost flex-1">Batal</button>
-                <button onclick="app.saveLink()" class="btn btn-primary flex-1">
-                    <i data-lucide="save" class="w-4 h-4"></i>
-                    <span>Simpan & Sync</span>
-                </button>
+                <button onclick="app.saveLink()" id="btn-save-link" class="btn btn-primary flex-1"><i data-lucide="save" class="w-4 h-4"></i><span>Simpan</span></button>
             </div>
         </div>
     </div>
 
+    <div id="debug-panel">
+        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <strong>🐛 DEBUG LOG</strong>
+            <div style="display:flex; gap:8px;">
+                <button onclick="document.getElementById('debug-log-content').innerHTML=''" style="background:#1e2230;color:#a5b4fc;border:none;padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;">Clear</button>
+                <button onclick="document.getElementById('debug-panel').classList.remove('show')" style="background:#1e2230;color:#a5b4fc;border:none;padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;">Tutup</button>
+            </div>
+        </div>
+        <div id="debug-log-content"></div>
+    </div>
+
     <script>
     // ============================================================
-    // APP v4.1 — Solid Theme + Bug Fix
+    // DEBUG
+    // ============================================================
+    window.dbg = function(msg, type) {
+        type = type || 'info';
+        const panel = document.getElementById('debug-panel');
+        const content = document.getElementById('debug-log-content');
+        if (!panel || !content) return;
+        const time = new Date().toLocaleTimeString();
+        const line = document.createElement('div');
+        line.className = 'log-line log-' + type;
+        line.textContent = '[' + time + '] ' + (typeof msg === 'object' ? JSON.stringify(msg).substring(0, 300) : msg);
+        content.appendChild(line);
+        panel.scrollTop = panel.scrollHeight;
+        while (content.children.length > 100) content.removeChild(content.firstChild);
+    };
+    const _origLog = console.log, _origErr = console.error, _origWarn = console.warn;
+    console.log = function() { _origLog.apply(console, arguments); dbg(Array.from(arguments).join(' '), 'info'); };
+    console.error = function() { _origErr.apply(console, arguments); dbg(Array.from(arguments).join(' '), 'error'); };
+    console.warn = function() { _origWarn.apply(console, arguments); dbg(Array.from(arguments).join(' '), 'error'); };
+    window.addEventListener('error', (e) => dbg('JS ERROR: ' + e.message, 'error'));
+
+    // ============================================================
+    // APP v4.3
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
-        
         user: null, menu: [], kategori: [], info: {}, footer: [], users: [], feedbackList: [],
         editMode: false, sortables: [], isOnline: navigator.onLine,
-        currentView: 'dashboard',
-        sidebarOpen: false,
+        currentView: 'dashboard', sidebarOpen: false,
         
-        KEYS: {
-            SESSION: 'sa4_session', CACHE: 'sa4_cache', PENDING: 'sa4_pending',
-            LAST_SYNC: 'sa4_lastsync', PREFS: 'sa4_prefs', THEME: 'sa4_theme'
-        },
-        
+        KEYS: { SESSION:'sa4_session', CACHE:'sa4_cache', PENDING:'sa4_pending', LAST_SYNC:'sa4_lastsync', PREFS:'sa4_prefs', THEME:'sa4_theme', APIURL:'sa4_apiurl' },
         prefs: { view: 'grid', showClicks: true, showBanner: true },
         
-        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','info','help-circle','alert-circle','alert-triangle','save','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock','menu','chevron-right','chevron-down','megaphone'],
-        
+        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','info','help-circle','alert-circle','alert-triangle','save','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock','menu','megaphone','store'],
         COLORS: ['indigo','sky','emerald','rose','amber','purple','teal','pink','orange','red','green','blue','violet','zinc'],
         
-        // ============================================================
-        // INIT
-        // ============================================================
+        // Helper: safe query (fix null error)
+        spinBtn: function(btn, on) {
+            if (!btn) return;
+            const icon = btn.querySelector('svg') || btn.querySelector('i');
+            if (!icon) return;
+            if (on) icon.classList.add('animate-spin');
+            else icon.classList.remove('animate-spin');
+        },
+        
         init: function() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js').catch(() => {});
-            }
-            
             const fsFlag = sessionStorage.getItem('force_sync_done');
             if (fsFlag) {
                 sessionStorage.removeItem('force_sync_done');
                 setTimeout(() => this.toast('Force Sync selesai', 'success'), 800);
                 setTimeout(() => this.syncNow(true), 1200);
             }
-            
             const savedTheme = localStorage.getItem(this.KEYS.THEME);
             if(savedTheme === 'light') document.documentElement.classList.remove('dark');
             else document.documentElement.classList.add('dark');
-            
+            const savedUrl = localStorage.getItem(this.KEYS.APIURL);
+            if (savedUrl) this.apiURL = savedUrl;
             try { this.prefs = { ...this.prefs, ...JSON.parse(localStorage.getItem(this.KEYS.PREFS) || '{}') }; } catch(e) {}
             try { const s = JSON.parse(localStorage.getItem(this.KEYS.SESSION) || 'null'); if (s?.user) this.user = s.user; } catch(e) {}
-            
             this.loadFromCache();
             this.updateUIState();
             this.updateViewIcon();
             this.updateSyncIndicator();
             this.navigate('dashboard');
-            
             ['search-input','search-input-mobile'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.addEventListener('input', (e) => {
@@ -622,73 +329,65 @@
                     this.renderDashboard(e.target.value.toLowerCase());
                 });
             });
-            
             this.setupIconPicker();
             this.setupColorPicker();
-            
             window.addEventListener('online', () => { this.isOnline = true; this.updateSyncIndicator(); this.syncPending(); });
             window.addEventListener('offline', () => { this.isOnline = false; this.updateSyncIndicator(); });
             window.addEventListener('storage', (e) => { if (e.key === this.KEYS.CACHE) { this.loadFromCache(); this.renderCurrentView(); } });
-            
             document.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('search-input')?.focus(); }
                 if (e.key === 'Escape') { this.closeModal('auth-modal'); this.closeModal('link-modal'); this.closeSidebar(); }
             });
-            
-            // Auto-fix pending queue yang nyangkut
+            let tapCount = 0;
+            const logo = document.getElementById('app-logo');
+            if (logo) {
+                logo.style.cursor = 'pointer';
+                logo.addEventListener('click', () => {
+                    tapCount++;
+                    if (tapCount >= 5) { document.getElementById('debug-panel').classList.toggle('show'); tapCount = 0; }
+                    setTimeout(() => tapCount = 0, 2000);
+                });
+            }
+            if (window.location.search.includes('debug=1')) document.getElementById('debug-panel').classList.add('show');
             setTimeout(() => this.fixTempPendingItems(), 500);
-            
             setTimeout(() => {
                 if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) this.loadFeedback(true);
             }, 1500);
-            
+            dbg('Init. User: ' + (this.user?.email || 'Guest'), 'success');
             lucide.createIcons();
         },
         
-        // ============================================================
-        // SIDEBAR & NAV
-        // ============================================================
         toggleSidebar: function() {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('sidebar-backdrop');
             const mainArea = document.getElementById('main-area');
-            
+            if (!sidebar) return;
             if (window.innerWidth >= 1024) {
                 sidebar.classList.toggle('collapsed');
-                mainArea.classList.toggle('expanded');
+                if (mainArea) mainArea.classList.toggle('expanded');
                 return;
             }
-            
             this.sidebarOpen = !this.sidebarOpen;
             sidebar.classList.toggle('open', this.sidebarOpen);
-            backdrop.classList.toggle('show', this.sidebarOpen);
+            if (backdrop) backdrop.classList.toggle('show', this.sidebarOpen);
         },
         
         closeSidebar: function() {
             const sidebar = document.getElementById('sidebar');
             const backdrop = document.getElementById('sidebar-backdrop');
-            if (window.innerWidth < 1024) {
+            if (window.innerWidth < 1024 && sidebar) {
                 this.sidebarOpen = false;
                 sidebar.classList.remove('open');
-                backdrop.classList.remove('show');
+                if (backdrop) backdrop.classList.remove('show');
             }
         },
         
         navigate: function(view) {
             this.currentView = view;
-            
-            document.querySelectorAll('.nav-item').forEach(n => {
-                n.classList.toggle('active', n.dataset.nav === view);
-            });
-            
-            const titles = {
-                dashboard: 'Dashboard', info: 'Info & Banner', kategori: 'Kategori',
-                users: 'Users', feedback: 'Feedback', backup: 'Backup & Sync',
-                prefs: 'Preferensi', diagnostic: 'Diagnostik'
-            };
-            document.getElementById('page-title').textContent = titles[view] || 'Dashboard';
-            
-            // Toggle search & view button
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.nav === view));
+            const titles = { dashboard:'Dashboard', info:'Info & Banner', kategori:'Kategori', users:'Users', feedback:'Feedback', backup:'Backup & Sync', prefs:'Preferensi', diagnostic:'Diagnostik' };
+            const title = document.getElementById('page-title');
+            if (title) title.textContent = titles[view] || 'Dashboard';
             const searchDesktop = document.getElementById('search-desktop');
             const searchMobile = document.getElementById('search-mobile-wrapper');
             const btnView = document.getElementById('btn-view');
@@ -696,13 +395,13 @@
             if (searchDesktop) searchDesktop.classList.toggle('hidden', !show);
             if (searchMobile) searchMobile.classList.toggle('hidden', !show);
             if (btnView) btnView.style.display = show ? '' : 'none';
-            
             this.renderCurrentView();
             this.closeSidebar();
         },
         
         renderCurrentView: function() {
             const el = document.getElementById('page-content');
+            if (!el) return;
             const views = {
                 dashboard: () => this.renderDashboard(),
                 info: () => this.renderInfoPage(),
@@ -718,16 +417,13 @@
             lucide.createIcons();
         },
         
-        // ============================================================
-        // STORAGE
-        // ============================================================
         loadFromCache: function() {
             try {
                 const c = JSON.parse(localStorage.getItem(this.KEYS.CACHE) || '{}');
                 this.menu = c.menu || []; this.kategori = c.kategori || [];
                 this.info = c.info || {}; this.footer = c.footer || [];
                 this.users = c.users || []; this.feedbackList = c.feedback || [];
-            } catch(e) {}
+            } catch(e) { dbg('Cache error: ' + e.message, 'error'); }
         },
         
         saveCache: function() {
@@ -745,33 +441,20 @@
         
         savePrefs: function() { localStorage.setItem(this.KEYS.PREFS, JSON.stringify(this.prefs)); },
         
-        // ============================================================
-        // AUTO FIX TEMP PENDING
-        // ============================================================
         fixTempPendingItems: function() {
             const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
             if (queue.length === 0) return;
-            
             let fixed = 0;
             const newQueue = queue.map(op => {
-                // Update ke temp ID → convert jadi add
                 if (op.action === 'update' && String(op.id).startsWith('tmp-')) {
                     fixed++;
-                    return {
-                        action: 'add',
-                        tempId: op.id,
-                        data: op.data,
-                        userEmail: op.userEmail,
-                        queuedAt: op.queuedAt
-                    };
+                    return { action: 'add', tempId: op.id, data: op.data, userEmail: op.userEmail, queuedAt: op.queuedAt };
                 }
                 return op;
             });
-            
             if (fixed > 0) {
                 localStorage.setItem(this.KEYS.PENDING, JSON.stringify(newQueue));
-                console.log('[FIX] Converted', fixed, 'update-ops → add-ops');
-                this.toast('Memperbaiki ' + fixed + ' pending...', 'info');
+                dbg('Fixed ' + fixed + ' pending', 'success');
                 this.syncPending();
             }
         },
@@ -782,15 +465,10 @@
         renderDashboard: function(q) {
             q = q || '';
             const userRole = this.user ? this.user.jabatan.toLowerCase() : '';
-            
             let items = this.menu.filter(item => {
                 if (item.DELETED === true || item.DELETED === 'TRUE') return false;
                 if (item.STATUS === 'arsip') return false;
-                if (q && !(
-                    String(item.JUDUL).toLowerCase().includes(q) ||
-                    String(item.DESKRIPSI || '').toLowerCase().includes(q) ||
-                    String(item.URL).toLowerCase().includes(q)
-                )) return false;
+                if (q && !(String(item.JUDUL||'').toLowerCase().includes(q) || String(item.DESKRIPSI||'').toLowerCase().includes(q) || String(item.URL||'').toLowerCase().includes(q))) return false;
                 const reqRole = String(item.AKSES_ROLE || '').trim();
                 if (!reqRole) return true;
                 const roles = reqRole.split(',').map(r => r.trim().toLowerCase()).filter(Boolean);
@@ -798,39 +476,22 @@
                 if (userRole === 'super admin') return true;
                 return roles.includes(userRole);
             });
-            
             let html = '';
             const banner = this.renderBanner();
-            
             if (this.user && (userRole === 'super admin' || userRole === 'admin')) {
                 html += `
                     <div class="flex items-center justify-between mb-4 gap-3 flex-wrap">
-                        <p class="text-xs text-zinc-500">
-                            ${this.editMode ? '<span class="text-accent font-semibold">Edit mode aktif</span>' : `${items.length} link aktif`}
-                        </p>
+                        <p class="text-xs text-zinc-500">${this.editMode ? '<span class="text-accent font-semibold">Edit mode aktif</span>' : `${items.length} link aktif`}</p>
                         <div class="flex gap-2">
-                            <button onclick="app.openLinkModal()" class="btn btn-primary btn-sm">
-                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah
-                            </button>
-                            <button onclick="app.toggleEditMode()" class="btn ${this.editMode ? 'btn-primary' : 'btn-ghost'} btn-sm">
-                                <i data-lucide="${this.editMode ? 'check' : 'pencil'}" class="w-3.5 h-3.5"></i>
-                                ${this.editMode ? 'Selesai' : 'Edit'}
-                            </button>
+                            <button onclick="app.openLinkModal()" class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah</button>
+                            <button onclick="app.toggleEditMode()" class="btn ${this.editMode ? 'btn-primary' : 'btn-ghost'} btn-sm"><i data-lucide="${this.editMode ? 'check' : 'pencil'}" class="w-3.5 h-3.5"></i>${this.editMode ? 'Selesai' : 'Edit'}</button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             }
-            
             if (items.length === 0) {
-                html += `
-                    <div class="flex flex-col items-center justify-center py-20 text-zinc-600">
-                        <i data-lucide="inbox" class="w-10 h-10 mb-3 opacity-40"></i>
-                        <p class="text-xs">${q ? 'Tidak ada hasil untuk "' + this.escape(q) + '"' : 'Belum ada menu'}</p>
-                    </div>
-                `;
+                html += `<div class="flex flex-col items-center justify-center py-20 text-zinc-600"><i data-lucide="inbox" class="w-10 h-10 mb-3 opacity-40"></i><p class="text-xs">${q ? 'Tidak ada hasil untuk "' + this.escape(q) + '"' : 'Belum ada menu'}</p></div>`;
                 return banner + html;
             }
-            
             const groups = {};
             this.kategori.forEach(k => groups[k.NAMA] = []);
             groups['Lain-lain'] = groups['Lain-lain'] || [];
@@ -839,44 +500,32 @@
                 if (!groups[kat]) groups[kat] = [];
                 groups[kat].push(item);
             });
-            
             const sortedKat = Object.keys(groups).sort((a, b) => {
                 const ka = this.kategori.find(k => k.NAMA === a);
                 const kb = this.kategori.find(k => k.NAMA === b);
                 return (Number(ka?.URUTAN) || 999) - (Number(kb?.URUTAN) || 999);
             });
-            
             const isList = this.prefs.view === 'list';
-            
             sortedKat.forEach(katName => {
                 const katItems = groups[katName];
                 if (!katItems || katItems.length === 0) return;
-                
                 katItems.sort((a, b) => {
                     const pa = (a.PINNED === true || a.PINNED === 'TRUE') ? 0 : 1;
                     const pb = (b.PINNED === true || b.PINNED === 'TRUE') ? 0 : 1;
                     if (pa !== pb) return pa - pb;
                     return (Number(a.URUTAN) || 999) - (Number(b.URUTAN) || 999);
                 });
-                
                 const katInfo = this.kategori.find(k => k.NAMA === katName);
                 const katIcon = katInfo?.ICON || 'folder';
-                
-                html += `
-                    <div class="mb-5">
-                        <div class="section-header">
-                            <i data-lucide="${katIcon}" class="w-3.5 h-3.5 text-accent"></i>
-                            <h3 class="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">${this.escape(katName)}</h3>
-                            <span class="text-[10px] text-zinc-600 font-mono ml-1">${katItems.length}</span>
-                        </div>
-                        ${isList 
-                            ? `<div class="links-list menu-list">${katItems.map(i => this.renderRow(i)).join('')}</div>`
-                            : `<div class="links-grid menu-grid">${katItems.map(i => this.renderCard(i)).join('')}</div>`
-                        }
+                html += `<div class="mb-5">
+                    <div class="section-header">
+                        <i data-lucide="${katIcon}" class="w-3.5 h-3.5 text-accent"></i>
+                        <h3 class="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">${this.escape(katName)}</h3>
+                        <span class="text-[10px] text-zinc-600 font-mono ml-1">${katItems.length}</span>
                     </div>
-                `;
+                    ${isList ? `<div class="links-list menu-list">${katItems.map(i => this.renderRow(i)).join('')}</div>` : `<div class="links-grid menu-grid">${katItems.map(i => this.renderCard(i)).join('')}</div>`}
+                </div>`;
             });
-            
             return banner + html;
         },
         
@@ -884,32 +533,12 @@
             const info = this.info;
             const show = this.prefs.showBanner && info && (info.STATUS === 'ON' || info.STATUS === 'on') && info.PESAN;
             if (!show) return '';
-            
-            const colorMap = {
-                green: 'border-emerald-500 bg-emerald-900/30 text-emerald-300',
-                blue: 'border-sky-500 bg-sky-900/30 text-sky-300',
-                red: 'border-red-500 bg-red-900/30 text-red-300',
-                yellow: 'border-amber-500 bg-amber-900/30 text-amber-300',
-                indigo: 'border-accent bg-accent-soft text-accent'
-            };
+            const colorMap = { green:'border-emerald-500 bg-emerald-900/30 text-emerald-300', blue:'border-sky-500 bg-sky-900/30 text-sky-300', red:'border-red-500 bg-red-900/30 text-red-300', yellow:'border-amber-500 bg-amber-900/30 text-amber-300', indigo:'border-accent bg-accent-soft text-accent' };
             const cls = colorMap[info.WARNA] || colorMap.indigo;
-            
-            return `
-                <div class="mb-4 p-3 border rounded-xl flex items-start gap-2.5 ${cls}">
-                    <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
-                    <p class="text-xs leading-relaxed flex-1">${this.escape(info.PESAN)}</p>
-                    <button onclick="app.hideBanner()" class="opacity-60 hover:opacity-100 p-0.5">
-                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                    </button>
-                </div>
-            `;
+            return `<div class="mb-4 p-3 border rounded-xl flex items-start gap-2.5 ${cls}"><i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i><p class="text-xs leading-relaxed flex-1">${this.escape(info.PESAN)}</p><button onclick="app.hideBanner()" class="opacity-60 hover:opacity-100 p-0.5"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></div>`;
         },
         
-        hideBanner: function() {
-            this.prefs.showBanner = false;
-            this.savePrefs();
-            this.renderCurrentView();
-        },
+        hideBanner: function() { this.prefs.showBanner = false; this.savePrefs(); this.renderCurrentView(); },
         
         renderCard: function(item) {
             const isPinned = item.PINNED === true || item.PINNED === 'TRUE';
@@ -917,37 +546,22 @@
             const icon = item.ICON || 'link';
             const isEdit = this.editMode;
             const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
-            
-            return `
-                <div class="link-card card" data-id="${item.ID}">
-                    ${isEdit ? `
-                        <div class="drag-handle absolute top-2 left-2 p-1 rounded-md text-zinc-500 z-10">
-                            <i data-lucide="grip-vertical" class="w-3 h-3"></i>
-                        </div>
-                        <div class="absolute top-2 right-2 flex gap-0.5 z-10">
-                            <button onclick="event.stopPropagation();app.editLink('${item.ID}')" class="icon-btn w-6 h-6" title="Edit">
-                                <i data-lucide="pencil" class="w-3 h-3"></i>
-                            </button>
-                            <button onclick="event.stopPropagation();app.deleteLink('${item.ID}')" class="icon-btn w-6 h-6 text-red-400" title="Hapus">
-                                <i data-lucide="trash-2" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-                    ` : ''}
-                    
-                    <a href="${isEdit ? 'javascript:void(0)' : this.safeUrl(item.URL)}" 
-                       ${!isEdit ? 'target="_blank" rel="noopener"' : ''}
-                       onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
-                       class="flex flex-col items-center flex-1 w-full ${isEdit ? 'pointer-events-none' : ''}">
-                        <div class="icon-circle ${c.bg}">
-                            <i data-lucide="${icon}" class="w-5 h-5 ${c.text}"></i>
-                        </div>
-                        <h4 class="text-xs font-semibold text-white line-clamp-2 leading-snug min-h-[2rem]">${this.escape(item.JUDUL)}</h4>
-                        ${showClicks ? `<div class="mt-1 text-[9px] text-zinc-600 font-mono">${item.CLICKS}×</div>` : ''}
-                    </a>
-                    
-                    ${isPinned && !isEdit ? `<div class="absolute top-2 right-2 text-[10px]">⭐</div>` : ''}
-                </div>
-            `;
+            const isTemp = String(item.ID).startsWith('tmp-');
+            return `<div class="link-card card" data-id="${item.ID}" ${isTemp ? 'style="border-color:#5a4a1e"' : ''}>
+                ${isEdit ? `
+                    <div class="drag-handle absolute top-2 left-2 p-1 rounded-md text-zinc-500 z-10"><i data-lucide="grip-vertical" class="w-3 h-3"></i></div>
+                    <div class="absolute top-2 right-2 flex gap-0.5 z-10">
+                        <button onclick="event.stopPropagation();app.editLink('${item.ID}')" class="icon-btn w-6 h-6" title="Edit"><i data-lucide="pencil" class="w-3 h-3"></i></button>
+                        <button onclick="event.stopPropagation();app.deleteLink('${item.ID}')" class="icon-btn w-6 h-6 text-red-400" title="Hapus"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    </div>
+                ` : ''}
+                <a href="${isEdit ? 'javascript:void(0)' : this.safeUrl(item.URL)}" ${!isEdit ? 'target="_blank" rel="noopener"' : ''} onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}" class="flex flex-col items-center flex-1 w-full ${isEdit ? 'pointer-events-none' : ''}">
+                    <div class="icon-circle ${c.bg}"><i data-lucide="${icon}" class="w-5 h-5 ${c.text}"></i></div>
+                    <h4 class="text-xs font-semibold text-white line-clamp-2 leading-snug min-h-[2rem]">${this.escape(item.JUDUL)}</h4>
+                    ${showClicks ? `<div class="mt-1 text-[9px] text-zinc-600 font-mono">${item.CLICKS}×</div>` : ''}
+                </a>
+                ${isPinned && !isEdit ? `<div class="absolute top-2 right-2 text-[10px]">⭐</div>` : ''}
+            </div>`;
         },
         
         renderRow: function(item) {
@@ -956,130 +570,55 @@
             const icon = item.ICON || 'link';
             const isEdit = this.editMode;
             const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
-            
-            return `
-                <div class="link-row" data-id="${item.ID}">
-                    ${isEdit ? `<div class="drag-handle p-1 text-zinc-500"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></div>` : ''}
-                    <a href="${isEdit ? 'javascript:void(0)' : this.safeUrl(item.URL)}"
-                       ${!isEdit ? 'target="_blank" rel="noopener"' : ''}
-                       onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
-                       class="flex items-center gap-3 flex-1 min-w-0 ${isEdit ? 'pointer-events-none' : ''}">
-                        <div class="w-9 h-9 rounded-full ${c.bg} flex items-center justify-center shrink-0">
-                            <i data-lucide="${icon}" class="w-4 h-4 ${c.text}"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-1.5">
-                                ${isPinned ? '<span class="text-[10px]">⭐</span>' : ''}
-                                <h4 class="text-xs font-semibold text-white truncate">${this.escape(item.JUDUL)}</h4>
-                            </div>
-                            ${item.DESKRIPSI ? `<p class="text-[10px] text-zinc-500 truncate">${this.escape(item.DESKRIPSI)}</p>` : ''}
-                        </div>
-                        ${showClicks ? `<span class="text-[9px] text-zinc-600 font-mono">${item.CLICKS}×</span>` : ''}
-                    </a>
-                    ${isEdit ? `
-                        <div class="flex gap-0.5 shrink-0">
-                            <button onclick="app.editLink('${item.ID}')" class="icon-btn w-7 h-7"><i data-lucide="pencil" class="w-3 h-3"></i></button>
-                            <button onclick="app.deleteLink('${item.ID}')" class="icon-btn w-7 h-7 text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
+            const isTemp = String(item.ID).startsWith('tmp-');
+            return `<div class="link-row" data-id="${item.ID}" ${isTemp ? 'style="border-color:#5a4a1e"' : ''}>
+                ${isEdit ? `<div class="drag-handle p-1 text-zinc-500"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></div>` : ''}
+                <a href="${isEdit ? 'javascript:void(0)' : this.safeUrl(item.URL)}" ${!isEdit ? 'target="_blank" rel="noopener"' : ''} onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}" class="flex items-center gap-3 flex-1 min-w-0 ${isEdit ? 'pointer-events-none' : ''}">
+                    <div class="w-9 h-9 rounded-full ${c.bg} flex items-center justify-center shrink-0"><i data-lucide="${icon}" class="w-4 h-4 ${c.text}"></i></div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-1.5">${isPinned ? '<span class="text-[10px]">⭐</span>' : ''}<h4 class="text-xs font-semibold text-white truncate">${this.escape(item.JUDUL)}</h4></div>
+                        ${item.DESKRIPSI ? `<p class="text-[10px] text-zinc-500 truncate">${this.escape(item.DESKRIPSI)}</p>` : ''}
+                    </div>
+                    ${showClicks ? `<span class="text-[9px] text-zinc-600 font-mono">${item.CLICKS}×</span>` : ''}
+                </a>
+                ${isEdit ? `<div class="flex gap-0.5 shrink-0">
+                    <button onclick="app.editLink('${item.ID}')" class="icon-btn w-7 h-7"><i data-lucide="pencil" class="w-3 h-3"></i></button>
+                    <button onclick="app.deleteLink('${item.ID}')" class="icon-btn w-7 h-7 text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                </div>` : ''}
+            </div>`;
         },
         
         colorConfig: function(color) {
-            const m = {
-                indigo:  { bg: 'bg-indigo-500/20',  text: 'text-indigo-300' },
-                sky:     { bg: 'bg-sky-500/20',     text: 'text-sky-300' },
-                emerald: { bg: 'bg-emerald-500/20', text: 'text-emerald-300' },
-                rose:    { bg: 'bg-rose-500/20',    text: 'text-rose-300' },
-                amber:   { bg: 'bg-amber-500/20',   text: 'text-amber-300' },
-                purple:  { bg: 'bg-purple-500/20',  text: 'text-purple-300' },
-                teal:    { bg: 'bg-teal-500/20',    text: 'text-teal-300' },
-                pink:    { bg: 'bg-pink-500/20',    text: 'text-pink-300' },
-                orange:  { bg: 'bg-orange-500/20',  text: 'text-orange-300' },
-                red:     { bg: 'bg-red-500/20',     text: 'text-red-300' },
-                green:   { bg: 'bg-green-500/20',   text: 'text-green-300' },
-                blue:    { bg: 'bg-blue-500/20',    text: 'text-blue-300' },
-                violet:  { bg: 'bg-violet-500/20',  text: 'text-violet-300' },
-                zinc:    { bg: 'bg-zinc-500/20',    text: 'text-zinc-300' }
-            };
+            const m = { indigo:{bg:'bg-indigo-500/20',text:'text-indigo-300'}, sky:{bg:'bg-sky-500/20',text:'text-sky-300'}, emerald:{bg:'bg-emerald-500/20',text:'text-emerald-300'}, rose:{bg:'bg-rose-500/20',text:'text-rose-300'}, amber:{bg:'bg-amber-500/20',text:'text-amber-300'}, purple:{bg:'bg-purple-500/20',text:'text-purple-300'}, teal:{bg:'bg-teal-500/20',text:'text-teal-300'}, pink:{bg:'bg-pink-500/20',text:'text-pink-300'}, orange:{bg:'bg-orange-500/20',text:'text-orange-300'}, red:{bg:'bg-red-500/20',text:'text-red-300'}, green:{bg:'bg-green-500/20',text:'text-green-300'}, blue:{bg:'bg-blue-500/20',text:'text-blue-300'}, violet:{bg:'bg-violet-500/20',text:'text-violet-300'}, zinc:{bg:'bg-zinc-500/20',text:'text-zinc-300'} };
             return m[color] || m.indigo;
         },
         
-        // ============================================================
-        // INFO PAGE
-        // ============================================================
         renderInfoPage: function() {
             const info = this.info || {};
             const canEdit = this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
             const d = canEdit ? '' : 'disabled';
-            
-            return `
-                <div class="max-w-2xl space-y-4">
-                    <div class="card p-4">
-                        <div class="flex items-center gap-2 mb-4">
-                            <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
-                                <i data-lucide="megaphone" class="w-4 h-4 text-accent"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-semibold text-white">Banner Pengumuman</h3>
-                                <p class="text-[10px] text-zinc-500">Muncul di atas dashboard</p>
-                            </div>
-                        </div>
-                        
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Status</label>
-                                <select id="info-status" ${d} class="input">
-                                    <option value="ON" ${info.STATUS === 'ON' ? 'selected' : ''}>ON</option>
-                                    <option value="OFF" ${info.STATUS !== 'ON' ? 'selected' : ''}>OFF</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Pesan</label>
-                                <textarea id="info-pesan" rows="3" ${d} class="input resize-none">${this.escape(info.PESAN || '')}</textarea>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Warna</label>
-                                <select id="info-warna" ${d} class="input">
-                                    ${['indigo','sky','emerald','amber','rose'].map(c => `<option value="${c}" ${info.WARNA === c ? 'selected' : ''}>${c}</option>`).join('')}
-                                </select>
-                            </div>
-                        </div>
+            return `<div class="max-w-2xl space-y-4">
+                <div class="card p-4">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center"><i data-lucide="megaphone" class="w-4 h-4 text-accent"></i></div>
+                        <div><h3 class="text-sm font-semibold text-white">Banner Pengumuman</h3><p class="text-[10px] text-zinc-500">Muncul di atas dashboard</p></div>
                     </div>
-                    
-                    <div class="card p-4">
-                        <div class="flex items-center gap-2 mb-3">
-                            <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
-                                <i data-lucide="package" class="w-4 h-4 text-accent"></i>
-                            </div>
-                            <h3 class="text-sm font-semibold text-white">Versi Aplikasi</h3>
-                        </div>
-                        <input type="text" id="info-versi" value="${this.escape(info.VERSI || '1.0')}" ${d} class="input">
+                    <div class="space-y-3">
+                        <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Status</label><select id="info-status" ${d} class="input"><option value="ON" ${info.STATUS === 'ON' ? 'selected' : ''}>ON</option><option value="OFF" ${info.STATUS !== 'ON' ? 'selected' : ''}>OFF</option></select></div>
+                        <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Pesan</label><textarea id="info-pesan" rows="3" ${d} class="input resize-none">${this.escape(info.PESAN || '')}</textarea></div>
+                        <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Warna</label><select id="info-warna" ${d} class="input">${['indigo','sky','emerald','amber','rose'].map(c => `<option value="${c}" ${info.WARNA === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
                     </div>
-                    
-                    ${canEdit ? `
-                        <button onclick="app.saveInfo()" class="btn btn-primary w-full py-3">
-                            <i data-lucide="save" class="w-4 h-4"></i>
-                            <span>Simpan</span>
-                        </button>
-                    ` : `
-                        <div class="card p-4 text-center text-xs text-zinc-500">
-                            <i data-lucide="lock" class="w-4 h-4 inline mr-1"></i>
-                            Login sebagai admin untuk mengedit
-                        </div>
-                    `}
                 </div>
-            `;
+                <div class="card p-4">
+                    <div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center"><i data-lucide="package" class="w-4 h-4 text-accent"></i></div><h3 class="text-sm font-semibold text-white">Versi Aplikasi</h3></div>
+                    <input type="text" id="info-versi" value="${this.escape(info.VERSI || '1.0')}" ${d} class="input">
+                </div>
+                ${canEdit ? `<button onclick="app.saveInfo()" class="btn btn-primary w-full py-3"><i data-lucide="save" class="w-4 h-4"></i><span>Simpan</span></button>` : `<div class="card p-4 text-center text-xs text-zinc-500">Login sebagai admin untuk mengedit</div>`}
+            </div>`;
         },
         
         saveInfo: function() {
-            const data = {
-                STATUS: document.getElementById('info-status').value,
-                PESAN: document.getElementById('info-pesan').value.trim(),
-                WARNA: document.getElementById('info-warna').value,
-                VERSI: document.getElementById('info-versi').value.trim()
-            };
+            const data = { STATUS: document.getElementById('info-status').value, PESAN: document.getElementById('info-pesan').value.trim(), WARNA: document.getElementById('info-warna').value, VERSI: document.getElementById('info-versi').value.trim() };
             this.info = { ...this.info, ...data };
             this.saveCache();
             this.queuePending({ action: 'saveInfo', data, userEmail: this.user?.email });
@@ -1087,122 +626,57 @@
             this.toast('Info disimpan', 'success');
         },
         
-        // ============================================================
-        // KATEGORI PAGE
-        // ============================================================
         renderKategoriPage: function() {
             const canEdit = this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
-            
-            const list = this.kategori.map(k => `
-                <div class="card p-3 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-lg bg-accent-soft flex items-center justify-center shrink-0">
-                        <i data-lucide="${k.ICON || 'folder'}" class="w-4 h-4 text-accent"></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-semibold text-white">${this.escape(k.NAMA)}</p>
-                        <p class="text-[10px] text-zinc-500">${this.menu.filter(m => m.KATEGORI === k.NAMA && m.DELETED !== true && m.DELETED !== 'TRUE').length} menu</p>
-                    </div>
-                    ${canEdit ? `
-                        <button onclick="app.editKategoriInline('${k.ID}')" class="icon-btn w-7 h-7">
-                            <i data-lucide="pencil" class="w-3 h-3"></i>
-                        </button>
-                        <button onclick="app.deleteKategoriInline('${k.ID}')" class="icon-btn w-7 h-7 text-red-400">
-                            <i data-lucide="trash-2" class="w-3 h-3"></i>
-                        </button>
-                    ` : ''}
-                </div>
-            `).join('');
-            
-            return `
-                <div class="max-w-2xl space-y-4">
-                    ${canEdit ? `
-                        <button onclick="app.addKategoriInline()" class="btn btn-primary w-full py-3">
-                            <i data-lucide="plus" class="w-4 h-4"></i>
-                            <span>Tambah Kategori</span>
-                        </button>
-                    ` : ''}
-                    <div class="space-y-2">
-                        ${list || '<div class="card p-8 text-center text-xs text-zinc-500"><i data-lucide="folder" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>Belum ada kategori</div>'}
-                    </div>
-                </div>
-            `;
+            const list = this.kategori.map(k => `<div class="card p-3 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-accent-soft flex items-center justify-center shrink-0"><i data-lucide="${k.ICON || 'folder'}" class="w-4 h-4 text-accent"></i></div>
+                <div class="flex-1 min-w-0"><p class="text-xs font-semibold text-white">${this.escape(k.NAMA)}</p><p class="text-[10px] text-zinc-500">${this.menu.filter(m => m.KATEGORI === k.NAMA && m.DELETED !== true && m.DELETED !== 'TRUE').length} menu</p></div>
+                ${canEdit ? `<button onclick="app.editKategoriInline('${k.ID}')" class="icon-btn w-7 h-7"><i data-lucide="pencil" class="w-3 h-3"></i></button><button onclick="app.deleteKategoriInline('${k.ID}')" class="icon-btn w-7 h-7 text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>` : ''}
+            </div>`).join('');
+            return `<div class="max-w-2xl space-y-4">${canEdit ? `<button onclick="app.addKategoriInline()" class="btn btn-primary w-full py-3"><i data-lucide="plus" class="w-4 h-4"></i><span>Tambah Kategori</span></button>` : ''}<div class="space-y-2">${list || '<div class="card p-8 text-center text-xs text-zinc-500">Belum ada kategori</div>'}</div></div>`;
         },
         
         addKategoriInline: function() {
-            const nama = prompt('Nama kategori:');
-            if (!nama?.trim()) return;
-            const icon = prompt('Icon Lucide (contoh: folder):', 'folder') || 'folder';
+            const nama = prompt('Nama kategori:'); if (!nama?.trim()) return;
+            const icon = prompt('Icon Lucide:', 'folder') || 'folder';
             const data = { ID: null, NAMA: nama.trim(), ICON: icon.trim() };
             this.kategori.push({ ...data, ID: 'tmp-' + Date.now(), URUTAN: this.kategori.length + 1 });
-            this.saveCache();
-            this.renderCurrentView();
+            this.saveCache(); this.renderCurrentView();
             this.queuePending({ action: 'saveKategori', data, userEmail: this.user?.email });
             this.syncPending();
         },
         
         editKategoriInline: function(id) {
-            const k = this.kategori.find(x => x.ID === id);
-            if (!k) return;
-            const nama = prompt('Nama kategori:', k.NAMA);
-            if (!nama?.trim()) return;
+            const k = this.kategori.find(x => x.ID === id); if (!k) return;
+            const nama = prompt('Nama kategori:', k.NAMA); if (!nama?.trim()) return;
             const icon = prompt('Icon:', k.ICON || 'folder') || 'folder';
             const data = { ID: id, NAMA: nama.trim(), ICON: icon.trim() };
             const idx = this.kategori.findIndex(x => x.ID === id);
             if (idx >= 0) this.kategori[idx] = { ...this.kategori[idx], ...data };
-            this.saveCache();
-            this.renderCurrentView();
+            this.saveCache(); this.renderCurrentView();
             this.queuePending({ action: 'saveKategori', data, userEmail: this.user?.email });
             this.syncPending();
         },
         
         deleteKategoriInline: function(id) {
-            const k = this.kategori.find(x => x.ID === id);
-            if (!k) return;
+            const k = this.kategori.find(x => x.ID === id); if (!k) return;
             if (!confirm(`Hapus kategori "${k.NAMA}"?`)) return;
             this.kategori = this.kategori.filter(x => x.ID !== id);
-            this.saveCache();
-            this.renderCurrentView();
+            this.saveCache(); this.renderCurrentView();
             this.queuePending({ action: 'deleteKategori', id, userEmail: this.user?.email });
             this.syncPending();
         },
         
-        // ============================================================
-        // USERS PAGE
-        // ============================================================
         renderUsersPage: function() {
             const isSA = this.user && this.user.jabatan.toLowerCase() === 'super admin';
             if (!isSA) return `<div class="card p-10 text-center text-xs text-zinc-500"><i data-lucide="shield-lock" class="w-8 h-8 mx-auto mb-3 opacity-40"></i>Hanya Super Admin</div>`;
-            
-            const list = this.users.map(u => `
-                <div class="card p-3 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-full bg-accent-soft flex items-center justify-center text-[11px] font-bold text-accent shrink-0">
-                        ${this.escape(String(u.NAMA || u.EMAIL).substring(0, 2).toUpperCase())}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-semibold text-white truncate">${this.escape(u.NAMA || '')}</p>
-                        <p class="text-[10px] text-zinc-500 truncate">${this.escape(u.EMAIL || '')}</p>
-                        <p class="text-[10px] text-accent mt-0.5">${this.escape(u.JABATAN || '')}</p>
-                    </div>
-                    <button onclick="app.editUserInline('${this.escape(u.EMAIL)}')" class="icon-btn w-7 h-7">
-                        <i data-lucide="pencil" class="w-3 h-3"></i>
-                    </button>
-                    <button onclick="app.deleteUserInline('${this.escape(u.EMAIL)}')" class="icon-btn w-7 h-7 text-red-400">
-                        <i data-lucide="trash-2" class="w-3 h-3"></i>
-                    </button>
-                </div>
-            `).join('');
-            
-            return `
-                <div class="max-w-2xl space-y-4">
-                    <button onclick="app.addUserInline()" class="btn btn-primary w-full py-3">
-                        <i data-lucide="user-plus" class="w-4 h-4"></i>
-                        <span>Tambah User</span>
-                    </button>
-                    <div class="space-y-2">
-                        ${list || '<div class="card p-8 text-center text-xs text-zinc-500">Belum ada user</div>'}
-                    </div>
-                </div>
-            `;
+            const list = this.users.map(u => `<div class="card p-3 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-accent-soft flex items-center justify-center text-[11px] font-bold text-accent shrink-0">${this.escape(String(u.NAMA || u.EMAIL).substring(0, 2).toUpperCase())}</div>
+                <div class="flex-1 min-w-0"><p class="text-xs font-semibold text-white truncate">${this.escape(u.NAMA || '')}</p><p class="text-[10px] text-zinc-500 truncate">${this.escape(u.EMAIL || '')}</p><p class="text-[10px] text-accent mt-0.5">${this.escape(u.JABATAN || '')}</p></div>
+                <button onclick="app.editUserInline('${this.escape(u.EMAIL)}')" class="icon-btn w-7 h-7"><i data-lucide="pencil" class="w-3 h-3"></i></button>
+                <button onclick="app.deleteUserInline('${this.escape(u.EMAIL)}')" class="icon-btn w-7 h-7 text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+            </div>`).join('');
+            return `<div class="max-w-2xl space-y-4"><button onclick="app.addUserInline()" class="btn btn-primary w-full py-3"><i data-lucide="user-plus" class="w-4 h-4"></i><span>Tambah User</span></button><div class="space-y-2">${list || '<div class="card p-8 text-center text-xs text-zinc-500">Belum ada user</div>'}</div></div>`;
         },
         
         addUserInline: function() {
@@ -1217,8 +691,7 @@
         },
         
         editUserInline: function(email) {
-            const u = this.users.find(x => x.EMAIL === email);
-            if (!u) return;
+            const u = this.users.find(x => x.EMAIL === email); if (!u) return;
             const nama = prompt('Nama:', u.NAMA || ''); if (nama === null) return;
             const jabatan = prompt('Jabatan:', u.JABATAN || 'Operator') || 'Operator';
             const unit = prompt('Unit:', u.UNIT || '') || '';
@@ -1236,77 +709,42 @@
             setTimeout(() => this.syncNow(true), 800);
         },
         
-        // ============================================================
-        // FEEDBACK PAGE
-        // ============================================================
         renderFeedbackPage: function() {
             const isAdmin = this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
-            
             if (!isAdmin) {
-                return `
-                    <div class="max-w-2xl space-y-3">
-                        <div class="card p-5">
-                            <div class="flex items-center gap-2 mb-3">
-                                <i data-lucide="message-circle" class="w-4 h-4 text-accent"></i>
-                                <h3 class="text-sm font-semibold text-white">Kirim Feedback</h3>
-                            </div>
-                            <div class="space-y-3">
-                                <select id="fb-tipe" class="input">
-                                    <option value="saran">💡 Saran</option>
-                                    <option value="bug">🐛 Laporan Bug</option>
-                                    <option value="lain">📝 Lainnya</option>
-                                </select>
-                                <textarea id="fb-pesan" rows="4" placeholder="Tulis pesan..." class="input resize-none"></textarea>
-                                <button onclick="app.sendFeedback()" class="btn btn-primary w-full py-2.5">
-                                    <i data-lucide="send" class="w-4 h-4"></i> Kirim
-                                </button>
-                            </div>
-                        </div>
+                return `<div class="max-w-2xl space-y-3"><div class="card p-5">
+                    <div class="flex items-center gap-2 mb-3"><i data-lucide="message-circle" class="w-4 h-4 text-accent"></i><h3 class="text-sm font-semibold text-white">Kirim Feedback</h3></div>
+                    <div class="space-y-3">
+                        <select id="fb-tipe" class="input"><option value="saran">💡 Saran</option><option value="bug">🐛 Laporan Bug</option><option value="lain">📝 Lainnya</option></select>
+                        <textarea id="fb-pesan" rows="4" placeholder="Tulis pesan..." class="input resize-none"></textarea>
+                        <button onclick="app.sendFeedback()" class="btn btn-primary w-full py-2.5"><i data-lucide="send" class="w-4 h-4"></i> Kirim</button>
                     </div>
-                `;
+                </div></div>`;
             }
-            
-            if (this.feedbackList.length === 0) {
-                return `<div class="card p-10 text-center text-xs text-zinc-500"><i data-lucide="inbox" class="w-8 h-8 mx-auto mb-3 opacity-40"></i>Belum ada feedback</div>`;
-            }
-            
-            const statusColor = {
-                baru: 'bg-red-900/50 text-red-300 border-red-700',
-                dibaca: 'bg-amber-900/50 text-amber-300 border-amber-700',
-                diproses: 'bg-sky-900/50 text-sky-300 border-sky-700',
-                selesai: 'bg-emerald-900/50 text-emerald-300 border-emerald-700'
-            };
-            const tipeIcon = { saran: '💡', bug: '🐛', lain: '📝' };
-            
-            return `
-                <div class="max-w-2xl space-y-2">
-                    <p class="text-[10px] text-zinc-500 uppercase font-semibold tracking-wider mb-3">${this.feedbackList.length} feedback</p>
-                    ${this.feedbackList.map(f => `
-                        <div class="card p-3.5 space-y-2">
-                            <div class="flex items-start justify-between gap-2">
-                                <div class="flex items-center gap-1.5 flex-wrap">
-                                    <span class="text-sm">${tipeIcon[f.TIPE] || '📝'}</span>
-                                    <span class="text-[9px] font-mono text-zinc-500">${this.escape(f.WAKTU)}</span>
-                                    <span class="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full border ${statusColor[String(f.STATUS).toLowerCase()] || statusColor.baru}">${this.escape(f.STATUS || 'baru')}</span>
-                                </div>
-                                <button onclick="app.deleteFeedbackInline('${f.ID}')" class="icon-btn w-7 h-7 text-red-400">
-                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
-                                </button>
-                            </div>
-                            <p class="text-xs text-zinc-300 whitespace-pre-wrap">${this.escape(f.PESAN)}</p>
-                            <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-2 border-t border-ink-750">
-                                <span class="truncate">${this.escape(f.PENGIRIM || 'anon')}</span>
-                                <select onchange="app.updateFeedbackStatusInline('${f.ID}', this.value)" class="input py-0.5 px-2 w-auto text-[10px]">
-                                    <option value="baru" ${f.STATUS==='baru'?'selected':''}>Baru</option>
-                                    <option value="dibaca" ${f.STATUS==='dibaca'?'selected':''}>Dibaca</option>
-                                    <option value="diproses" ${f.STATUS==='diproses'?'selected':''}>Diproses</option>
-                                    <option value="selesai" ${f.STATUS==='selesai'?'selected':''}>Selesai</option>
-                                </select>
-                            </div>
+            if (this.feedbackList.length === 0) return `<div class="card p-10 text-center text-xs text-zinc-500"><i data-lucide="inbox" class="w-8 h-8 mx-auto mb-3 opacity-40"></i>Belum ada feedback</div>`;
+            const statusColor = { baru:'bg-red-900/50 text-red-300 border-red-700', dibaca:'bg-amber-900/50 text-amber-300 border-amber-700', diproses:'bg-sky-900/50 text-sky-300 border-sky-700', selesai:'bg-emerald-900/50 text-emerald-300 border-emerald-700' };
+            const tipeIcon = { saran:'💡', bug:'🐛', lain:'📝' };
+            return `<div class="max-w-2xl space-y-2"><p class="text-[10px] text-zinc-500 uppercase font-semibold tracking-wider mb-3">${this.feedbackList.length} feedback</p>
+                ${this.feedbackList.map(f => `<div class="card p-3.5 space-y-2">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-sm">${tipeIcon[f.TIPE] || '📝'}</span>
+                            <span class="text-[9px] font-mono text-zinc-500">${this.escape(f.WAKTU)}</span>
+                            <span class="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full border ${statusColor[String(f.STATUS).toLowerCase()] || statusColor.baru}">${this.escape(f.STATUS || 'baru')}</span>
                         </div>
-                    `).join('')}
-                </div>
-            `;
+                        <button onclick="app.deleteFeedbackInline('${f.ID}')" class="icon-btn w-7 h-7 text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    </div>
+                    <p class="text-xs text-zinc-300 whitespace-pre-wrap">${this.escape(f.PESAN)}</p>
+                    <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-2 border-t border-ink-750">
+                        <span class="truncate">${this.escape(f.PENGIRIM || 'anon')}</span>
+                        <select onchange="app.updateFeedbackStatusInline('${f.ID}', this.value)" class="input py-0.5 px-2 w-auto text-[10px]">
+                            <option value="baru" ${f.STATUS==='baru'?'selected':''}>Baru</option>
+                            <option value="dibaca" ${f.STATUS==='dibaca'?'selected':''}>Dibaca</option>
+                            <option value="diproses" ${f.STATUS==='diproses'?'selected':''}>Diproses</option>
+                            <option value="selesai" ${f.STATUS==='selesai'?'selected':''}>Selesai</option>
+                        </select>
+                    </div>
+                </div>`).join('')}</div>`;
         },
         
         loadFeedback: function(silent) {
@@ -1343,8 +781,7 @@
         },
         
         updateFeedbackStatusInline: function(id, status) {
-            const f = this.feedbackList.find(x => x.ID === id);
-            if (f) f.STATUS = status;
+            const f = this.feedbackList.find(x => x.ID === id); if (f) f.STATUS = status;
             this.saveCache();
             this.apiPost({ action: 'updateFeedback', id, status, userEmail: this.user?.email });
         },
@@ -1352,76 +789,44 @@
         deleteFeedbackInline: function(id) {
             if (!confirm('Hapus feedback?')) return;
             this.feedbackList = this.feedbackList.filter(x => x.ID !== id);
-            this.saveCache();
-            this.renderCurrentView();
+            this.saveCache(); this.renderCurrentView();
             this.apiPost({ action: 'deleteFeedback', id, userEmail: this.user?.email });
         },
         
-        // ============================================================
-        // BACKUP PAGE
-        // ============================================================
         renderBackupPage: function() {
             const canEdit = this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
             if (!canEdit) return `<div class="card p-10 text-center text-xs text-zinc-500"><i data-lucide="lock" class="w-8 h-8 mx-auto mb-3 opacity-40"></i>Login sebagai admin</div>`;
-            
             const cacheSize = (localStorage.getItem(this.KEYS.CACHE) || '').length;
             const pendingCount = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]').length;
             const lastSync = localStorage.getItem(this.KEYS.LAST_SYNC) || '-';
-            
-            return `
-                <div class="max-w-2xl space-y-4">
-                    <div class="card p-4 space-y-2.5 text-xs">
-                        <div class="flex justify-between"><span class="text-zinc-500">Cache</span><span class="font-mono text-white">${(cacheSize/1024).toFixed(1)} KB</span></div>
-                        <div class="flex justify-between"><span class="text-zinc-500">Pending</span><span class="font-mono ${pendingCount > 0 ? 'text-amber-300' : 'text-white'}">${pendingCount}</span></div>
-                        <div class="flex justify-between"><span class="text-zinc-500">Last sync</span><span class="font-mono text-white text-[10px]">${lastSync}</span></div>
-                        <div class="flex justify-between"><span class="text-zinc-500">Total menu</span><span class="font-mono text-white">${this.menu.length}</span></div>
-                    </div>
-                    
-                    <div class="card p-4">
-                        <div class="flex items-center gap-2 mb-3">
-                            <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
-                                <i data-lucide="zap" class="w-4 h-4 text-accent"></i>
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="text-sm font-semibold text-white">Force Sync</h3>
-                                <p class="text-[10px] text-zinc-500">Reset cache + update app ke versi terbaru</p>
-                            </div>
-                        </div>
-                        <button onclick="app.forceSync()" class="btn btn-primary w-full py-2.5">
-                            <i data-lucide="zap" class="w-4 h-4"></i>
-                            <span>Jalankan Force Sync</span>
-                        </button>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="app.exportJSON()" class="btn btn-ghost py-3">
-                            <i data-lucide="download" class="w-4 h-4"></i>
-                            <span>Export</span>
-                        </button>
-                        <label class="btn btn-ghost py-3 cursor-pointer">
-                            <i data-lucide="upload" class="w-4 h-4"></i>
-                            <span>Import</span>
-                            <input type="file" accept=".json" class="hidden" onchange="app.importJSON(event)">
-                        </label>
-                    </div>
-                    
-                    <div class="card p-4 space-y-3">
-                        <h4 class="text-xs font-semibold text-red-400 uppercase tracking-wider">Zona Berbahaya</h4>
-                        <button onclick="app.clearCache()" class="btn btn-ghost w-full py-2.5">
-                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            <span>Clear Cache & Sync</span>
-                        </button>
-                        <button onclick="app.factoryReset()" class="btn btn-danger w-full py-2.5">
-                            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
-                            <span>Reset Semua Data</span>
-                        </button>
-                    </div>
+            return `<div class="max-w-2xl space-y-4">
+                <div class="card p-4 space-y-2.5 text-xs">
+                    <div class="flex justify-between"><span class="text-zinc-500">Cache</span><span class="font-mono text-white">${(cacheSize/1024).toFixed(1)} KB</span></div>
+                    <div class="flex justify-between"><span class="text-zinc-500">Pending</span><span class="font-mono ${pendingCount > 0 ? 'text-amber-300' : 'text-white'}">${pendingCount}</span></div>
+                    <div class="flex justify-between"><span class="text-zinc-500">Last sync</span><span class="font-mono text-white text-[10px]">${lastSync}</span></div>
+                    <div class="flex justify-between"><span class="text-zinc-500">Total menu</span><span class="font-mono text-white">${this.menu.length}</span></div>
                 </div>
-            `;
+                <div class="card p-4">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center"><i data-lucide="zap" class="w-4 h-4 text-accent"></i></div>
+                        <div class="flex-1"><h3 class="text-sm font-semibold text-white">Force Sync</h3><p class="text-[10px] text-zinc-500">Reset cache + reload</p></div>
+                    </div>
+                    <button onclick="app.forceSync()" class="btn btn-primary w-full py-2.5"><i data-lucide="zap" class="w-4 h-4"></i><span>Jalankan Force Sync</span></button>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="app.exportJSON()" class="btn btn-ghost py-3"><i data-lucide="download" class="w-4 h-4"></i><span>Export</span></button>
+                    <label class="btn btn-ghost py-3 cursor-pointer"><i data-lucide="upload" class="w-4 h-4"></i><span>Import</span><input type="file" accept=".json" class="hidden" onchange="app.importJSON(event)"></label>
+                </div>
+                <div class="card p-4 space-y-3">
+                    <h4 class="text-xs font-semibold text-red-400 uppercase tracking-wider">Zona Berbahaya</h4>
+                    <button onclick="app.clearCache()" class="btn btn-ghost w-full py-2.5"><i data-lucide="refresh-cw" class="w-4 h-4"></i><span>Clear Cache & Sync</span></button>
+                    <button onclick="app.factoryReset()" class="btn btn-danger w-full py-2.5"><i data-lucide="alert-triangle" class="w-4 h-4"></i><span>Reset Semua Data</span></button>
+                </div>
+            </div>`;
         },
         
         exportJSON: function() {
-            const data = { version: '4.1', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info };
+            const data = { version: '4.3', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1433,14 +838,13 @@
         },
         
         importJSON: function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+            const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
                     const data = JSON.parse(e.target.result);
                     if (!data.menu) throw new Error('Format invalid');
-                    this.toast(`File berisi ${data.menu.length} menu — apply manual via Sheet`, 'warning');
+                    this.toast(`File berisi ${data.menu.length} menu`, 'warning');
                 } catch(err) { this.toast('File tidak valid', 'error'); }
                 event.target.value = '';
             };
@@ -1452,8 +856,7 @@
             localStorage.removeItem(this.KEYS.CACHE);
             localStorage.removeItem(this.KEYS.LAST_SYNC);
             this.menu = []; this.kategori = [];
-            this.saveCache();
-            this.syncNow();
+            this.saveCache(); this.syncNow();
         },
         
         factoryReset: function() {
@@ -1463,162 +866,97 @@
             location.reload();
         },
         
-        // ============================================================
-        // PREFS PAGE
-        // ============================================================
         renderPrefsPage: function() {
             const p = this.prefs;
-            return `
-                <div class="max-w-2xl space-y-4">
-                    <div class="card p-4">
-                        <h3 class="text-sm font-semibold text-white mb-3">Tampilan</h3>
-                        <div class="flex gap-2">
-                            <button onclick="app.setPref('view','grid')" class="btn ${p.view==='grid' ? 'btn-primary' : 'btn-ghost'} flex-1 py-2.5">
-                                <i data-lucide="layout-grid" class="w-4 h-4"></i>
-                                <span>Grid</span>
-                            </button>
-                            <button onclick="app.setPref('view','list')" class="btn ${p.view==='list' ? 'btn-primary' : 'btn-ghost'} flex-1 py-2.5">
-                                <i data-lucide="layout-list" class="w-4 h-4"></i>
-                                <span>List</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="card p-4 space-y-3">
-                        <h3 class="text-sm font-semibold text-white">Options</h3>
-                        <label class="flex items-center justify-between cursor-pointer">
-                            <div>
-                                <p class="text-xs font-medium text-white">Click Counter</p>
-                                <p class="text-[10px] text-zinc-500 mt-0.5">Tampilkan jumlah klik</p>
-                            </div>
-                            <input type="checkbox" ${p.showClicks ? 'checked' : ''} onchange="app.setPref('showClicks', this.checked)" class="w-4 h-4 rounded">
-                        </label>
-                        <label class="flex items-center justify-between cursor-pointer">
-                            <div>
-                                <p class="text-xs font-medium text-white">Banner Info</p>
-                                <p class="text-[10px] text-zinc-500 mt-0.5">Tampilkan pengumuman</p>
-                            </div>
-                            <input type="checkbox" ${p.showBanner ? 'checked' : ''} onchange="app.setPref('showBanner', this.checked)" class="w-4 h-4 rounded">
-                        </label>
-                    </div>
-                    
-                    <div class="card p-4">
-                        <h3 class="text-sm font-semibold text-white mb-3">Sync</h3>
-                        <button onclick="app.syncNow()" class="btn btn-ghost w-full py-2.5">
-                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            <span>Sync Sekarang</span>
-                        </button>
+            return `<div class="max-w-2xl space-y-4">
+                <div class="card p-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">Tampilan</h3>
+                    <div class="flex gap-2">
+                        <button onclick="app.setPref('view','grid')" class="btn ${p.view==='grid' ? 'btn-primary' : 'btn-ghost'} flex-1 py-2.5"><i data-lucide="layout-grid" class="w-4 h-4"></i><span>Grid</span></button>
+                        <button onclick="app.setPref('view','list')" class="btn ${p.view==='list' ? 'btn-primary' : 'btn-ghost'} flex-1 py-2.5"><i data-lucide="layout-list" class="w-4 h-4"></i><span>List</span></button>
                     </div>
                 </div>
-            `;
+                <div class="card p-4 space-y-3">
+                    <h3 class="text-sm font-semibold text-white">Options</h3>
+                    <label class="flex items-center justify-between cursor-pointer"><div><p class="text-xs font-medium text-white">Click Counter</p><p class="text-[10px] text-zinc-500 mt-0.5">Tampilkan jumlah klik</p></div><input type="checkbox" ${p.showClicks ? 'checked' : ''} onchange="app.setPref('showClicks', this.checked)" class="w-4 h-4 rounded"></label>
+                    <label class="flex items-center justify-between cursor-pointer"><div><p class="text-xs font-medium text-white">Banner Info</p><p class="text-[10px] text-zinc-500 mt-0.5">Tampilkan pengumuman</p></div><input type="checkbox" ${p.showBanner ? 'checked' : ''} onchange="app.setPref('showBanner', this.checked)" class="w-4 h-4 rounded"></label>
+                </div>
+                <div class="card p-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">Sync</h3>
+                    <button onclick="app.syncNow()" class="btn btn-ghost w-full py-2.5"><i data-lucide="refresh-cw" class="w-4 h-4"></i><span>Sync Sekarang</span></button>
+                </div>
+            </div>`;
         },
         
         setPref: function(key, value) {
             this.prefs[key] = value;
-            this.savePrefs();
-            this.renderCurrentView();
+            this.savePrefs(); this.renderCurrentView();
             if (key === 'view') this.updateViewIcon();
         },
         
-        // ============================================================
-        // DIAGNOSTIC PAGE
-        // ============================================================
         renderDiagnosticPage: function() {
-            return `
-                <div class="max-w-2xl space-y-4">
-                    <div class="card p-4">
-                        <h3 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-                            <i data-lucide="activity" class="w-4 h-4 text-accent"></i>
-                            Diagnostik Backend
-                        </h3>
-                        <p class="text-[11px] text-zinc-500 mb-3">Test koneksi & endpoint ke Google Apps Script.</p>
-                        <button onclick="app.runDiagnostic()" class="btn btn-primary w-full py-2.5">
-                            <i data-lucide="play" class="w-4 h-4"></i>
-                            <span>Jalankan Test</span>
-                        </button>
-                        <div id="diagnostic-output" class="mt-3"></div>
-                    </div>
-                    
-                    <div class="card p-4">
-                        <h3 class="text-sm font-semibold text-white mb-3">API URL</h3>
-                        <input type="text" id="diag-apiurl" value="${this.apiURL}" class="input font-mono text-[10px]">
-                        <button onclick="app.updateApiUrl()" class="btn btn-ghost w-full py-2 mt-2">
-                            <i data-lucide="save" class="w-4 h-4"></i>
-                            <span>Update URL</span>
-                        </button>
-                        <p class="text-[10px] text-zinc-500 mt-2">Ubah kalau deployment Apps Script berubah URL-nya.</p>
-                    </div>
-                    
-                    <div class="card p-4">
-                        <h3 class="text-sm font-semibold text-white mb-3">Info Device</h3>
-                        <div class="space-y-2 text-[11px] font-mono">
-                            <div class="flex justify-between"><span class="text-zinc-500">Online</span><span>${this.isOnline ? '✓' : '✗'}</span></div>
-                            <div class="flex justify-between"><span class="text-zinc-500">User</span><span>${this.user?.email || '-'}</span></div>
-                            <div class="flex justify-between"><span class="text-zinc-500">Role</span><span>${this.user?.jabatan || '-'}</span></div>
-                            <div class="flex justify-between"><span class="text-zinc-500">Cache</span><span>${(localStorage.getItem(this.KEYS.CACHE) || '').length} B</span></div>
-                            <div class="flex justify-between"><span class="text-zinc-500">Menu</span><span>${this.menu.length} items</span></div>
-                            <div class="flex justify-between"><span class="text-zinc-500">Kategori</span><span>${this.kategori.length} items</span></div>
-                        </div>
-                    </div>
-                    
-                    <div class="card p-4">
-                        <h3 class="text-sm font-semibold text-white mb-3">Test POST</h3>
-                        <button onclick="app.testPost()" class="btn btn-ghost w-full py-2.5 mb-2">
-                            <i data-lucide="send" class="w-4 h-4"></i>
-                            <span>Test Add Menu</span>
-                        </button>
-                        <p class="text-[10px] text-zinc-500">Kirim test POST ke backend, lihat response di Console.</p>
+            return `<div class="max-w-2xl space-y-4">
+                <div class="card p-4">
+                    <h3 class="text-sm font-semibold text-white mb-3 flex items-center gap-2"><i data-lucide="activity" class="w-4 h-4 text-accent"></i>Diagnostik</h3>
+                    <button onclick="app.runDiagnostic()" class="btn btn-primary w-full py-2.5 mb-2"><i data-lucide="play" class="w-4 h-4"></i><span>Jalankan Test</span></button>
+                    <button onclick="app.testPost()" class="btn btn-ghost w-full py-2.5"><i data-lucide="send" class="w-4 h-4"></i><span>Test Add Menu</span></button>
+                    <div id="diagnostic-output" class="mt-3"></div>
+                </div>
+                <div class="card p-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">API URL</h3>
+                    <input type="text" id="diag-apiurl" value="${this.apiURL}" class="input font-mono text-[10px]">
+                    <button onclick="app.updateApiUrl()" class="btn btn-ghost w-full py-2 mt-2"><i data-lucide="save" class="w-4 h-4"></i><span>Update URL</span></button>
+                </div>
+                <div class="card p-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">Info</h3>
+                    <div class="space-y-2 text-[11px] font-mono">
+                        <div class="flex justify-between"><span class="text-zinc-500">Online</span><span>${this.isOnline ? '✓' : '✗'}</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">User</span><span>${this.user?.email || '-'}</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Role</span><span>${this.user?.jabatan || '-'}</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Menu</span><span>${this.menu.length} items</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Pending</span><span>${JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]').length}</span></div>
                     </div>
                 </div>
-            `;
+                <div class="card p-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">Debug Panel</h3>
+                    <button onclick="document.getElementById('debug-panel').classList.toggle('show')" class="btn btn-ghost w-full py-2.5"><i data-lucide="bug" class="w-4 h-4"></i><span>Toggle Debug Panel</span></button>
+                    <p class="text-[10px] text-zinc-500 mt-2">Atau ketuk logo 5x, atau tambah <code>?debug=1</code>.</p>
+                </div>
+            </div>`;
         },
         
         runDiagnostic: function() {
             const out = document.getElementById('diagnostic-output');
             out.innerHTML = '<p class="text-xs text-zinc-500 mt-2">Testing...</p>';
-            
             const tests = [
-                fetch(`${this.apiURL}?action=ping`).then(r => r.json()).then(d => ({ name: 'Ping', ok: d.status === 'success', data: d })).catch(e => ({ name: 'Ping', ok: false, error: e.message })),
-                fetch(`${this.apiURL}?action=bootstrap`).then(r => r.json()).then(d => ({ name: 'Bootstrap', ok: d.status === 'success', data: { menu: d.data?.menu?.length || 0, kategori: d.data?.kategori?.length || 0 } })).catch(e => ({ name: 'Bootstrap', ok: false, error: e.message }))
+                fetch(`${this.apiURL}?action=ping`).then(r => r.json()).then(d => ({ name:'Ping', ok:d.status === 'success', data:d })).catch(e => ({ name:'Ping', ok:false, error:e.message })),
+                fetch(`${this.apiURL}?action=bootstrap`).then(r => r.json()).then(d => ({ name:'Bootstrap', ok:d.status === 'success', data:{ menu:d.data?.menu?.length || 0, kategori:d.data?.kategori?.length || 0 } })).catch(e => ({ name:'Bootstrap', ok:false, error:e.message }))
             ];
-            
             Promise.all(tests).then(results => {
-                out.innerHTML = results.map(r => `
-                    <div class="mt-2 p-3 rounded-lg border ${r.ok ? 'border-emerald-700 bg-emerald-900/30' : 'border-red-700 bg-red-900/30'}">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="text-xs font-semibold ${r.ok ? 'text-emerald-300' : 'text-red-300'}">${r.name}</span>
-                            <span class="text-[10px] font-mono ${r.ok ? 'text-emerald-400' : 'text-red-400'}">${r.ok ? '✓ OK' : '✗ FAIL'}</span>
-                        </div>
-                        <pre class="text-[9px] text-zinc-400 whitespace-pre-wrap">${this.escape(JSON.stringify(r.data || r.error, null, 2).substring(0, 400))}</pre>
-                    </div>
-                `).join('');
+                out.innerHTML = results.map(r => `<div class="mt-2 p-3 rounded-lg border ${r.ok ? 'border-emerald-700 bg-emerald-900/30' : 'border-red-700 bg-red-900/30'}">
+                    <div class="flex items-center justify-between mb-1"><span class="text-xs font-semibold ${r.ok ? 'text-emerald-300' : 'text-red-300'}">${r.name}</span><span class="text-[10px] font-mono">${r.ok ? '✓ OK' : '✗ FAIL'}</span></div>
+                    <pre class="text-[9px] text-zinc-400 whitespace-pre-wrap">${this.escape(JSON.stringify(r.data || r.error, null, 2).substring(0, 400))}</pre>
+                </div>`).join('');
             });
         },
         
         testPost: async function() {
+            this.toast('Testing...', 'info');
             try {
                 const res = await fetch(this.apiURL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        action: 'add',
-                        data: { judul: 'DIAG ' + Date.now(), url: 'https://example.com/' + Date.now(), icon: 'link', warna: 'indigo' },
-                        userEmail: this.user?.email
-                    })
+                    body: JSON.stringify({ action:'add', data:{ judul:'TEST ' + new Date().toLocaleTimeString(), url:'https://example.com/' + Date.now(), icon:'link', warna:'indigo' }, userEmail:this.user?.email })
                 });
                 const text = await res.text();
-                console.log('HTTP Status:', res.status);
-                console.log('Response Body:', text);
-                
+                dbg('HTTP ' + res.status + ': ' + text.substring(0, 300), 'info');
                 try {
                     const json = JSON.parse(text);
-                    if (json.status === 'success') this.toast('✓ Backend OK — POST berhasil', 'success');
-                    else this.toast('Backend error: ' + json.message, 'error');
-                } catch(e) {
-                    this.toast('Response bukan JSON — cek Console', 'error');
-                }
+                    if (json.status === 'success') { this.toast('✓ Backend OK', 'success'); this.syncNow(true); }
+                    else this.toast('Backend: ' + json.message, 'error');
+                } catch(e) { this.toast('Response bukan JSON', 'error'); }
             } catch(err) {
-                console.error('POST error:', err);
+                dbg('POST error: ' + err.message, 'error');
                 this.toast('POST gagal: ' + err.message, 'error');
             }
         },
@@ -1627,12 +965,12 @@
             const url = document.getElementById('diag-apiurl').value.trim();
             if (!url) return;
             this.apiURL = url;
-            localStorage.setItem('sa4_apiurl', url);
+            localStorage.setItem(this.KEYS.APIURL, url);
             this.toast('API URL diupdate', 'success');
         },
         
         // ============================================================
-        // SYNC
+        // SYNC — FIXED
         // ============================================================
         syncNow: function(silent) {
             if (!this.isOnline) {
@@ -1640,10 +978,10 @@
                 this.updateSyncIndicator('offline');
                 return;
             }
-            
             this.updateSyncIndicator('syncing');
             const btn = document.getElementById('btn-sync');
-            if (btn) btn.querySelector('i').classList.add('animate-spin');
+            if (btn && !silent) this.spinBtn(btn, true);
+            dbg('Sync start...', 'info');
             
             fetch(`${this.apiURL}?action=bootstrap`)
                 .then(r => r.json())
@@ -1659,80 +997,46 @@
                     localStorage.setItem(this.KEYS.LAST_SYNC, res.serverTime);
                     this.renderCurrentView();
                     this.updateSyncIndicator('synced');
+                    dbg('Sync OK: ' + this.menu.length + ' menu', 'success');
                     if (!silent) this.toast('Data tersinkron', 'success');
                     if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) this.loadFeedback(silent);
                 })
                 .catch(err => {
+                    dbg('Sync error: ' + err.message, 'error');
                     this.updateSyncIndicator('error');
                     if (!silent) this.toast('Sync gagal: ' + err.message, 'error');
                 })
-                .finally(() => { if (btn) btn.querySelector('i').classList.remove('animate-spin'); });
+                .finally(() => { if (btn && !silent) this.spinBtn(btn, false); });
         },
         
         apiPost: function(payload) {
             if (!this.isOnline) return;
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
-            })
-            .then(r => r.json())
-            .then(res => {
-                if (res.status !== 'success') console.error('[API]', res);
-            })
-            .catch(e => console.error('[API]', e));
+            fetch(this.apiURL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify(payload) })
+                .then(r => r.json())
+                .then(res => { if (res.status !== 'success') dbg('API error: ' + res.message, 'error'); })
+                .catch(e => dbg('API exception: ' + e.message, 'error'));
         },
         
-        // ============================================================
-        // FORCE SYNC
-        // ============================================================
         forceSync: function() {
             if (!this.user) { this.toast('Login dulu', 'warning'); return; }
             const role = this.user.jabatan.toLowerCase();
             if (role !== 'super admin' && role !== 'admin') { this.toast('Tidak punya akses', 'error'); return; }
-            
-            if (!confirm('Force Sync?\n\n• Hapus cache lokal\n• Update file ke versi terbaru\n• Reload halaman\n\nSession login tetap tersimpan.')) return;
-            
-            const pending = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
-            if (pending.length > 0) {
-                if (!confirm(`Ada ${pending.length} pending. Sync dulu sebelum force?`)) {
-                    // Lanjut force
-                } else {
-                    this.syncPending();
-                    setTimeout(() => this._doForceSync(), 2500);
-                    return;
-                }
-            }
+            if (!confirm('Force Sync?\n\n• Hapus cache lokal\n• Reload halaman\n• Session login tetap tersimpan.')) return;
             this._doForceSync();
         },
         
         _doForceSync: function() {
             this.toast('Memproses...', 'info');
-            
-            const clearCaches = (typeof caches !== 'undefined') ? 
-                caches.keys().then(names => Promise.all(names.map(name => caches.delete(name)))) : Promise.resolve();
-            const unregisterSW = ('serviceWorker' in navigator) ?
-                navigator.serviceWorker.getRegistrations().then(regs => Promise.all(regs.map(r => r.unregister()))) : Promise.resolve();
-            
-            const keep = [this.KEYS.SESSION, this.KEYS.PREFS, this.KEYS.THEME];
+            const keep = [this.KEYS.SESSION, this.KEYS.PREFS, this.KEYS.THEME, this.KEYS.APIURL];
             Object.values(this.KEYS).forEach(k => { if (!keep.includes(k)) localStorage.removeItem(k); });
-            
-            Promise.all([clearCaches, unregisterSW]).then(() => {
-                sessionStorage.setItem('force_sync_done', '1');
-                setTimeout(() => {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('_fs', Date.now());
-                    window.location.replace(url.toString());
-                }, 600);
-            }).catch(() => {
-                sessionStorage.setItem('force_sync_done', '1');
-                setTimeout(() => window.location.reload(true), 500);
-            });
+            sessionStorage.setItem('force_sync_done', '1');
+            setTimeout(() => {
+                const url = new URL(window.location.href);
+                url.searchParams.set('_fs', Date.now());
+                window.location.replace(url.toString());
+            }, 600);
         },
         
-        // ============================================================
-        // PENDING
-        // ============================================================
         queuePending: function(op) {
             const q = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
             q.push({ ...op, queuedAt: Date.now() });
@@ -1744,53 +1048,47 @@
             if (!this.isOnline) { this.updateSyncIndicator('offline'); return; }
             const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
             if (queue.length === 0) { this.updateSyncIndicator(); return; }
-            
             this.updateSyncIndicator('syncing');
-            console.log('[SYNC] Processing', queue.length, 'ops');
+            dbg('Processing ' + queue.length + ' ops', 'info');
             
             const next = (i) => {
                 if (i >= queue.length) {
                     localStorage.setItem(this.KEYS.PENDING, '[]');
                     this.updateSyncIndicator('synced');
-                    console.log('[SYNC] All done');
+                    dbg('All sync done', 'success');
                     this.syncNow(true);
                     return;
                 }
                 const op = queue[i];
-                console.log('[SYNC]', op.action, op);
+                dbg('Op ' + (i+1) + '/' + queue.length + ': ' + op.action, 'info');
                 
-                fetch(this.apiURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(op)
-                })
-                .then(r => r.text())
-                .then(text => {
-                    let res;
-                    try { res = JSON.parse(text); }
-                    catch(e) { throw new Error('Not JSON: ' + text.substring(0, 100)); }
-                    
-                    console.log('[SYNC] Response:', res);
-                    
-                    if (res.status === 'success') {
-                        if (op.action === 'add' && op.tempId && res.id) {
-                            const item = this.menu.find(m => m.ID === op.tempId);
-                            if (item) item.ID = res.id;
-                            this.saveCache();
+                fetch(this.apiURL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify(op) })
+                    .then(r => r.text())
+                    .then(text => {
+                        let res;
+                        try { res = JSON.parse(text); }
+                        catch(e) { throw new Error('Not JSON: ' + text.substring(0, 100)); }
+                        
+                        if (res.status === 'success') {
+                            dbg('✓ ' + op.action + ' success', 'success');
+                            if (op.action === 'add' && op.tempId && res.id) {
+                                const item = this.menu.find(m => m.ID === op.tempId);
+                                if (item) item.ID = res.id;
+                                this.saveCache();
+                            }
+                            next(i + 1);
+                        } else {
+                            dbg('✗ Server error: ' + res.message, 'error');
+                            localStorage.setItem(this.KEYS.PENDING, JSON.stringify(queue.slice(i + 1)));
+                            this.updateSyncIndicator('error');
+                            this.toast('Gagal: ' + (res.message || 'Unknown'), 'error');
                         }
-                        next(i + 1);
-                    } else {
-                        console.error('[SYNC] Server error:', res);
-                        localStorage.setItem(this.KEYS.PENDING, JSON.stringify(queue.slice(i + 1)));
+                    })
+                    .catch(err => {
+                        dbg('✗ Sync exception: ' + err.message, 'error');
                         this.updateSyncIndicator('error');
-                        this.toast('Gagal: ' + (res.message || 'Unknown'), 'error');
-                    }
-                })
-                .catch(err => {
-                    console.error('[SYNC] Exception:', err);
-                    this.updateSyncIndicator('error');
-                    this.toast('Gagal kirim: ' + err.message, 'error');
-                });
+                        this.toast('Gagal kirim: ' + err.message, 'error');
+                    });
             };
             next(0);
         },
@@ -1798,56 +1096,49 @@
         trackClick: function(id) {
             const item = this.menu.find(m => m.ID === id);
             if (item) item.CLICKS = (Number(item.CLICKS) || 0) + 1;
-            if (!this.isOnline) return;
-            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'trackClick', id }) }).catch(() => {});
+            if (!this.isOnline || String(id).startsWith('tmp-')) return;
+            fetch(this.apiURL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify({ action:'trackClick', id }) }).catch(() => {});
         },
         
-        // ============================================================
-        // AUTH
-        // ============================================================
         doLogin: function() {
             const email = document.getElementById('input-email').value.trim();
             const pass = document.getElementById('input-pass').value;
             const remember = document.getElementById('remember-me').checked;
             const btn = document.getElementById('btn-submit');
             if (!email || !pass) { this.toast('Email & password wajib', 'error'); return; }
-            
             const orig = btn.innerHTML;
             btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Memverifikasi...';
             btn.disabled = true;
             lucide.createIcons();
+            dbg('Login: ' + email, 'info');
             
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'login', email, password: pass })
-            })
-            .then(r => r.json())
-            .then(res => {
-                if (res.status === 'success') {
-                    this.user = { nama: res.nama, jabatan: res.jabatan, unit: res.unit, email: res.email };
-                    this.saveSession();
-                    this.updateUIState();
-                    this.renderCurrentView();
-                    this.closeModal('auth-modal');
-                    this.toast('Selamat datang, ' + res.nama, 'success');
-                    if (remember) { this.trackLogin(); setTimeout(() => this.loadFeedback(true), 800); }
-                    this.syncNow(true);
-                } else {
-                    this.toast(res.message || 'Login gagal', 'error');
-                }
-            })
-            .catch(() => this.toast('Server tidak dapat dijangkau', 'error'))
-            .finally(() => { btn.innerHTML = orig; btn.disabled = false; lucide.createIcons(); });
+            fetch(this.apiURL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify({ action:'login', email, password:pass }) })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.status === 'success') {
+                        this.user = { nama:res.nama, jabatan:res.jabatan, unit:res.unit, email:res.email };
+                        this.saveSession();
+                        this.updateUIState();
+                        this.renderCurrentView();
+                        this.closeModal('auth-modal');
+                        this.toast('Selamat datang, ' + res.nama, 'success');
+                        dbg('Login OK: ' + res.nama, 'success');
+                        if (remember) { this.trackLogin(); setTimeout(() => this.loadFeedback(true), 800); }
+                        this.syncNow(true);
+                    } else {
+                        this.toast(res.message || 'Login gagal', 'error');
+                        dbg('Login failed: ' + res.message, 'error');
+                    }
+                })
+                .catch(err => { this.toast('Server tidak dapat dijangkau', 'error'); dbg('Login error: ' + err.message, 'error'); })
+                .finally(() => { btn.innerHTML = orig; btn.disabled = false; lucide.createIcons(); });
         },
         
         doLogout: function() {
             if (!confirm('Logout?')) return;
             localStorage.removeItem(this.KEYS.SESSION);
-            this.user = null;
-            this.editMode = false;
-            this.updateUIState();
-            this.renderCurrentView();
+            this.user = null; this.editMode = false;
+            this.updateUIState(); this.renderCurrentView();
             this.closeModal('auth-modal');
             this.toast('Logout', 'info');
         },
@@ -1855,18 +1146,13 @@
         trackLogin: function() {
             if (!this.user || !this.isOnline) return;
             const device = /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
-            this.apiPost({ action: 'trackLogin', email: this.user.email, device });
+            this.apiPost({ action:'trackLogin', email:this.user.email, device });
         },
         
-        // ============================================================
-        // LINK CRUD — FIXED
-        // ============================================================
         openLinkModal: function(id) {
             if (!this.user) { this.toast('Login dulu', 'warning'); return; }
-            
             const modal = document.getElementById('link-modal');
             modal.classList.add('show');
-            
             if (id) {
                 const item = this.menu.find(m => m.ID === id);
                 if (!item) return;
@@ -1898,19 +1184,20 @@
                 this.selectIcon('link');
                 this.selectColor('indigo');
             }
-            
             const sel = document.getElementById('link-kategori');
             sel.innerHTML = this.kategori.map(k => `<option value="${this.escape(k.NAMA)}">${this.escape(k.NAMA)}</option>`).join('') + `<option value="Lain-lain">Lain-lain</option>`;
-            
             setTimeout(() => document.getElementById('link-judul')?.focus(), 100);
             lucide.createIcons();
         },
         
         editLink: function(id) { this.openLinkModal(id); },
         
+        // ============================================================
+        // SAVE LINK — FIXED (uppercase fields + safe)
+        // ============================================================
         saveLink: function() {
             const id = document.getElementById('link-id').value;
-            const data = {
+            const rawData = {
                 judul: document.getElementById('link-judul').value.trim(),
                 url: document.getElementById('link-url').value.trim(),
                 deskripsi: document.getElementById('link-deskripsi').value.trim(),
@@ -1921,35 +1208,62 @@
                 pinned: document.getElementById('link-pinned').checked,
                 status: document.getElementById('link-status').value
             };
-            
-            if (!data.judul || !data.url) { this.toast('Judul & URL wajib', 'error'); return; }
-            try { const u = new URL(data.url); if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error(); }
+            if (!rawData.judul || !rawData.url) { this.toast('Judul & URL wajib', 'error'); return; }
+            try { const u = new URL(rawData.url); if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error(); }
             catch(e) { this.toast('URL tidak valid', 'error'); return; }
             
             this.closeModal('link-modal');
-            
-            // FIX: Cek apakah ID adalah temp ID (belum sync)
             const isTempId = !id || String(id).startsWith('tmp-');
+            const now = new Date().toISOString();
             
             if (isTempId) {
-                // ADD — item baru atau retry item yang belum sync
-                if (id) {
-                    // Hapus yang lama (retry)
-                    this.menu = this.menu.filter(m => m.ID !== id);
-                }
+                if (id) this.menu = this.menu.filter(m => m.ID !== id);
                 const tempId = 'tmp-' + Date.now();
-                data.ID = tempId;
-                data.CLICKS = 0;
-                data.DELETED = false;
-                this.menu.push(data);
-                this.queuePending({ action: 'add', tempId, data, userEmail: this.user?.email });
+                // PUSH dengan UPPERCASE fields (konsisten dengan backend)
+                const newItem = {
+                    ID: tempId,
+                    JUDUL: rawData.judul,
+                    DESKRIPSI: rawData.deskripsi,
+                    URL: rawData.url,
+                    ICON: rawData.icon,
+                    WARNA: rawData.warna,
+                    KATEGORI: rawData.kategori,
+                    AKSES_ROLE: rawData.akses_role,
+                    URUTAN: 999,
+                    PINNED: rawData.pinned,
+                    STATUS: rawData.status,
+                    CLICKS: 0,
+                    CREATED_BY: this.user?.email || 'system',
+                    CREATED_AT: now,
+                    UPDATED_AT: now,
+                    DELETED: false
+                };
+                this.menu.push(newItem);
+                // Kirim payload lowercase (yang dibaca backend)
+                this.queuePending({ action:'add', tempId, data:rawData, userEmail:this.user?.email });
                 this.toast('Link ditambahkan', 'success');
+                dbg('Add: ' + rawData.judul, 'info');
             } else {
-                // UPDATE — item sudah punya ID asli
                 const idx = this.menu.findIndex(m => m.ID === id);
-                if (idx >= 0) this.menu[idx] = { ...this.menu[idx], ...data };
-                this.queuePending({ action: 'update', id, data, userEmail: this.user?.email });
+                if (idx >= 0) {
+                    // Update dengan UPPERCASE fields
+                    this.menu[idx] = {
+                        ...this.menu[idx],
+                        JUDUL: rawData.judul,
+                        DESKRIPSI: rawData.deskripsi,
+                        URL: rawData.url,
+                        ICON: rawData.icon,
+                        WARNA: rawData.warna,
+                        KATEGORI: rawData.kategori,
+                        AKSES_ROLE: rawData.akses_role,
+                        PINNED: rawData.pinned,
+                        STATUS: rawData.status,
+                        UPDATED_AT: now
+                    };
+                }
+                this.queuePending({ action:'update', id, data:rawData, userEmail:this.user?.email });
                 this.toast('Link diupdate', 'success');
+                dbg('Update: ' + rawData.judul, 'info');
             }
             
             this.saveCache();
@@ -1964,7 +1278,8 @@
             this.menu = this.menu.filter(m => m.ID !== id);
             this.saveCache();
             this.renderCurrentView();
-            this.queuePending({ action: 'delete', id, userEmail: this.user?.email });
+            if (String(id).startsWith('tmp-')) { this.toast('Link dihapus', 'info'); return; }
+            this.queuePending({ action:'delete', id, userEmail:this.user?.email });
             this.syncPending();
             this.toast('Link dihapus', 'success');
         },
@@ -1975,7 +1290,9 @@
                 if (item) item.URUTAN = idx + 1;
             });
             this.saveCache();
-            this.queuePending({ action: 'reorder', ids, userEmail: this.user?.email });
+            const realIds = ids.filter(id => !String(id).startsWith('tmp-'));
+            if (realIds.length === 0) return;
+            this.queuePending({ action:'reorder', ids:realIds, userEmail:this.user?.email });
             this.syncPending();
         },
         
@@ -2006,50 +1323,34 @@
             });
         },
         
-        // ============================================================
-        // UI STATE
-        // ============================================================
         updateUIState: function() {
             const info = document.getElementById('sidebar-user-info');
             if (info) info.textContent = this.user ? this.user.nama : 'Guest';
-            
             const authArea = document.getElementById('sidebar-auth-area');
             if (authArea) {
                 if (this.user) {
-                    authArea.innerHTML = `
-                        <div class="p-2 rounded-lg bg-ink-850 border border-ink-750">
-                            <p class="text-[10px] text-zinc-500">Login sebagai</p>
-                            <p class="text-xs font-semibold text-white truncate">${this.escape(this.user.nama)}</p>
-                            <p class="text-[10px] text-accent font-mono">${this.escape(this.user.jabatan)}</p>
-                        </div>
-                        <button onclick="app.doLogout()" class="btn btn-ghost w-full py-2 text-xs">
-                            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-                            <span>Logout</span>
-                        </button>
-                    `;
+                    authArea.innerHTML = `<div class="p-2 rounded-lg bg-ink-850 border border-ink-750">
+                        <p class="text-[10px] text-zinc-500">Login sebagai</p>
+                        <p class="text-xs font-semibold text-white truncate">${this.escape(this.user.nama)}</p>
+                        <p class="text-[10px] text-accent font-mono">${this.escape(this.user.jabatan)}</p>
+                    </div>
+                    <button onclick="app.doLogout()" class="btn btn-ghost w-full py-2 text-xs mt-2"><i data-lucide="log-out" class="w-3.5 h-3.5"></i><span>Logout</span></button>`;
                 } else {
-                    authArea.innerHTML = `
-                        <button onclick="app.openAuthModal()" class="btn btn-primary w-full py-2.5">
-                            <i data-lucide="log-in" class="w-4 h-4"></i>
-                            <span>Login</span>
-                        </button>
-                    `;
+                    authArea.innerHTML = `<button onclick="app.openAuthModal()" class="btn btn-primary w-full py-2.5"><i data-lucide="log-in" class="w-4 h-4"></i><span>Login</span></button>`;
                 }
             }
-            
             const authText = document.getElementById('btn-auth-text');
             if (authText) authText.textContent = this.user ? this.user.nama.split(' ')[0] : 'Login';
-            
-            document.getElementById('form-login').classList.toggle('hidden', !!this.user);
-            document.getElementById('view-profile').classList.toggle('hidden', !this.user);
-            
+            const formLogin = document.getElementById('form-login');
+            const viewProfile = document.getElementById('view-profile');
+            if (formLogin) formLogin.classList.toggle('hidden', !!this.user);
+            if (viewProfile) viewProfile.classList.toggle('hidden', !this.user);
             if (this.user) {
-                document.getElementById('prof-name').textContent = this.user.nama;
-                document.getElementById('prof-role').textContent = this.user.jabatan;
-                document.getElementById('prof-unit').textContent = this.user.unit || '-';
-                document.getElementById('prof-email').textContent = this.user.email || '-';
+                const el1 = document.getElementById('prof-name'); if (el1) el1.textContent = this.user.nama;
+                const el2 = document.getElementById('prof-role'); if (el2) el2.textContent = this.user.jabatan;
+                const el3 = document.getElementById('prof-unit'); if (el3) el3.textContent = this.user.unit || '-';
+                const el4 = document.getElementById('prof-email'); if (el4) el4.textContent = this.user.email || '-';
             }
-            
             this.updateFeedbackBadge();
             lucide.createIcons();
         },
@@ -2060,13 +1361,11 @@
             if (!dot || !text) return;
             const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
             const lastSync = localStorage.getItem(this.KEYS.LAST_SYNC);
-            
             const s = state || (this.isOnline ? 'synced' : 'offline');
             dot.className = 'sync-dot';
             if (s === 'syncing') dot.classList.add('syncing');
             else if (s === 'offline') dot.classList.add('offline');
             else if (s === 'error') dot.classList.add('error');
-            
             let label = 'Synced';
             if (queue.length > 0) label = `Pending ${queue.length}`;
             else if (!this.isOnline) label = 'Offline';
@@ -2102,12 +1401,14 @@
         },
         
         openAuthModal: function() {
-            document.getElementById('auth-modal').classList.add('show');
+            const m = document.getElementById('auth-modal');
+            if (m) m.classList.add('show');
             setTimeout(() => document.getElementById('input-email')?.focus(), 100);
         },
         
         closeModal: function(id) {
-            document.getElementById(id).classList.remove('show');
+            const m = document.getElementById(id);
+            if (m) m.classList.remove('show');
         },
         
         toggleTheme: function() {
@@ -2118,9 +1419,10 @@
         toast: function(msg, type) {
             const el = document.createElement('div');
             el.className = `toast toast-${type || 'info'}`;
-            const icons = { success: 'check-circle', error: 'alert-circle', warning: 'alert-triangle', info: 'info' };
+            const icons = { success:'check-circle', error:'alert-circle', warning:'alert-triangle', info:'info' };
             el.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="w-4 h-4 shrink-0"></i><span class="flex-1">${this.escape(msg)}</span>`;
-            document.getElementById('toast-container').appendChild(el);
+            const c = document.getElementById('toast-container');
+            if (c) c.appendChild(el);
             lucide.createIcons();
             setTimeout(() => {
                 el.style.transition = 'all 0.3s';
@@ -2130,21 +1432,13 @@
             }, 3000);
         },
         
-        // ============================================================
-        // ICON PICKER
-        // ============================================================
         setupIconPicker: function() {
             const grid = document.getElementById('icon-grid');
             const search = document.getElementById('link-icon-search');
-            if (!grid) return;
+            if (!grid || !search) return;
             const render = (filter) => {
                 const list = filter ? this.ICONS.filter(i => i.includes(filter.toLowerCase())) : this.ICONS;
-                grid.innerHTML = list.map(ic => `
-                    <div class="aspect-square flex items-center justify-center rounded-lg cursor-pointer transition ${document.getElementById('link-icon').value === ic ? 'bg-accent text-ink-950' : 'text-zinc-400 hover:bg-ink-750 hover:text-accent'}" 
-                         onclick="app.selectIcon('${ic}')" title="${ic}">
-                        <i data-lucide="${ic}" class="w-4 h-4"></i>
-                    </div>
-                `).join('');
+                grid.innerHTML = list.map(ic => `<div class="aspect-square flex items-center justify-center rounded-lg cursor-pointer transition ${document.getElementById('link-icon').value === ic ? 'bg-accent text-ink-950' : 'text-zinc-400 hover:bg-ink-750 hover:text-accent'}" onclick="app.selectIcon('${ic}')" title="${ic}"><i data-lucide="${ic}" class="w-4 h-4"></i></div>`).join('');
                 lucide.createIcons();
             };
             search.addEventListener('input', e => render(e.target.value));
@@ -2152,53 +1446,32 @@
         },
         
         selectIcon: function(ic) {
-            document.getElementById('link-icon').value = ic;
+            const el = document.getElementById('link-icon'); if (!el) return;
+            el.value = ic;
             document.querySelectorAll('#icon-grid > div').forEach(b => {
                 b.classList.remove('bg-accent', 'text-ink-950');
                 b.classList.add('text-zinc-400');
-                if (b.title === ic) {
-                    b.classList.add('bg-accent', 'text-ink-950');
-                    b.classList.remove('text-zinc-400');
-                }
+                if (b.title === ic) { b.classList.add('bg-accent', 'text-ink-950'); b.classList.remove('text-zinc-400'); }
             });
         },
         
         setupColorPicker: function() {
-            const picker = document.getElementById('color-picker');
-            if (!picker) return;
-            const map = {
-                indigo: 'bg-indigo-400', sky: 'bg-sky-400', emerald: 'bg-emerald-400', rose: 'bg-rose-400',
-                amber: 'bg-amber-400', purple: 'bg-purple-400', teal: 'bg-teal-400', pink: 'bg-pink-400',
-                orange: 'bg-orange-400', red: 'bg-red-400', green: 'bg-green-400', blue: 'bg-blue-400',
-                violet: 'bg-violet-400', zinc: 'bg-zinc-400'
-            };
-            picker.innerHTML = this.COLORS.map(c => `
-                <button type="button" class="w-6 h-6 rounded-full ${map[c]} ring-2 ring-transparent hover:ring-white/30 transition" data-color="${c}" onclick="app.selectColor('${c}')" title="${c}"></button>
-            `).join('');
+            const picker = document.getElementById('color-picker'); if (!picker) return;
+            const map = { indigo:'bg-indigo-400', sky:'bg-sky-400', emerald:'bg-emerald-400', rose:'bg-rose-400', amber:'bg-amber-400', purple:'bg-purple-400', teal:'bg-teal-400', pink:'bg-pink-400', orange:'bg-orange-400', red:'bg-red-400', green:'bg-green-400', blue:'bg-blue-400', violet:'bg-violet-400', zinc:'bg-zinc-400' };
+            picker.innerHTML = this.COLORS.map(c => `<button type="button" class="w-6 h-6 rounded-full ${map[c]} ring-2 ring-transparent hover:ring-white/30 transition" data-color="${c}" onclick="app.selectColor('${c}')" title="${c}"></button>`).join('');
         },
         
         selectColor: function(c) {
-            document.getElementById('link-warna').value = c;
+            const el = document.getElementById('link-warna'); if (!el) return;
+            el.value = c;
             document.querySelectorAll('#color-picker button').forEach(b => b.classList.remove('ring-white/60'));
             const target = document.querySelector(`#color-picker button[data-color="${c}"]`);
             if (target) target.classList.add('ring-white/60');
         },
         
-        // ============================================================
-        // UTILS
-        // ============================================================
-        escape: function(s) {
-            return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
-        },
-        
-        safeUrl: function(url) {
-            try { const u = new URL(String(url)); if (u.protocol === 'http:' || u.protocol === 'https:') return u.href; } catch(e) {}
-            return '#';
-        }
+        escape: function(s) { return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); },
+        safeUrl: function(url) { try { const u = new URL(String(url)); if (u.protocol === 'http:' || u.protocol === 'https:') return u.href; } catch(e) {} return '#'; }
     };
-    
-    const savedUrl = localStorage.getItem('sa4_apiurl');
-    if (savedUrl) app.apiURL = savedUrl;
     
     document.addEventListener('DOMContentLoaded', () => app.init());
     </script>
