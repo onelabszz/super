@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta name="theme-color" content="#0a0a0a">
-    <meta name="description" content="Super Admin Console v3.3">
+    <meta name="theme-color" content="#0a0b10">
+    <meta name="description" content="Console v4.0">
     <title>Console</title>
     
     <link rel="manifest" href="manifest.json">
@@ -20,18 +20,19 @@
                 extend: {
                     colors: {
                         ink: {
-                            950: '#0a0a0a',
-                            900: '#141416',
-                            850: '#1a1a1c',
-                            800: '#1c1c1e',
-                            750: '#232326',
-                            700: '#2a2a2e',
-                            600: '#3a3a3f',
+                            950: '#0a0b10',
+                            900: '#0d0f14',
+                            850: '#14171f',
+                            800: '#181c26',
+                            750: '#1e2230',
+                            700: '#252a3a',
+                            600: '#3a4054',
                         },
                         accent: {
-                            DEFAULT: '#fcd34d',
-                            hover: '#fbbf24',
-                            dim: '#eab308',
+                            DEFAULT: '#a5b4fc',
+                            hover: '#c4caff',
+                            dim: '#818cf8',
+                            soft: 'rgba(165, 180, 252, 0.12)',
                         }
                     },
                     fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
@@ -39,278 +40,464 @@
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         * { -webkit-tap-highlight-color: transparent; }
-        html, body { background-color: #0a0a0a; }
-        body { font-family: 'Inter', sans-serif; color: #e4e4e7; }
+        html, body { background-color: #0a0b10; }
+        body { font-family: 'Inter', sans-serif; color: #e4e4e7; overflow-x: hidden; }
         
+        /* Subtle grain */
         body::before {
             content: '';
-            position: fixed;
-            inset: 0;
-            background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+            position: fixed; inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
             background-size: 3px 3px;
-            pointer-events: none;
-            z-index: 0;
+            pointer-events: none; z-index: 0;
         }
         
-        html:not(.dark) body { background-color: #f5f5f7; color: #18181b; }
-        html:not(.dark) body::before { background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px); }
-        html:not(.dark) .bg-ink-950 { background-color: #f5f5f7 !important; }
-        html:not(.dark) .bg-ink-900 { background-color: #ffffff !important; }
-        html:not(.dark) .bg-ink-800 { background-color: #ffffff !important; }
-        html:not(.dark) .bg-ink-850 { background-color: #fafafa !important; }
-        html:not(.dark) .bg-ink-750 { background-color: #f4f4f5 !important; }
-        html:not(.dark) .border-ink-700 { border-color: #e4e4e7 !important; }
-        html:not(.dark) .border-ink-800 { border-color: #e4e4e7 !important; }
-        html:not(.dark) .border-ink-750 { border-color: #e4e4e7 !important; }
-        html:not(.dark) .text-white { color: #18181b !important; }
-        html:not(.dark) .text-zinc-400 { color: #71717a !important; }
-        html:not(.dark) .text-zinc-500 { color: #71717a !important; }
-        html:not(.dark) .text-zinc-300 { color: #3f3f46 !important; }
-        html:not(.dark) .text-zinc-200 { color: #27272a !important; }
-        html:not(.dark) .text-zinc-100 { color: #18181b !important; }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #252a3a; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a4054; }
         
-        .glass { background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); }
-        html:not(.dark) .glass { background: rgba(255, 255, 255, 0.85); }
+        /* Sidebar */
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: 260px;
+            background: #0d0f14;
+            border-right: 1px solid #1e2230;
+            transform: translateX(-100%);
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 60;
+            display: flex; flex-direction: column;
+        }
+        .sidebar.open { transform: translateX(0); }
         
-        .card-link { transition: transform 0.2s ease, background 0.2s ease; }
+        @media (min-width: 1024px) {
+            .sidebar { transform: translateX(0); }
+            .sidebar.collapsed { transform: translateX(-100%); }
+            .main-area { margin-left: 260px; transition: margin 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+            .main-area.expanded { margin-left: 0; }
+        }
+        
+        .backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 55;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        .backdrop.show { opacity: 1; pointer-events: auto; }
+        
+        @media (min-width: 1024px) { .backdrop { display: none !important; } }
+        
+        /* Nav items */
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px; font-weight: 500;
+            color: #a1a1aa;
+            transition: all 0.15s;
+            cursor: pointer;
+            position: relative;
+        }
+        .nav-item:hover { background: #181c26; color: #e4e4e7; }
+        .nav-item.active { background: rgba(165, 180, 252, 0.1); color: #a5b4fc; font-weight: 600; }
+        .nav-item.active::before {
+            content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 3px; height: 20px;
+            background: #a5b4fc; border-radius: 0 3px 3px 0;
+        }
+        
+        /* Card */
+        .card {
+            background: #14171f;
+            border: 1px solid #1e2230;
+            border-radius: 14px;
+            transition: all 0.2s;
+        }
+        
+        /* Link card */
+        .link-card {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
         @media (hover: hover) {
-            .card-link:hover { transform: translateY(-2px); }
-            .card-link:hover .card-inner { background: #232326; }
+            .link-card:hover { transform: translateY(-2px); border-color: rgba(165, 180, 252, 0.3); }
         }
-        html:not(.dark) .card-link:hover .card-inner { background: #f4f4f5; }
+        .link-card:active { transform: scale(0.98); }
         
-        .sortable-ghost { opacity: 0.3; background: rgba(252, 211, 77, 0.3) !important; }
-        .sortable-chosen { transform: scale(1.03) rotate(1deg); z-index: 100; }
+        /* Icon circle */
+        .icon-circle {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .icon-circle::after {
+            content: ''; position: absolute; inset: -3px;
+            border-radius: 50%;
+            background: inherit;
+            opacity: 0.35;
+            filter: blur(14px);
+            z-index: -1;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px; font-weight: 600;
+            transition: all 0.15s;
+            cursor: pointer;
+            border: none;
+            white-space: nowrap;
+        }
+        .btn-primary { background: #a5b4fc; color: #0a0b10; }
+        .btn-primary:hover { background: #c4caff; }
+        .btn-primary:active { transform: scale(0.97); }
+        .btn-ghost { background: transparent; color: #a1a1aa; border: 1px solid #1e2230; }
+        .btn-ghost:hover { background: #181c26; color: #e4e4e7; border-color: #252a3a; }
+        .btn-danger { background: rgba(252, 165, 165, 0.1); color: #fca5a5; border: 1px solid rgba(252, 165, 165, 0.2); }
+        .btn-danger:hover { background: rgba(252, 165, 165, 0.15); }
+        .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+        
+        /* Icon button */
+        .icon-btn {
+            width: 34px; height: 34px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 9px;
+            color: #a1a1aa;
+            transition: all 0.15s;
+            cursor: pointer;
+            background: transparent; border: none;
+            flex-shrink: 0;
+        }
+        .icon-btn:hover { background: #181c26; color: #e4e4e7; }
+        .icon-btn:active { transform: scale(0.94); }
+        
+        /* Input */
+        .input {
+            width: 100%;
+            background: #14171f;
+            border: 1px solid #1e2230;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #e4e4e7;
+            outline: none;
+            transition: all 0.15s;
+        }
+        .input:focus { border-color: rgba(165, 180, 252, 0.5); box-shadow: 0 0 0 3px rgba(165, 180, 252, 0.1); }
+        .input::placeholder { color: #52525b; }
+        .input:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Modal */
+        .modal {
+            position: fixed; inset: 0; z-index: 70;
+            display: none; align-items: center; justify-content: center;
+            padding: 16px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+        }
+        .modal.show { display: flex; }
+        .modal-box {
+            background: #0d0f14;
+            border: 1px solid #1e2230;
+            border-radius: 18px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            max-height: 92vh;
+            width: 100%;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.96) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        /* Toast */
+        #toast-container {
+            position: fixed; top: 76px; right: 14px; z-index: 80;
+            display: flex; flex-direction: column; gap: 8px;
+            max-width: 320px;
+            pointer-events: none;
+        }
+        .toast {
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 12.5px; font-weight: 600;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.4);
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+            border: 1px solid;
+        }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast-success { background: rgba(110, 231, 183, 0.12); color: #6ee7b7; border-color: rgba(110, 231, 183, 0.25); }
+        .toast-error { background: rgba(252, 165, 165, 0.12); color: #fca5a5; border-color: rgba(252, 165, 165, 0.25); }
+        .toast-warning { background: rgba(252, 211, 77, 0.12); color: #fcd34d; border-color: rgba(252, 211, 77, 0.25); }
+        .toast-info { background: rgba(165, 180, 252, 0.12); color: #a5b4fc; border-color: rgba(165, 180, 252, 0.25); }
+        
+        /* Sync status */
+        .sync-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: #6ee7b7; flex-shrink: 0;
+        }
+        .sync-dot.syncing { background: #a5b4fc; animation: pulse 1.2s ease-in-out infinite; }
+        .sync-dot.offline { background: #52525b; }
+        .sync-dot.error { background: #fca5a5; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        
+        /* Grid/List view for links */
+        .links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        @media (min-width: 640px) { .links-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
+        @media (min-width: 1024px) { .links-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } }
+        
+        .links-list {
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .link-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px;
+            background: #14171f;
+            border: 1px solid #1e2230;
+            border-radius: 12px;
+            transition: all 0.15s;
+            cursor: pointer;
+        }
+        .link-row:hover { background: #181c26; border-color: rgba(165, 180, 252, 0.3); }
+        
+        /* Sortable */
+        .sortable-ghost { opacity: 0.3; background: rgba(165, 180, 252, 0.2) !important; border-radius: 12px; }
         .drag-handle { cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
         
-        .modal-enter { animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        /* Section header */
+        .section-header {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 12px;
+            padding: 0 2px;
+        }
         
-        .panel-enter { animation: panelIn 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes panelIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-        .panel-exit { animation: panelOut 0.22s ease-in forwards; }
-        @keyframes panelOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
-        
-        .toast { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        
-        .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; max-height: 180px; overflow-y: auto; padding: 8px; border: 1px solid #232326; border-radius: 14px; background: #141416; }
-        html:not(.dark) .icon-grid { background: #fafafa; border-color: #e4e4e7; }
-        .icon-btn { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: #a1a1aa; }
-        .icon-btn:hover { background: #232326; color: #fcd34d; }
-        html:not(.dark) .icon-btn:hover { background: #f4f4f5; }
-        .icon-btn.selected { background: #fcd34d; color: #0a0a0a; }
-        
-        .color-dot { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
-        .color-dot:hover { transform: scale(1.15); }
-        .color-dot.selected { border-color: #fcd34d; transform: scale(1.15); }
-        
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 3px; }
-        html:not(.dark) ::-webkit-scrollbar-thumb { background: #d4d4d8; }
-        ::-webkit-scrollbar-thumb:hover { background: #3a3a3f; }
-        
-        @keyframes syncPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .sync-pulse { animation: syncPulse 1.2s ease-in-out infinite; }
-        
-        .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
-        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        
-        .ptab-active { background: #fcd34d; color: #0a0a0a; font-weight: 700; }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        @keyframes forceSpin { 100% { transform: rotate(360deg); } }
-        .force-spin { animation: forceSpin 1s linear infinite; }
-        
-        .edit-mode-active { background: #fcd34d !important; color: #0a0a0a !important; box-shadow: 0 10px 15px -3px rgba(252, 211, 77, 0.3); }
+        /* Light mode tweaks */
+        html:not(.dark) body { background: #f4f5f8; color: #1e2230; }
+        html:not(.dark) body::before { background-image: radial-gradient(rgba(0,0,0,0.015) 1px, transparent 1px); }
+        html:not(.dark) .sidebar { background: #ffffff; border-color: #e4e4e7; }
+        html:not(.dark) .nav-item { color: #52525b; }
+        html:not(.dark) .nav-item:hover { background: #f4f4f5; color: #18181b; }
+        html:not(.dark) .nav-item.active { background: rgba(129, 140, 248, 0.1); color: #6366f1; }
+        html:not(.dark) .nav-item.active::before { background: #6366f1; }
+        html:not(.dark) .card, html:not(.dark) .link-card, html:not(.dark) .link-row { background: #ffffff; border-color: #e4e4e7; }
+        html:not(.dark) .input { background: #ffffff; border-color: #e4e4e7; color: #18181b; }
+        html:not(.dark) .modal-box { background: #ffffff; border-color: #e4e4e7; }
+        html:not(.dark) .icon-btn:hover { background: #f4f4f5; color: #18181b; }
+        html:not(.dark) .btn-ghost { border-color: #e4e4e7; color: #52525b; }
+        html:not(.dark) .btn-ghost:hover { background: #f4f4f5; color: #18181b; }
+        html:not(.dark) .text-white { color: #18181b; }
+        html:not(.dark) .text-zinc-400 { color: #71717a; }
+        html:not(.dark) .text-zinc-500 { color: #71717a; }
+        html:not(.dark) .border-ink-750, html:not(.dark) .border-ink-700 { border-color: #e4e4e7; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col relative transition-colors duration-200">
+<body>
 
-    <!-- NAVBAR -->
-    <nav class="sticky top-0 z-40 w-full glass border-b border-ink-800/50">
-        <div class="max-w-[1600px] mx-auto px-3 sm:px-4">
-            <div class="flex items-center justify-between h-14 gap-2">
+    <!-- SIDEBAR BACKDROP -->
+    <div id="sidebar-backdrop" class="backdrop" onclick="app.closeSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-ink-750">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-accent flex items-center justify-center shrink-0">
+                    <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-6 h-6 object-contain" alt="Logo">
+                </div>
+                <div class="min-w-0">
+                    <h1 class="font-bold text-sm text-white leading-tight">Console</h1>
+                    <p class="text-[10px] text-zinc-500 truncate" id="sidebar-user-info">Guest</p>
+                </div>
+            </div>
+            <button onclick="app.closeSidebar()" class="icon-btn lg:hidden">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+        
+        <!-- Nav -->
+        <nav class="flex-1 overflow-y-auto p-3 space-y-1">
+            <button onclick="app.navigate('dashboard')" data-nav="dashboard" class="nav-item w-full">
+                <i data-lucide="home" class="w-4 h-4 shrink-0"></i>
+                <span>Dashboard</span>
+            </button>
+            <button onclick="app.navigate('info')" data-nav="info" class="nav-item w-full">
+                <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
+                <span>Info & Banner</span>
+            </button>
+            <button onclick="app.navigate('kategori')" data-nav="kategori" class="nav-item w-full">
+                <i data-lucide="folder" class="w-4 h-4 shrink-0"></i>
+                <span>Kategori</span>
+            </button>
+            <button onclick="app.navigate('users')" data-nav="users" class="nav-item w-full">
+                <i data-lucide="users" class="w-4 h-4 shrink-0"></i>
+                <span>Users</span>
+            </button>
+            <button onclick="app.navigate('feedback')" data-nav="feedback" class="nav-item w-full">
+                <i data-lucide="inbox" class="w-4 h-4 shrink-0"></i>
+                <span>Feedback</span>
+                <span id="nav-feedback-badge" class="ml-auto text-[10px] bg-red-500/20 text-red-400 font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
+            </button>
+            
+            <div class="my-3 border-t border-ink-750"></div>
+            <p class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">Sistem</p>
+            
+            <button onclick="app.navigate('backup')" data-nav="backup" class="nav-item w-full">
+                <i data-lucide="database" class="w-4 h-4 shrink-0"></i>
+                <span>Backup & Sync</span>
+            </button>
+            <button onclick="app.navigate('prefs')" data-nav="prefs" class="nav-item w-full">
+                <i data-lucide="sliders" class="w-4 h-4 shrink-0"></i>
+                <span>Preferensi</span>
+            </button>
+            <button onclick="app.navigate('diagnostic')" data-nav="diagnostic" class="nav-item w-full">
+                <i data-lucide="activity" class="w-4 h-4 shrink-0"></i>
+                <span>Diagnostik</span>
+            </button>
+        </nav>
+        
+        <!-- Footer -->
+        <div class="p-3 border-t border-ink-750 space-y-2">
+            <div id="sidebar-auth-area"></div>
+        </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <div id="main-area" class="main-area min-h-screen flex flex-col">
+        
+        <!-- TOP BAR -->
+        <header class="sticky top-0 z-40 border-b border-ink-750 bg-ink-950/85" style="backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);">
+            <div class="h-14 flex items-center gap-2 px-3">
+                <!-- Hamburger -->
+                <button onclick="app.toggleSidebar()" class="icon-btn">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
                 
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <div class="w-9 h-9 rounded-2xl bg-accent flex items-center justify-center shrink-0 shadow-lg shadow-accent/20">
-                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-6 h-6 object-contain" alt="Logo">
-                    </div>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-1.5">
-                            <h1 class="font-bold text-sm tracking-tight leading-none text-white">Console</h1>
-                            <span id="nav-role-badge" class="text-[9px] font-mono uppercase tracking-wider text-zinc-500 font-semibold hidden sm:inline">Guest</span>
-                        </div>
-                        <div class="flex items-center gap-1.5 mt-0.5">
-                            <span id="sync-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            <span id="sync-text" class="text-[9px] font-mono text-zinc-500 truncate">Baru saja</span>
-                        </div>
-                    </div>
+                <!-- Title -->
+                <h2 id="page-title" class="font-semibold text-sm text-white truncate">Dashboard</h2>
+                
+                <!-- Search (desktop only) -->
+                <div class="hidden md:flex flex-1 max-w-md mx-auto relative">
+                    <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+                    <input type="text" id="search-input" placeholder="Cari menu..." class="input pl-9 py-1.5 text-xs">
                 </div>
-
-                <div class="hidden md:flex flex-1 max-w-md mx-4">
-                    <div class="relative w-full">
-                        <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-                        <input type="text" id="search-input" placeholder="Cari menu..." 
-                            class="w-full pl-9 pr-3 py-2 bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl text-xs text-white placeholder-zinc-500 outline-none transition">
+                
+                <!-- Actions -->
+                <div class="flex items-center gap-0.5 ml-auto">
+                    <!-- Sync status -->
+                    <div class="hidden sm:flex items-center gap-1.5 mr-1.5 px-2 py-1 rounded-md bg-ink-850 text-[10px]">
+                        <span id="sync-dot" class="sync-dot"></span>
+                        <span id="sync-text" class="text-zinc-500 font-mono">Synced</span>
                     </div>
-                </div>
-
-                <div class="flex items-center gap-1">
-                    <button onclick="app.toggleView()" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Ganti tampilan">
-                        <i data-lucide="layout-grid" id="view-icon" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="app.syncNow()" id="btn-sync" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Sync">
+                    
+                    <button onclick="app.syncNow()" id="btn-sync" class="icon-btn" title="Sync">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
-                    <button onclick="app.forceSync()" id="btn-force-sync" class="hidden p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Force Sync (Ctrl+Shift+R)">
-                        <i data-lucide="zap" class="w-4 h-4"></i>
+                    
+                    <button onclick="app.toggleView()" class="icon-btn" title="Ganti tampilan">
+                        <i data-lucide="layout-grid" id="view-icon" class="w-4 h-4"></i>
                     </button>
-                    <button id="btn-tambah" onclick="app.openLinkModal()" class="hidden items-center gap-1 px-3 py-1.5 bg-accent hover:bg-accent-hover text-black rounded-full text-xs font-bold transition shadow-lg shadow-accent/20" title="Tambah link">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        <span class="hidden sm:inline">Tambah</span>
-                    </button>
-                    <button id="btn-edit-mode" onclick="app.toggleEditMode()" class="hidden p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Edit Mode">
-                        <i data-lucide="pencil" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="app.toggleTheme()" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition">
+                    
+                    <button onclick="app.toggleTheme()" class="icon-btn">
                         <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
                         <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
                     </button>
-                    <button onclick="app.openPanel()" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Pengaturan">
-                        <i data-lucide="settings-2" class="w-4 h-4"></i>
-                    </button>
-                    <button onclick="app.openAuthModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold bg-ink-800 hover:bg-ink-750 text-white transition ml-0.5 border border-ink-700">
+                    
+                    <button onclick="app.openAuthModal()" class="btn btn-primary btn-sm ml-1">
                         <i data-lucide="user-circle" class="w-3.5 h-3.5"></i>
                         <span id="btn-auth-text" class="hidden sm:inline">Login</span>
                     </button>
                 </div>
             </div>
-        </div>
-        
-        <div class="md:hidden px-3 pb-2.5">
-            <div class="relative w-full">
-                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-                <input type="text" id="search-input-mobile" placeholder="Cari menu..." 
-                    class="w-full pl-9 pr-3 py-2 bg-ink-850 border border-ink-750 focus:border-accent/50 rounded-2xl text-xs text-white placeholder-zinc-500 outline-none transition">
-            </div>
-        </div>
-    </nav>
-
-    <!-- MAIN -->
-    <main class="flex-1 relative z-10 p-3 sm:p-5 max-w-[1600px] mx-auto w-full">
-        <div id="info-banner" class="hidden mb-4"></div>
-        
-        <div id="content-container">
-            <div class="flex flex-col items-center justify-center py-20 text-zinc-500">
-                <i data-lucide="loader" class="w-6 h-6 animate-spin mb-3 text-accent"></i>
-                <span class="text-xs font-mono uppercase tracking-wider">Memuat...</span>
-            </div>
-        </div>
-    </main>
-
-    <!-- SETTINGS PANEL -->
-    <div id="settings-panel" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="app.closePanel()"></div>
-        
-        <div id="panel-content" class="absolute right-0 top-0 bottom-0 w-full max-w-lg bg-ink-900 border-l border-ink-800 flex flex-col panel-enter">
             
-            <div class="flex items-center justify-between p-4 border-b border-ink-800 shrink-0">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-accent/10 flex items-center justify-center">
-                        <i data-lucide="settings-2" class="w-4 h-4 text-accent"></i>
-                    </div>
-                    <h2 class="font-bold text-sm text-white">Pengaturan</h2>
+            <!-- Mobile search -->
+            <div class="md:hidden px-3 pb-2.5">
+                <div class="relative">
+                    <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+                    <input type="text" id="search-input-mobile" placeholder="Cari menu..." class="input pl-9 py-2 text-xs">
                 </div>
-                <button onclick="app.closePanel()" class="p-2 text-zinc-400 hover:text-white rounded-xl hover:bg-ink-800 transition">
-                    <i data-lucide="x" class="w-4 h-4"></i>
-                </button>
             </div>
-            
-            <div class="flex gap-1 p-2 border-b border-ink-800 overflow-x-auto shrink-0 no-scrollbar">
-                <button onclick="app.setPanelTab('info')" data-ptab="info" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
-                    <i data-lucide="info" class="w-3 h-3 inline mr-1"></i> Info
-                </button>
-                <button onclick="app.setPanelTab('kategori')" data-ptab="kategori" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
-                    <i data-lucide="folder" class="w-3 h-3 inline mr-1"></i> Kategori
-                </button>
-                <button onclick="app.setPanelTab('users')" data-ptab="users" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
-                    <i data-lucide="users" class="w-3 h-3 inline mr-1"></i> Users
-                </button>
-                <button onclick="app.setPanelTab('feedback')" data-ptab="feedback" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
-                    <i data-lucide="inbox" class="w-3 h-3 inline mr-1"></i> Feedback
-                </button>
-                <button onclick="app.setPanelTab('backup')" data-ptab="backup" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
-                    <i data-lucide="database" class="w-3 h-3 inline mr-1"></i> Backup
-                </button>
-                <button onclick="app.setPanelTab('prefs')" data-ptab="prefs" class="ptab whitespace-nowrap px-3 py-1.5 text-[11px] font-semibold rounded-xl text-zinc-400 hover:text-white transition">
-                    <i data-lucide="sliders" class="w-3 h-3 inline mr-1"></i> Preferensi
-                </button>
-            </div>
-            
-            <div id="panel-body" class="flex-1 overflow-y-auto p-5"></div>
-        </div>
+        </header>
+        
+        <!-- CONTENT -->
+        <main id="page-content" class="flex-1 p-3 sm:p-5 pb-16"></main>
     </div>
 
+    <!-- TOASTS -->
+    <div id="toast-container"></div>
+
     <!-- MODAL: LOGIN -->
-    <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="w-full max-w-sm bg-ink-900 border border-ink-800 rounded-3xl shadow-2xl overflow-hidden modal-enter relative">
-            <button onclick="app.closeModal('auth-modal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white z-10 p-1.5 rounded-xl hover:bg-ink-800 transition">
+    <div id="auth-modal" class="modal">
+        <div class="modal-box max-w-sm">
+            <button onclick="app.closeModal('auth-modal')" class="icon-btn absolute top-3 right-3 z-10">
                 <i data-lucide="x" class="w-4 h-4"></i>
             </button>
-
-            <div id="form-login" class="p-7">
-                <div class="mb-6 text-center">
-                    <div class="w-16 h-16 bg-accent/10 rounded-3xl flex items-center justify-center mb-4 mx-auto border border-accent/20">
-                        <i data-lucide="shield-lock" class="w-7 h-7 text-accent"></i>
+            
+            <div id="form-login" class="p-6">
+                <div class="text-center mb-6">
+                    <div class="w-14 h-14 rounded-2xl bg-accent-soft border border-accent/20 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="shield-check" class="w-6 h-6 text-accent"></i>
                     </div>
-                    <h3 class="text-lg font-bold text-white">Selamat Datang</h3>
-                    <p class="text-xs text-zinc-500 mt-1">Masuk untuk akses penuh</p>
+                    <h3 class="text-base font-semibold text-white">Selamat Datang</h3>
+                    <p class="text-xs text-zinc-500 mt-1">Masuk untuk mengelola</p>
                 </div>
                 <form onsubmit="event.preventDefault(); app.doLogin()" class="space-y-3">
-                    <div class="relative">
-                        <i data-lucide="mail" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-                        <input type="email" id="input-email" autocomplete="email" class="w-full pl-10 pr-4 py-3 bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl text-sm text-white placeholder-zinc-500 outline-none transition" placeholder="Email">
-                    </div>
-                    <div class="relative">
-                        <i data-lucide="lock" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-                        <input type="password" id="input-pass" autocomplete="current-password" class="w-full pl-10 pr-4 py-3 bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl text-sm text-white placeholder-zinc-500 outline-none transition" placeholder="Password">
-                    </div>
-                    <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-400 px-1">
-                        <input type="checkbox" id="remember-me" checked class="w-3.5 h-3.5 rounded accent-amber-400">
-                        <span>Ingat saya di perangkat ini</span>
+                    <input type="email" id="input-email" placeholder="Email" autocomplete="email" class="input">
+                    <input type="password" id="input-pass" placeholder="Password" autocomplete="current-password" class="input">
+                    <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-400">
+                        <input type="checkbox" id="remember-me" checked class="w-3.5 h-3.5 rounded">
+                        <span>Ingat saya</span>
                     </label>
-                    <button type="submit" id="btn-submit" class="w-full bg-accent hover:bg-accent-hover text-black font-bold py-3.5 rounded-2xl text-sm transition active:scale-[0.98] flex justify-center items-center gap-2 shadow-lg shadow-accent/20 mt-2">Masuk</button>
+                    <button type="submit" id="btn-submit" class="btn btn-primary w-full py-3 mt-1">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>Masuk</span>
+                    </button>
                 </form>
             </div>
-
+            
             <div id="view-profile" class="hidden">
-                <div class="p-7 text-center border-b border-ink-800">
-                    <div class="w-20 h-20 rounded-3xl mx-auto mb-4 flex items-center justify-center border-2 border-accent/30 bg-accent/5 shadow-lg shadow-accent/10 overflow-hidden">
-                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-12 h-12 object-contain" alt="Avatar">
+                <div class="p-6 text-center border-b border-ink-750">
+                    <div class="w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center border border-accent/20 bg-accent-soft">
+                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-10 h-10 object-contain" alt="Avatar">
                     </div>
-                    <h3 class="text-base font-bold text-white" id="prof-name">-</h3>
-                    <p class="inline-block mt-2 px-3 py-0.5 bg-accent/10 text-accent text-[10px] font-mono font-bold tracking-widest uppercase rounded-full border border-accent/20" id="prof-role">-</p>
+                    <h3 class="text-sm font-semibold text-white" id="prof-name">-</h3>
+                    <p class="inline-block mt-1.5 px-2.5 py-0.5 bg-accent-soft text-accent text-[10px] font-mono font-bold uppercase rounded-full" id="prof-role">-</p>
                 </div>
-                <div class="p-5 space-y-3">
-                    <div class="flex justify-between items-center text-xs py-2 border-b border-ink-800">
-                        <span class="text-zinc-500">Unit Kerja</span>
-                        <span class="font-semibold text-zinc-300" id="prof-unit">-</span>
+                <div class="p-4 space-y-3">
+                    <div class="flex justify-between text-xs py-2 border-b border-ink-750">
+                        <span class="text-zinc-500">Unit</span>
+                        <span class="font-medium text-zinc-300" id="prof-unit">-</span>
                     </div>
-                    <div class="flex justify-between items-center text-xs py-2 border-b border-ink-800">
+                    <div class="flex justify-between text-xs py-2 border-b border-ink-750">
                         <span class="text-zinc-500">Email</span>
-                        <span class="font-semibold text-zinc-300 text-[11px]" id="prof-email">-</span>
+                        <span class="font-medium text-zinc-300 text-[11px]" id="prof-email">-</span>
                     </div>
-                    <button onclick="app.doLogout()" class="w-full mt-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold py-3 rounded-2xl text-sm transition flex items-center justify-center gap-2 border border-red-500/20">
-                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+                    <button onclick="app.doLogout()" class="btn btn-danger w-full py-2.5 mt-2">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Logout</span>
                     </button>
                 </div>
             </div>
@@ -318,127 +505,101 @@
     </div>
 
     <!-- MODAL: LINK CRUD -->
-    <div id="link-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-        <div class="w-full max-w-xl bg-ink-900 border border-ink-800 rounded-3xl shadow-2xl overflow-hidden modal-enter max-h-[90vh] flex flex-col">
-            <div class="flex items-center justify-between p-5 border-b border-ink-800 shrink-0">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-8 h-8 rounded-xl bg-accent/10 flex items-center justify-center">
-                        <i data-lucide="link" class="w-4 h-4 text-accent"></i>
-                    </div>
-                    <h3 class="text-sm font-bold text-white" id="link-modal-title">Tambah Link</h3>
-                </div>
-                <button onclick="app.closeModal('link-modal')" class="text-zinc-500 hover:text-white p-2 rounded-xl hover:bg-ink-800 transition">
+    <div id="link-modal" class="modal">
+        <div class="modal-box max-w-lg">
+            <div class="flex items-center justify-between p-4 border-b border-ink-750 shrink-0">
+                <h3 class="text-sm font-semibold text-white" id="link-modal-title">Tambah Link</h3>
+                <button onclick="app.closeModal('link-modal')" class="icon-btn">
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
             
-            <div class="p-5 overflow-y-auto space-y-4">
+            <div class="p-4 overflow-y-auto space-y-3 flex-1">
                 <input type="hidden" id="link-id">
                 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Judul *</label>
-                    <input type="text" id="link-judul" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition" placeholder="Nama link">
+                    <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Judul *</label>
+                    <input type="text" id="link-judul" placeholder="Nama link" class="input">
                 </div>
                 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">URL *</label>
-                    <input type="url" id="link-url" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition font-mono" placeholder="https://...">
+                    <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">URL *</label>
+                    <input type="url" id="link-url" placeholder="https://..." class="input font-mono text-xs">
                 </div>
                 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Deskripsi</label>
-                    <textarea id="link-deskripsi" rows="2" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition resize-none" placeholder="Deskripsi singkat"></textarea>
+                    <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Deskripsi</label>
+                    <textarea id="link-deskripsi" rows="2" placeholder="Deskripsi singkat" class="input resize-none"></textarea>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Kategori</label>
-                        <select id="link-kategori" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white outline-none transition"></select>
+                        <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Kategori</label>
+                        <select id="link-kategori" class="input"></select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Akses Role</label>
-                        <input type="text" id="link-role" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none transition" placeholder="Super Admin">
+                        <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Akses Role</label>
+                        <input type="text" id="link-role" placeholder="Kosong = publik" class="input">
                     </div>
                 </div>
                 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Icon</label>
-                    <input type="text" id="link-icon-search" placeholder="Cari icon..." class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 rounded-2xl px-4 py-2 text-xs text-white placeholder-zinc-500 outline-none transition mb-2">
-                    <div id="icon-grid" class="icon-grid"></div>
+                    <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Icon</label>
+                    <input type="text" id="link-icon-search" placeholder="Cari icon..." class="input text-xs py-2 mb-2">
+                    <div id="icon-grid" class="grid grid-cols-8 sm:grid-cols-10 gap-1.5 max-h-32 overflow-y-auto p-2 border border-ink-750 rounded-lg bg-ink-900"></div>
                     <input type="hidden" id="link-icon" value="link">
                 </div>
                 
                 <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-zinc-500 mb-1.5">Warna</label>
-                    <div class="flex flex-wrap gap-2" id="color-picker"></div>
-                    <input type="hidden" id="link-warna" value="zinc">
+                    <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Warna</label>
+                    <div class="flex flex-wrap gap-1.5" id="color-picker"></div>
+                    <input type="hidden" id="link-warna" value="indigo">
                 </div>
                 
-                <div class="flex items-center gap-4 pt-1">
+                <div class="flex items-center gap-3 pt-1">
                     <label class="flex items-center gap-2 cursor-pointer text-xs text-zinc-300">
-                        <input type="checkbox" id="link-pinned" class="w-4 h-4 rounded accent-amber-400">
-                        <span class="font-semibold">⭐ Pin</span>
+                        <input type="checkbox" id="link-pinned" class="w-4 h-4 rounded">
+                        <span class="font-medium">⭐ Pin ke atas</span>
                     </label>
-                    <select id="link-status" class="text-xs bg-ink-850 border border-ink-750 focus:border-accent/50 rounded-2xl px-3 py-1.5 text-white outline-none">
+                    <select id="link-status" class="input py-1.5 w-auto text-xs">
                         <option value="aktif">Aktif</option>
                         <option value="arsip">Arsip</option>
                     </select>
                 </div>
             </div>
             
-            <div class="flex items-center gap-3 p-5 border-t border-ink-800 shrink-0">
-                <button onclick="app.closeModal('link-modal')" class="flex-1 px-4 py-2.5 border border-ink-750 hover:bg-ink-850 text-white rounded-2xl text-sm font-semibold transition">Batal</button>
-                <button onclick="app.saveLink()" class="flex-1 px-4 py-2.5 bg-accent hover:bg-accent-hover text-black rounded-2xl text-sm font-bold transition flex items-center justify-center gap-1.5 shadow-lg shadow-accent/20">
-                    <i data-lucide="save" class="w-4 h-4"></i> Simpan
+            <div class="flex items-center gap-2 p-4 border-t border-ink-750 shrink-0">
+                <button onclick="app.closeModal('link-modal')" class="btn btn-ghost flex-1">Batal</button>
+                <button onclick="app.saveLink()" class="btn btn-primary flex-1">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    <span>Simpan & Sync</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast-container" class="fixed top-20 right-3 z-[60] space-y-2 max-w-xs"></div>
-
     <script>
     // ============================================================
-    // APP v3.3 — Fixed Edit Mode
+    // APP v4.0
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
         
-        user: null,
-        menu: [],
-        kategori: [],
-        info: {},
-        footer: [],
-        users: [],
-        feedbackList: [],
-        editMode: false,
-        sortables: [],
-        isOnline: navigator.onLine,
-        currentTab: 'info',
-        panelOpen: false,
+        user: null, menu: [], kategori: [], info: {}, footer: [], users: [], feedbackList: [],
+        editMode: false, sortables: [], isOnline: navigator.onLine,
+        currentView: 'dashboard',
+        sidebarOpen: false,
         
         KEYS: {
-            SESSION: 'sa3_session',
-            CACHE: 'sa3_cache',
-            PENDING: 'sa3_pending',
-            LAST_SYNC: 'sa3_lastsync',
-            PREFS: 'sa3_prefs',
-            THEME: 'sa3_theme'
+            SESSION: 'sa4_session', CACHE: 'sa4_cache', PENDING: 'sa4_pending',
+            LAST_SYNC: 'sa4_lastsync', PREFS: 'sa4_prefs', THEME: 'sa4_theme'
         },
         
-        prefs: {
-            view: 'grid',
-            compact: true,
-            autoSync: false,
-            autoSyncInterval: 5,
-            showClicks: true,
-            showBanner: true
-        },
+        prefs: { view: 'grid', showClicks: true, showBanner: true, autoSync: false, autoSyncInterval: 5 },
         
-        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','hash','at-sign','regex','info','help-circle','alert-circle','alert-triangle','save','grip-vertical','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock'],
+        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','info','help-circle','alert-circle','alert-triangle','save','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock','menu','chevron-right','chevron-down'],
         
-        COLORS: ['zinc','blue','red','green','emerald','rose','yellow','amber','indigo','purple','orange','pink','sky','teal','violet'],
+        COLORS: ['indigo','sky','emerald','rose','amber','purple','teal','pink','orange','red','green','blue','violet','zinc'],
         
         // ============================================================
         // INIT
@@ -448,86 +609,127 @@
                 navigator.serviceWorker.register('sw.js').catch(() => {});
             }
             
-            const forceSyncFlag = sessionStorage.getItem('force_sync_done');
-            if (forceSyncFlag) {
+            const fsFlag = sessionStorage.getItem('force_sync_done');
+            if (fsFlag) {
                 sessionStorage.removeItem('force_sync_done');
-                console.log('[Force Sync] Reload complete');
-                setTimeout(() => {
-                    if (app && app.toast) app.toast('Force Sync selesai — data terbaru dimuat', 'success');
-                }, 800);
-                setTimeout(() => {
-                    if (app && app.syncNow) app.syncNow(true);
-                }, 1200);
+                setTimeout(() => this.toast('Force Sync selesai', 'success'), 800);
+                setTimeout(() => this.syncNow(true), 1200);
             }
             
             const savedTheme = localStorage.getItem(this.KEYS.THEME);
-            if(savedTheme === 'light') {
-                document.documentElement.classList.remove('dark');
-            } else {
-                document.documentElement.classList.add('dark');
-            }
+            if(savedTheme === 'light') document.documentElement.classList.remove('dark');
+            else document.documentElement.classList.add('dark');
             
-            try {
-                const p = JSON.parse(localStorage.getItem(this.KEYS.PREFS) || '{}');
-                this.prefs = { ...this.prefs, ...p };
-            } catch(e) {}
-            
-            try {
-                const sess = JSON.parse(localStorage.getItem(this.KEYS.SESSION) || 'null');
-                if (sess && sess.user) this.user = sess.user;
-            } catch(e) { localStorage.removeItem(this.KEYS.SESSION); }
+            try { this.prefs = { ...this.prefs, ...JSON.parse(localStorage.getItem(this.KEYS.PREFS) || '{}') }; } catch(e) {}
+            try { const s = JSON.parse(localStorage.getItem(this.KEYS.SESSION) || 'null'); if (s?.user) this.user = s.user; } catch(e) {}
             
             this.loadFromCache();
             this.updateUIState();
-            this.renderAll();
-            this.updateSyncIndicator();
             this.updateViewIcon();
+            this.updateSyncIndicator();
+            this.navigate('dashboard');
             
             ['search-input','search-input-mobile'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.addEventListener('input', (e) => this.renderMenu(e.target.value.toLowerCase()));
+                if (el) el.addEventListener('input', (e) => {
+                    if (this.currentView !== 'dashboard') this.navigate('dashboard');
+                    this.renderDashboard(e.target.value.toLowerCase());
+                });
             });
             
             this.setupIconPicker();
             this.setupColorPicker();
             
-            window.addEventListener('online', () => { 
-                this.isOnline = true; this.updateSyncIndicator(); 
-                if (this.prefs.autoSync) this.syncNow(true); 
-                this.syncPending();
-            });
-            window.addEventListener('offline', () => { 
-                this.isOnline = false; this.updateSyncIndicator(); 
-            });
-            
-            window.addEventListener('storage', (e) => {
-                if (e.key === this.KEYS.CACHE) { this.loadFromCache(); this.renderAll(); }
-            });
-            
-            if (this.prefs.autoSync) {
-                setInterval(() => { if (this.isOnline) this.syncNow(true); }, this.prefs.autoSyncInterval * 60 * 1000);
-            }
-            
-            this.renderPanel();
+            window.addEventListener('online', () => { this.isOnline = true; this.updateSyncIndicator(); this.syncPending(); });
+            window.addEventListener('offline', () => { this.isOnline = false; this.updateSyncIndicator(); });
+            window.addEventListener('storage', (e) => { if (e.key === this.KEYS.CACHE) { this.loadFromCache(); this.renderCurrentView(); } });
             
             document.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') { 
-                    e.preventDefault(); 
-                    document.getElementById('search-input').focus(); 
-                }
-                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') { 
-                    e.preventDefault();
-                    if (this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin')) {
-                        this.forceSync();
-                    }
-                }
-                if (e.key === 'Escape') { 
-                    this.closeModal('auth-modal'); 
-                    this.closeModal('link-modal'); 
-                    this.closePanel(); 
-                }
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('search-input')?.focus(); }
+                if (e.key === 'Escape') { this.closeModal('auth-modal'); this.closeModal('link-modal'); this.closeSidebar(); }
             });
             
+            setTimeout(() => {
+                if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) this.loadFeedback(true);
+            }, 1500);
+            
+            lucide.createIcons();
+        },
+        
+        // ============================================================
+        // SIDEBAR & NAV
+        // ============================================================
+        toggleSidebar: function() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const mainArea = document.getElementById('main-area');
+            
+            // Desktop: toggle collapse
+            if (window.innerWidth >= 1024) {
+                sidebar.classList.toggle('collapsed');
+                mainArea.classList.toggle('expanded');
+                return;
+            }
+            
+            // Mobile: overlay
+            this.sidebarOpen = !this.sidebarOpen;
+            sidebar.classList.toggle('open', this.sidebarOpen);
+            backdrop.classList.toggle('show', this.sidebarOpen);
+        },
+        
+        closeSidebar: function() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            if (window.innerWidth < 1024) {
+                this.sidebarOpen = false;
+                sidebar.classList.remove('open');
+                backdrop.classList.remove('show');
+            }
+        },
+        
+        navigate: function(view) {
+            this.currentView = view;
+            
+            // Update nav active state
+            document.querySelectorAll('.nav-item').forEach(n => {
+                n.classList.toggle('active', n.dataset.nav === view);
+            });
+            
+            // Update title
+            const titles = {
+                dashboard: 'Dashboard', info: 'Info & Banner', kategori: 'Kategori',
+                users: 'Users', feedback: 'Feedback', backup: 'Backup & Sync',
+                prefs: 'Preferensi', diagnostic: 'Diagnostik'
+            };
+            document.getElementById('page-title').textContent = titles[view] || 'Dashboard';
+            
+            // Show/hide search
+            const searchDesktop = document.getElementById('search-input')?.parentElement;
+            const searchMobile = document.getElementById('search-input-mobile')?.parentElement.parentElement;
+            const show = view === 'dashboard';
+            if (searchDesktop) searchDesktop.classList.toggle('hidden', !show);
+            if (searchMobile) searchMobile.classList.toggle('hidden', !show);
+            const viewBtn = document.querySelector('button[onclick="app.toggleView()"]');
+            if (viewBtn) viewBtn.style.display = show ? '' : 'none';
+            
+            this.renderCurrentView();
+            this.closeSidebar();
+        },
+        
+        renderCurrentView: function() {
+            const el = document.getElementById('page-content');
+            const views = {
+                dashboard: () => this.renderDashboard(),
+                info: () => this.renderInfoPage(),
+                kategori: () => this.renderKategoriPage(),
+                users: () => this.renderUsersPage(),
+                feedback: () => this.renderFeedbackPage(),
+                backup: () => this.renderBackupPage(),
+                prefs: () => this.renderPrefsPage(),
+                diagnostic: () => this.renderDiagnosticPage()
+            };
+            el.innerHTML = (views[this.currentView] || views.dashboard)();
+            if (this.currentView === 'dashboard') this.setupSortable();
             lucide.createIcons();
         },
         
@@ -536,13 +738,10 @@
         // ============================================================
         loadFromCache: function() {
             try {
-                const cached = JSON.parse(localStorage.getItem(this.KEYS.CACHE) || '{}');
-                this.menu = cached.menu || [];
-                this.kategori = cached.kategori || [];
-                this.info = cached.info || {};
-                this.footer = cached.footer || [];
-                this.users = cached.users || [];
-                this.feedbackList = cached.feedback || [];
+                const c = JSON.parse(localStorage.getItem(this.KEYS.CACHE) || '{}');
+                this.menu = c.menu || []; this.kategori = c.kategori || [];
+                this.info = c.info || {}; this.footer = c.footer || [];
+                this.users = c.users || []; this.feedbackList = c.feedback || [];
             } catch(e) {}
         },
         
@@ -555,185 +754,17 @@
         },
         
         saveSession: function() {
-            if (this.user) {
-                localStorage.setItem(this.KEYS.SESSION, JSON.stringify({ user: this.user, savedAt: new Date().toISOString() }));
-            } else {
-                localStorage.removeItem(this.KEYS.SESSION);
-            }
+            if (this.user) localStorage.setItem(this.KEYS.SESSION, JSON.stringify({ user: this.user, savedAt: new Date().toISOString() }));
+            else localStorage.removeItem(this.KEYS.SESSION);
         },
         
         savePrefs: function() { localStorage.setItem(this.KEYS.PREFS, JSON.stringify(this.prefs)); },
         
         // ============================================================
-        // SYNC
+        // DASHBOARD
         // ============================================================
-        syncNow: function(silent) {
-            if (!this.isOnline) {
-                if (!silent) this.toast('Offline — tidak bisa sync', 'warning');
-                this.updateSyncIndicator('offline'); return;
-            }
-            
-            this.updateSyncIndicator('syncing');
-            const btn = document.getElementById('btn-sync');
-            if (btn && !silent) btn.querySelector('i').classList.add('animate-spin');
-            
-            fetch(`${this.apiURL}?action=bootstrap`)
-                .then(r => r.json())
-                .then(res => {
-                    if (res.status !== 'success') throw new Error(res.message);
-                    const d = res.data;
-                    if (d.menu) this.menu = d.menu;
-                    if (d.kategori) this.kategori = d.kategori;
-                    if (d.info) this.info = d.info;
-                    if (d.footer) this.footer = d.footer;
-                    if (d.users) this.users = d.users;
-                    this.saveCache();
-                    localStorage.setItem(this.KEYS.LAST_SYNC, res.serverTime);
-                    this.renderAll();
-                    this.updateSyncIndicator('synced');
-                    if (!silent) this.toast('Data tersinkron', 'success');
-                    if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) {
-                        this.loadFeedback(silent);
-                    }
-                })
-                .catch(err => {
-                    this.updateSyncIndicator('error');
-                    if (!silent) this.toast('Sync gagal: ' + err.message, 'error');
-                })
-                .finally(() => { if (btn) btn.querySelector('i').classList.remove('animate-spin'); });
-        },
-        
-        // ============================================================
-        // FORCE SYNC
-        // ============================================================
-        forceSync: function() {
-            if (!this.user) { this.toast('Login dulu untuk Force Sync', 'warning'); return; }
-            const role = this.user.jabatan.toLowerCase();
-            if (role !== 'super admin' && role !== 'admin') {
-                this.toast('Hanya Admin/Super Admin yang bisa Force Sync', 'error');
-                return;
-            }
-            
-            const confirmed = confirm(
-                'FORCE SYNC\n\n' +
-                'Tindakan ini akan:\n' +
-                '• Hapus semua cache lokal (menu, kategori, feedback)\n' +
-                '• Update file aplikasi ke versi terbaru\n' +
-                '• Reload halaman otomatis\n\n' +
-                '✓ Session login tetap tersimpan\n' +
-                '✗ Perubahan yang belum sync akan HILANG\n\n' +
-                'Lanjutkan?'
-            );
-            if (!confirmed) return;
-            
-            const pending = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
-            if (pending.length > 0) {
-                const doSyncFirst = confirm(
-                    `Ada ${pending.length} perubahan belum tersinkron.\n\n` +
-                    'OK = Sync dulu, baru Force Sync\n' +
-                    'Cancel = Lanjut Force Sync (data pending HILANG)'
-                );
-                if (doSyncFirst) {
-                    this.syncPending();
-                    setTimeout(() => {
-                        if (confirm('Sync selesai. Lanjut Force Sync sekarang?')) {
-                            this._doForceSync();
-                        }
-                    }, 2500);
-                    return;
-                }
-            }
-            
-            this._doForceSync();
-        },
-        
-        _doForceSync: function() {
-            this.toast('Memproses Force Sync...', 'info');
-            this.updateSyncIndicator('syncing');
-            
-            const btnFS = document.getElementById('btn-force-sync');
-            if (btnFS) btnFS.querySelector('i').classList.add('force-spin');
-            
-            const clearCaches = (typeof caches !== 'undefined') ? 
-                caches.keys().then(names => 
-                    Promise.all(names.map(name => caches.delete(name)))
-                ) : Promise.resolve();
-            
-            const unregisterSW = ('serviceWorker' in navigator) ?
-                navigator.serviceWorker.getRegistrations().then(regs => 
-                    Promise.all(regs.map(reg => reg.unregister()))
-                ) : Promise.resolve();
-            
-            const keysToKeep = [this.KEYS.SESSION, this.KEYS.PREFS, this.KEYS.THEME];
-            Object.values(this.KEYS).forEach(k => {
-                if (!keysToKeep.includes(k)) {
-                    localStorage.removeItem(k);
-                }
-            });
-            
-            Promise.all([clearCaches, unregisterSW])
-                .then(() => {
-                    console.log('[Force Sync] Cache & SW cleared');
-                    sessionStorage.setItem('force_sync_done', Date.now().toString());
-                    setTimeout(() => {
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('_fs', Date.now());
-                        window.location.replace(url.toString());
-                    }, 800);
-                })
-                .catch(err => {
-                    console.error('[Force Sync] Error:', err);
-                    sessionStorage.setItem('force_sync_done', Date.now().toString());
-                    setTimeout(() => {
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('_fs', Date.now());
-                        window.location.replace(url.toString());
-                    }, 500);
-                });
-        },
-        
-        // ============================================================
-        // RENDER
-        // ============================================================
-        renderAll: function(searchQuery) {
-            this.renderMenu(searchQuery);
-            this.renderInfoBanner();
-            lucide.createIcons();
-        },
-        
-        renderInfoBanner: function() {
-            const banner = document.getElementById('info-banner');
-            if (!banner) return;
-            const info = this.info;
-            const showBanner = this.prefs.showBanner && info && (info.STATUS === 'ON' || info.STATUS === 'on' || info.STATUS === true);
-            
-            if (!showBanner || !info.PESAN) { banner.classList.add('hidden'); return; }
-            
-            const colorMap = {
-                green: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300',
-                blue: 'bg-blue-500/10 border-blue-500/30 text-blue-300',
-                red: 'bg-red-500/10 border-red-500/30 text-red-300',
-                yellow: 'bg-accent/10 border-accent/30 text-accent',
-                indigo: 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
-            };
-            const cls = colorMap[info.WARNA] || colorMap.yellow;
-            
-            banner.className = `mb-4 p-3.5 border rounded-2xl flex items-start gap-3 ${cls}`;
-            banner.innerHTML = `
-                <div class="w-7 h-7 rounded-xl bg-current/10 flex items-center justify-center shrink-0">
-                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
-                </div>
-                <div class="flex-1 text-xs leading-relaxed pt-0.5">${this.escape(info.PESAN)}</div>
-                <button onclick="document.getElementById('info-banner').classList.add('hidden')" class="opacity-60 hover:opacity-100 shrink-0 p-1">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                </button>
-            `;
-            lucide.createIcons();
-        },
-        
-        renderMenu: function(searchQuery) {
-            const container = document.getElementById('content-container');
-            const q = searchQuery || '';
+        renderDashboard: function(q) {
+            q = q || '';
             const userRole = this.user ? this.user.jabatan.toLowerCase() : '';
             
             let items = this.menu.filter(item => {
@@ -752,39 +783,60 @@
                 return roles.includes(userRole);
             });
             
-            if (items.length === 0) {
-                container.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-20 text-zinc-600">
-                        <div class="w-16 h-16 rounded-3xl bg-ink-850 flex items-center justify-center mb-4 border border-ink-800">
-                            <i data-lucide="inbox" class="w-7 h-7 opacity-50"></i>
+            let html = '';
+            
+            // Banner
+            const banner = this.renderBanner();
+            
+            // Toolbar info
+            if (this.user && (userRole === 'super admin' || userRole === 'admin')) {
+                html += `
+                    <div class="flex items-center justify-between mb-4 gap-3">
+                        <p class="text-xs text-zinc-500">
+                            ${this.editMode ? '<span class="text-accent font-semibold">Edit mode aktif</span>' : `${items.length} link aktif`}
+                        </p>
+                        <div class="flex gap-2">
+                            <button onclick="app.openLinkModal()" class="btn btn-primary btn-sm">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah
+                            </button>
+                            <button onclick="app.toggleEditMode()" class="btn ${this.editMode ? 'btn-primary' : 'btn-ghost'} btn-sm">
+                                <i data-lucide="${this.editMode ? 'check' : 'pencil'}" class="w-3.5 h-3.5"></i>
+                                ${this.editMode ? 'Selesai' : 'Edit'}
+                            </button>
                         </div>
+                    </div>
+                `;
+            }
+            
+            if (items.length === 0) {
+                html += `
+                    <div class="flex flex-col items-center justify-center py-20 text-zinc-600">
+                        <i data-lucide="inbox" class="w-10 h-10 mb-3 opacity-40"></i>
                         <p class="text-xs">${q ? 'Tidak ada hasil untuk "' + this.escape(q) + '"' : 'Belum ada menu'}</p>
                     </div>
                 `;
-                lucide.createIcons();
-                return;
+                return banner + html;
             }
             
+            // Group by kategori
             const groups = {};
             this.kategori.forEach(k => groups[k.NAMA] = []);
             groups['Lain-lain'] = groups['Lain-lain'] || [];
-            
             items.forEach(item => {
                 const kat = item.KATEGORI || 'Lain-lain';
                 if (!groups[kat]) groups[kat] = [];
                 groups[kat].push(item);
             });
             
-            const sortedKatNames = Object.keys(groups).sort((a, b) => {
+            const sortedKat = Object.keys(groups).sort((a, b) => {
                 const ka = this.kategori.find(k => k.NAMA === a);
                 const kb = this.kategori.find(k => k.NAMA === b);
                 return (Number(ka?.URUTAN) || 999) - (Number(kb?.URUTAN) || 999);
             });
             
-            const isListView = this.prefs.view === 'list';
-            let html = '';
+            const isList = this.prefs.view === 'list';
             
-            sortedKatNames.forEach(katName => {
+            sortedKat.forEach(katName => {
                 const katItems = groups[katName];
                 if (!katItems || katItems.length === 0) return;
                 
@@ -799,495 +851,214 @@
                 const katIcon = katInfo?.ICON || 'folder';
                 
                 html += `
-                    <div class="mb-6">
-                        <div class="flex items-center gap-2 mb-3 px-1">
-                            <div class="w-6 h-6 rounded-lg bg-ink-850 border border-ink-800 flex items-center justify-center">
-                                <i data-lucide="${katIcon}" class="w-3 h-3 text-accent"></i>
-                            </div>
-                            <h3 class="text-[11px] font-bold uppercase tracking-widest text-zinc-400">${this.escape(katName)}</h3>
-                            <span class="text-[9px] bg-ink-850 border border-ink-800 px-1.5 py-0.5 rounded-full font-mono text-zinc-500">${katItems.length}</span>
+                    <div class="mb-5">
+                        <div class="section-header">
+                            <i data-lucide="${katIcon}" class="w-3.5 h-3.5 text-accent"></i>
+                            <h3 class="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">${this.escape(katName)}</h3>
+                            <span class="text-[10px] text-zinc-600 font-mono ml-1">${katItems.length}</span>
                         </div>
-                        ${isListView 
-                            ? `<div class="menu-list flex flex-col gap-1.5">${katItems.map(item => this.renderListRow(item)).join('')}</div>`
-                            : `<div class="menu-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5">${katItems.map(item => this.renderCard(item)).join('')}</div>`
+                        ${isList 
+                            ? `<div class="links-list menu-list">${katItems.map(i => this.renderRow(i)).join('')}</div>`
+                            : `<div class="links-grid menu-grid">${katItems.map(i => this.renderCard(i)).join('')}</div>`
                         }
                     </div>
                 `;
             });
             
-            container.innerHTML = html;
-            this.setupSortable();
-            lucide.createIcons();
+            return banner + html;
         },
         
-        renderCard: function(item) {
-            const isPinned = item.PINNED === true || item.PINNED === 'TRUE';
-            const colorMap = this.getColorConfig(item.WARNA);
-            const icon = item.ICON || 'link';
-            const isEdit = this.editMode;
-            const safeUrl = this.safeUrl(item.URL);
-            const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
+        renderBanner: function() {
+            const info = this.info;
+            const show = this.prefs.showBanner && info && (info.STATUS === 'ON' || info.STATUS === 'on') && info.PESAN;
+            if (!show) return '';
+            
+            const colorMap = {
+                green: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-300',
+                blue: 'border-sky-500/30 bg-sky-500/5 text-sky-300',
+                red: 'border-red-500/30 bg-red-500/5 text-red-300',
+                yellow: 'border-amber-500/30 bg-amber-500/5 text-amber-300',
+                indigo: 'border-accent/30 bg-accent-soft text-accent'
+            };
+            const cls = colorMap[info.WARNA] || colorMap.indigo;
             
             return `
-                <div class="menu-card card-link group relative" data-id="${item.ID}">
-                    <div class="card-inner relative flex flex-col p-4 bg-ink-800 border border-ink-700/60 rounded-3xl transition-all duration-200">
-                        
-                        ${isEdit ? `
-                            <div class="drag-handle absolute top-2.5 left-2.5 p-1 rounded-lg hover:bg-ink-750 text-zinc-500 z-10">
-                                <i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i>
-                            </div>
-                            <div class="absolute top-2.5 right-2.5 flex gap-1 z-10">
-                                <button onclick="event.stopPropagation();app.editLink('${item.ID}')" class="p-1.5 rounded-lg bg-ink-750/80 hover:bg-ink-700 text-zinc-400 hover:text-accent" title="Edit">
-                                    <i data-lucide="pencil" class="w-3 h-3"></i>
-                                </button>
-                                <button onclick="event.stopPropagation();app.deleteLink('${item.ID}')" class="p-1.5 rounded-lg bg-ink-750/80 hover:bg-red-500/20 text-zinc-400 hover:text-red-400" title="Hapus">
-                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
-                                </button>
-                            </div>
-                        ` : ''}
-                        
-                        <a href="${isEdit ? 'javascript:void(0)' : safeUrl}" ${!isEdit ? 'target="_blank" rel="noopener"' : ''} 
-                           onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
-                           class="flex flex-col items-center text-center ${isEdit ? 'pointer-events-none' : ''}">
-                            
-                            <div class="relative mt-1 mb-3">
-                                <div class="w-14 h-14 rounded-full flex items-center justify-center ${colorMap.bg} ${colorMap.glow}">
-                                    <i data-lucide="${icon}" class="w-6 h-6 ${colorMap.text}"></i>
-                                </div>
-                                ${isPinned ? `<div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center text-[10px] shadow-lg shadow-accent/30">⭐</div>` : ''}
-                            </div>
-                            
-                            <h4 class="font-semibold text-xs text-white leading-tight line-clamp-2 group-hover:text-accent transition min-h-[2rem]">${this.escape(item.JUDUL)}</h4>
-                            ${item.DESKRIPSI ? `<p class="text-[10px] text-zinc-500 mt-1 line-clamp-1 leading-tight">${this.escape(item.DESKRIPSI)}</p>` : ''}
-                            
-                            ${showClicks ? `<div class="mt-2 inline-flex items-center gap-1 px-2 py-0.5 bg-ink-850 border border-ink-700 rounded-full text-[9px] text-zinc-500 font-mono">${item.CLICKS}×</div>` : ''}
-                        </a>
-                    </div>
+                <div class="mb-4 p-3 border rounded-xl flex items-start gap-2.5 ${cls}">
+                    <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
+                    <p class="text-xs leading-relaxed flex-1">${this.escape(info.PESAN)}</p>
+                    <button onclick="app.hideBanner()" class="opacity-60 hover:opacity-100 p-0.5">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
                 </div>
             `;
         },
         
-        renderListRow: function(item) {
+        hideBanner: function() {
+            this.prefs.showBanner = false;
+            this.savePrefs();
+            this.renderCurrentView();
+        },
+        
+        renderCard: function(item) {
             const isPinned = item.PINNED === true || item.PINNED === 'TRUE';
-            const colorMap = this.getColorConfig(item.WARNA);
+            const c = this.colorConfig(item.WARNA);
             const icon = item.ICON || 'link';
             const isEdit = this.editMode;
-            const safeUrl = this.safeUrl(item.URL);
             const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
             
             return `
-                <div class="list-row group flex items-center gap-3 p-3 bg-ink-800 border border-ink-700/60 rounded-2xl hover:border-accent/30 transition" data-id="${item.ID}">
-                    ${isEdit ? `<div class="drag-handle p-1 text-zinc-500 cursor-grab"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></div>` : ''}
+                <div class="link-card card ${isEdit ? '' : ''}" data-id="${item.ID}">
+                    ${isEdit ? `
+                        <div class="drag-handle absolute top-2 left-2 p-1 rounded-md text-zinc-500 z-10">
+                            <i data-lucide="grip-vertical" class="w-3 h-3"></i>
+                        </div>
+                        <div class="absolute top-2 right-2 flex gap-0.5 z-10">
+                            <button onclick="event.stopPropagation();app.editLink('${item.ID}')" class="icon-btn w-6 h-6" title="Edit">
+                                <i data-lucide="pencil" class="w-3 h-3"></i>
+                            </button>
+                            <button onclick="event.stopPropagation();app.deleteLink('${item.ID}')" class="icon-btn w-6 h-6 text-red-400" title="Hapus">
+                                <i data-lucide="trash-2" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    ` : ''}
                     
-                    <a href="${isEdit ? 'javascript:void(0)' : safeUrl}" ${!isEdit ? 'target="_blank" rel="noopener"' : ''} 
+                    <a href="${isEdit ? 'javascript:void(0)' : this.safeUrl(item.URL)}" 
+                       ${!isEdit ? 'target="_blank" rel="noopener"' : ''}
+                       onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
+                       class="flex flex-col items-center flex-1 w-full ${isEdit ? 'pointer-events-none' : ''}">
+                        <div class="icon-circle ${c.bg}" style="${c.glow}">
+                            <i data-lucide="${icon}" class="w-5 h-5 ${c.text}"></i>
+                        </div>
+                        <h4 class="text-xs font-semibold text-white line-clamp-2 leading-snug min-h-[2rem]">${this.escape(item.JUDUL)}</h4>
+                        ${showClicks ? `<div class="mt-1 text-[9px] text-zinc-600 font-mono">${item.CLICKS}×</div>` : ''}
+                    </a>
+                    
+                    ${isPinned && !isEdit ? `<div class="absolute top-2 right-2 text-[10px]">⭐</div>` : ''}
+                </div>
+            `;
+        },
+        
+        renderRow: function(item) {
+            const isPinned = item.PINNED === true || item.PINNED === 'TRUE';
+            const c = this.colorConfig(item.WARNA);
+            const icon = item.ICON || 'link';
+            const isEdit = this.editMode;
+            const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
+            
+            return `
+                <div class="link-row" data-id="${item.ID}">
+                    ${isEdit ? `<div class="drag-handle p-1 text-zinc-500"><i data-lucide="grip-vertical" class="w-3.5 h-3.5"></i></div>` : ''}
+                    <a href="${isEdit ? 'javascript:void(0)' : this.safeUrl(item.URL)}"
+                       ${!isEdit ? 'target="_blank" rel="noopener"' : ''}
                        onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
                        class="flex items-center gap-3 flex-1 min-w-0 ${isEdit ? 'pointer-events-none' : ''}">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${colorMap.bg} ${colorMap.glow}">
-                            <i data-lucide="${icon}" class="w-4 h-4 ${colorMap.text}"></i>
+                        <div class="w-9 h-9 rounded-full ${c.bg} flex items-center justify-center shrink-0">
+                            <i data-lucide="${icon}" class="w-4 h-4 ${c.text}"></i>
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-1.5">
                                 ${isPinned ? '<span class="text-[10px]">⭐</span>' : ''}
-                                <h4 class="font-semibold text-xs text-white truncate group-hover:text-accent transition">${this.escape(item.JUDUL)}</h4>
+                                <h4 class="text-xs font-semibold text-white truncate">${this.escape(item.JUDUL)}</h4>
                             </div>
-                            <p class="text-[10px] text-zinc-500 truncate mt-0.5">${this.escape(item.DESKRIPSI || item.URL)}</p>
+                            ${item.DESKRIPSI ? `<p class="text-[10px] text-zinc-500 truncate">${this.escape(item.DESKRIPSI)}</p>` : ''}
                         </div>
-                        ${showClicks ? `<span class="text-[9px] text-zinc-500 font-mono shrink-0 px-2 py-0.5 bg-ink-850 border border-ink-700 rounded-full">${item.CLICKS}×</span>` : ''}
+                        ${showClicks ? `<span class="text-[9px] text-zinc-600 font-mono">${item.CLICKS}×</span>` : ''}
                     </a>
-                    
                     ${isEdit ? `
-                        <div class="flex gap-1 shrink-0">
-                            <button onclick="app.editLink('${item.ID}')" class="p-1.5 rounded-lg hover:bg-ink-750 text-zinc-400 hover:text-accent">
-                                <i data-lucide="pencil" class="w-3 h-3"></i>
-                            </button>
-                            <button onclick="app.deleteLink('${item.ID}')" class="p-1.5 rounded-lg hover:bg-red-500/20 text-zinc-400 hover:text-red-400">
-                                <i data-lucide="trash-2" class="w-3 h-3"></i>
-                            </button>
+                        <div class="flex gap-0.5 shrink-0">
+                            <button onclick="app.editLink('${item.ID}')" class="icon-btn w-7 h-7"><i data-lucide="pencil" class="w-3 h-3"></i></button>
+                            <button onclick="app.deleteLink('${item.ID}')" class="icon-btn w-7 h-7 text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                         </div>
                     ` : ''}
                 </div>
             `;
         },
         
-        // ============================================================
-        // VIEW
-        // ============================================================
-        toggleView: function() {
-            this.prefs.view = this.prefs.view === 'grid' ? 'list' : 'grid';
-            this.savePrefs();
-            this.updateViewIcon();
-            this.renderMenu(document.getElementById('search-input')?.value?.toLowerCase() || '');
-            lucide.createIcons();
-            this.toast(this.prefs.view === 'list' ? 'Tampilan list' : 'Tampilan grid', 'info');
-        },
-        
-        updateViewIcon: function() {
-            const icon = document.getElementById('view-icon');
-            if (!icon) return;
-            icon.setAttribute('data-lucide', this.prefs.view === 'grid' ? 'layout-grid' : 'layout-list');
-            lucide.createIcons();
-        },
-        
-        // ============================================================
-        // SORTABLE
-        // ============================================================
-        setupSortable: function() {
-            this.sortables.forEach(s => { try { s.destroy(); } catch(e) {} });
-            this.sortables = [];
-            if (!this.editMode) return;
-            document.querySelectorAll('.menu-grid, .menu-list').forEach(grid => {
-                const sortable = Sortable.create(grid, {
-                    animation: 180, handle: '.drag-handle',
-                    ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
-                    onEnd: () => {
-                        const allIds = [];
-                        document.querySelectorAll('.menu-grid, .menu-list').forEach(g => {
-                            g.querySelectorAll('[data-id]').forEach(el => allIds.push(el.dataset.id));
-                        });
-                        this.reorderMenus(allIds);
-                    }
-                });
-                this.sortables.push(sortable);
-            });
-        },
-        
-        // ============================================================
-        // EDIT MODE
-        // ============================================================
-        toggleEditMode: function() {
-            if (!this.user) { this.toast('Login dulu untuk edit', 'warning'); return; }
-            const role = this.user.jabatan.toLowerCase();
-            if (role !== 'super admin' && role !== 'admin') { 
-                this.toast('Anda tidak punya akses edit', 'error'); 
-                return; 
-            }
-            this.editMode = !this.editMode;
-            this.updateUIState();
-            this.renderAll();
-            this.toast(this.editMode ? '🔓 Edit mode aktif — klik card untuk edit/hapus' : '🔒 Edit mode nonaktif', 'info');
-        },
-        
-        // ============================================================
-        // LINK CRUD
-        // ============================================================
-        openLinkModal: function(id) {
-            if (!this.user) { this.toast('Login dulu', 'warning'); return; }
-            const modal = document.getElementById('link-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            
-            if (id) {
-                const item = this.menu.find(m => m.ID === id);
-                if (!item) return;
-                document.getElementById('link-modal-title').textContent = 'Edit Link';
-                document.getElementById('link-id').value = item.ID;
-                document.getElementById('link-judul').value = item.JUDUL || '';
-                document.getElementById('link-url').value = item.URL || '';
-                document.getElementById('link-deskripsi').value = item.DESKRIPSI || '';
-                document.getElementById('link-kategori').value = item.KATEGORI || 'Lain-lain';
-                document.getElementById('link-role').value = item.AKSES_ROLE || '';
-                document.getElementById('link-icon').value = item.ICON || 'link';
-                document.getElementById('link-warna').value = item.WARNA || 'zinc';
-                document.getElementById('link-pinned').checked = item.PINNED === true || item.PINNED === 'TRUE';
-                document.getElementById('link-status').value = item.STATUS || 'aktif';
-                this.selectIcon(item.ICON || 'link');
-                this.selectColor(item.WARNA || 'zinc');
-            } else {
-                document.getElementById('link-modal-title').textContent = 'Tambah Link';
-                document.getElementById('link-id').value = '';
-                document.getElementById('link-judul').value = '';
-                document.getElementById('link-url').value = '';
-                document.getElementById('link-deskripsi').value = '';
-                document.getElementById('link-kategori').value = this.kategori[0]?.NAMA || 'Lain-lain';
-                document.getElementById('link-role').value = '';
-                document.getElementById('link-icon').value = 'link';
-                document.getElementById('link-warna').value = 'yellow';
-                document.getElementById('link-pinned').checked = false;
-                document.getElementById('link-status').value = 'aktif';
-                this.selectIcon('link');
-                this.selectColor('yellow');
-            }
-            this.renderKategoriOptions();
-            lucide.createIcons();
-        },
-        
-        editLink: function(id) { this.openLinkModal(id); },
-        
-        saveLink: function() {
-            const id = document.getElementById('link-id').value;
-            const data = {
-                judul: document.getElementById('link-judul').value.trim(),
-                url: document.getElementById('link-url').value.trim(),
-                deskripsi: document.getElementById('link-deskripsi').value.trim(),
-                kategori: document.getElementById('link-kategori').value,
-                akses_role: document.getElementById('link-role').value.trim(),
-                icon: document.getElementById('link-icon').value,
-                warna: document.getElementById('link-warna').value,
-                pinned: document.getElementById('link-pinned').checked,
-                status: document.getElementById('link-status').value
+        colorConfig: function(color) {
+            const m = {
+                indigo:  { bg: 'bg-indigo-500/15',  text: 'text-indigo-300',  glow: '' },
+                sky:     { bg: 'bg-sky-500/15',     text: 'text-sky-300',     glow: '' },
+                emerald: { bg: 'bg-emerald-500/15', text: 'text-emerald-300', glow: '' },
+                rose:    { bg: 'bg-rose-500/15',    text: 'text-rose-300',    glow: '' },
+                amber:   { bg: 'bg-amber-500/15',   text: 'text-amber-300',   glow: '' },
+                purple:  { bg: 'bg-purple-500/15',  text: 'text-purple-300',  glow: '' },
+                teal:    { bg: 'bg-teal-500/15',    text: 'text-teal-300',    glow: '' },
+                pink:    { bg: 'bg-pink-500/15',    text: 'text-pink-300',    glow: '' },
+                orange:  { bg: 'bg-orange-500/15',  text: 'text-orange-300',  glow: '' },
+                red:     { bg: 'bg-red-500/15',     text: 'text-red-300',     glow: '' },
+                green:   { bg: 'bg-green-500/15',   text: 'text-green-300',   glow: '' },
+                blue:    { bg: 'bg-blue-500/15',    text: 'text-blue-300',    glow: '' },
+                violet:  { bg: 'bg-violet-500/15',  text: 'text-violet-300',  glow: '' },
+                zinc:    { bg: 'bg-zinc-500/15',    text: 'text-zinc-300',    glow: '' }
             };
-            
-            if (!data.judul || !data.url) { this.toast('Judul & URL wajib', 'error'); return; }
-            try {
-                const u = new URL(data.url);
-                if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error();
-            } catch(e) { this.toast('URL tidak valid', 'error'); return; }
-            
-            this.closeModal('link-modal');
-            
-            if (!id) {
-                const tempId = 'tmp-' + Date.now();
-                data.ID = tempId; data.CLICKS = 0; data.DELETED = false;
-                this.menu.push(data);
-                this.queuePending({ action: 'add', tempId, data, userEmail: this.user?.email });
-            } else {
-                const idx = this.menu.findIndex(m => m.ID === id);
-                if (idx >= 0) this.menu[idx] = { ...this.menu[idx], ...data };
-                this.queuePending({ action: 'update', id, data, userEmail: this.user?.email });
-            }
-            this.saveCache();
-            this.renderAll();
-            this.syncPending();
-            this.toast(id ? 'Link diupdate' : 'Link ditambahkan', 'success');
-        },
-        
-        deleteLink: function(id) {
-            const item = this.menu.find(m => m.ID === id);
-            if (!item) return;
-            if (!confirm(`Hapus "${item.JUDUL}"?`)) return;
-            this.menu = this.menu.filter(m => m.ID !== id);
-            this.saveCache();
-            this.renderAll();
-            this.queuePending({ action: 'delete', id, userEmail: this.user?.email });
-            this.syncPending();
-            this.toast('Link dihapus', 'success');
-        },
-        
-        reorderMenus: function(ids) {
-            ids.forEach((id, idx) => {
-                const item = this.menu.find(m => m.ID === id);
-                if (item) item.URUTAN = idx + 1;
-            });
-            this.saveCache();
-            this.queuePending({ action: 'reorder', ids, userEmail: this.user?.email });
-            this.syncPending();
+            return m[color] || m.indigo;
         },
         
         // ============================================================
-        // PENDING
+        // INFO PAGE
         // ============================================================
-        queuePending: function(op) {
-            const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
-            queue.push({ ...op, queuedAt: Date.now() });
-            localStorage.setItem(this.KEYS.PENDING, JSON.stringify(queue));
-            this.updateSyncIndicator();
-        },
-        
-        syncPending: function() {
-            if (!this.isOnline) { this.updateSyncIndicator('offline'); return; }
-            const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
-            if (queue.length === 0) { this.updateSyncIndicator(); return; }
-            
-            const processNext = (i) => {
-                if (i >= queue.length) {
-                    localStorage.setItem(this.KEYS.PENDING, '[]');
-                    this.updateSyncIndicator();
-                    return;
-                }
-                const op = queue[i];
-                fetch(this.apiURL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(op)
-                })
-                .then(r => r.json())
-                .then(res => {
-                    if (res.status === 'success') {
-                        if (op.action === 'add' && op.tempId && res.id) {
-                            const item = this.menu.find(m => m.ID === op.tempId);
-                            if (item) item.ID = res.id;
-                            this.saveCache();
-                        }
-                        processNext(i + 1);
-                    } else {
-                        localStorage.setItem(this.KEYS.PENDING, JSON.stringify(queue.slice(i + 1)));
-                        this.updateSyncIndicator('error');
-                        console.error('Sync error:', res);
-                    }
-                })
-                .catch(() => this.updateSyncIndicator('offline'));
-            };
-            processNext(0);
-        },
-        
-        trackClick: function(id) {
-            const item = this.menu.find(m => m.ID === id);
-            if (item) item.CLICKS = (Number(item.CLICKS) || 0) + 1;
-            if (!this.isOnline) return;
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'trackClick', id })
-            }).catch(() => {});
-        },
-        
-        // ============================================================
-        // AUTH
-        // ============================================================
-        doLogin: function() {
-            const email = document.getElementById('input-email').value.trim();
-            const pass = document.getElementById('input-pass').value;
-            const remember = document.getElementById('remember-me').checked;
-            const btn = document.getElementById('btn-submit');
-            if (!email || !pass) { this.toast('Email & password wajib', 'error'); return; }
-            
-            const orig = btn.innerHTML;
-            btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-4 h-4"></i> Memverifikasi...`;
-            btn.disabled = true;
-            lucide.createIcons();
-            
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'login', email, password: pass })
-            })
-            .then(r => r.json())
-            .then(res => {
-                if (res.status === 'success') {
-                    this.user = { nama: res.nama, jabatan: res.jabatan, unit: res.unit, email: res.email };
-                    this.saveSession();
-                    this.updateUIState();
-                    this.renderAll();
-                    this.closeModal('auth-modal');
-                    this.toast('Selamat datang, ' + res.nama, 'success');
-                    if (remember) { this.trackLogin(); this.loadFeedback(true); }
-                } else {
-                    this.toast(res.message || 'Login gagal', 'error');
-                }
-            })
-            .catch(() => this.toast('Server tidak dapat dijangkau', 'error'))
-            .finally(() => { btn.innerHTML = orig; btn.disabled = false; lucide.createIcons(); });
-        },
-        
-        doLogout: function() {
-            if (!confirm('Logout dari console?')) return;
-            localStorage.removeItem(this.KEYS.SESSION);
-            this.user = null;
-            this.editMode = false;
-            this.feedbackList = [];
-            this.updateUIState();
-            this.renderAll();
-            this.closeModal('auth-modal');
-            this.toast('Logout berhasil', 'info');
-        },
-        
-        trackLogin: function() {
-            if (!this.user || !this.isOnline) return;
-            const device = /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'trackLogin', email: this.user.email, device })
-            }).catch(() => {});
-        },
-        
-        // ============================================================
-        // PANEL
-        // ============================================================
-        openPanel: function() {
-            const panel = document.getElementById('settings-panel');
-            panel.classList.remove('hidden');
-            this.panelOpen = true;
-            this.renderPanel();
-            lucide.createIcons();
-        },
-        
-        closePanel: function() {
-            const panel = document.getElementById('settings-panel');
-            const content = document.getElementById('panel-content');
-            content.classList.remove('panel-enter');
-            content.classList.add('panel-exit');
-            setTimeout(() => {
-                panel.classList.add('hidden');
-                content.classList.remove('panel-exit');
-                this.panelOpen = false;
-            }, 200);
-        },
-        
-        setPanelTab: function(tab) { this.currentTab = tab; this.renderPanel(); },
-        
-        renderPanel: function() {
-            document.querySelectorAll('.ptab').forEach(t => {
-                if (t.dataset.ptab === this.currentTab) t.classList.add('ptab-active');
-                else t.classList.remove('ptab-active');
-            });
-            
-            const body = document.getElementById('panel-body');
-            const isLoggedIn = !!this.user;
-            const canEdit = isLoggedIn && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
-            const isSuperAdmin = isLoggedIn && this.user.jabatan.toLowerCase() === 'super admin';
-            
-            const tabs = {
-                info: () => this.renderTabInfo(canEdit),
-                kategori: () => this.renderTabKategori(canEdit),
-                users: () => this.renderTabUsers(isSuperAdmin),
-                feedback: () => this.renderTabFeedback(isSuperAdmin || (isLoggedIn && this.user.jabatan.toLowerCase() === 'admin')),
-                backup: () => this.renderTabBackup(canEdit),
-                prefs: () => this.renderTabPrefs()
-            };
-            body.innerHTML = (tabs[this.currentTab] || tabs.info)();
-            lucide.createIcons();
-        },
-        
-        renderTabInfo: function(canEdit) {
+        renderInfoPage: function() {
             const info = this.info || {};
-            const disabled = canEdit ? '' : 'disabled';
-            const dis = canEdit ? '' : 'opacity-50 cursor-not-allowed';
-            
-            const inputCls = `w-full bg-ink-850 border border-ink-750 focus:border-accent/50 focus:ring-2 focus:ring-accent/20 rounded-2xl px-4 py-2.5 text-sm text-white outline-none transition ${dis}`;
-            const labelCls = "block text-[10px] font-bold uppercase text-zinc-500 mb-1.5";
+            const canEdit = this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
+            const d = canEdit ? '' : 'disabled';
             
             return `
-                <div class="space-y-4">
-                    <div class="p-3.5 bg-accent/5 border border-accent/20 rounded-2xl">
-                        <p class="text-[11px] text-accent leading-relaxed">
-                            <i data-lucide="info" class="w-3 h-3 inline mr-1"></i>
-                            Banner muncul di atas halaman utama.
-                        </p>
+                <div class="max-w-2xl space-y-4">
+                    <div class="card p-4">
+                        <div class="flex items-center gap-2 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
+                                <i data-lucide="megaphone" class="w-4 h-4 text-accent"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">Banner Pengumuman</h3>
+                                <p class="text-[10px] text-zinc-500">Muncul di atas dashboard</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Status</label>
+                                <select id="info-status" ${d} class="input">
+                                    <option value="ON" ${info.STATUS === 'ON' ? 'selected' : ''}>ON</option>
+                                    <option value="OFF" ${info.STATUS !== 'ON' ? 'selected' : ''}>OFF</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Pesan</label>
+                                <textarea id="info-pesan" rows="3" ${d} class="input resize-none">${this.escape(info.PESAN || '')}</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Warna</label>
+                                <select id="info-warna" ${d} class="input">
+                                    ${['indigo','sky','emerald','amber','rose'].map(c => `<option value="${c}" ${info.WARNA === c ? 'selected' : ''}>${c}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div>
-                        <label class="${labelCls}">Status Banner</label>
-                        <select id="info-status" ${disabled} class="${inputCls}">
-                            <option value="ON" ${info.STATUS === 'ON' ? 'selected' : ''}>ON</option>
-                            <option value="OFF" ${info.STATUS !== 'ON' ? 'selected' : ''}>OFF</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="${labelCls}">Pesan Banner</label>
-                        <textarea id="info-pesan" rows="3" ${disabled} class="${inputCls} resize-none">${this.escape(info.PESAN || '')}</textarea>
-                    </div>
-                    
-                    <div>
-                        <label class="${labelCls}">Warna</label>
-                        <select id="info-warna" ${disabled} class="${inputCls}">
-                            ${['blue','green','red','yellow','indigo'].map(c => `<option value="${c}" ${info.WARNA === c ? 'selected' : ''}>${c}</option>`).join('')}
-                        </select>
-                    </div>
-                    
-                    <hr class="border-ink-800">
-                    
-                    <div>
-                        <label class="${labelCls}">Versi Aplikasi</label>
-                        <input type="text" id="info-versi" value="${this.escape(info.VERSI || '1.0')}" ${disabled} class="${inputCls}">
+                    <div class="card p-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
+                                <i data-lucide="package" class="w-4 h-4 text-accent"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">Versi Aplikasi</h3>
+                            </div>
+                        </div>
+                        <input type="text" id="info-versi" value="${this.escape(info.VERSI || '1.0')}" ${d} class="input">
                     </div>
                     
                     ${canEdit ? `
-                        <button onclick="app.saveInfo()" class="w-full px-4 py-3 bg-accent hover:bg-accent-hover text-black rounded-2xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition">
-                            <i data-lucide="save" class="w-4 h-4"></i> Simpan Info
+                        <button onclick="app.saveInfo()" class="btn btn-primary w-full py-3">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <span>Simpan</span>
                         </button>
-                    ` : `<p class="text-[11px] text-center text-zinc-500 py-2">Login sebagai Admin untuk mengedit</p>`}
+                    ` : `
+                        <div class="card p-4 text-center text-xs text-zinc-500">
+                            <i data-lucide="lock" class="w-4 h-4 inline mr-1"></i>
+                            Login sebagai admin untuk mengedit
+                        </div>
+                    `}
                 </div>
             `;
         },
@@ -1301,73 +1072,77 @@
             };
             this.info = { ...this.info, ...data };
             this.saveCache();
-            this.renderInfoBanner();
             this.queuePending({ action: 'saveInfo', data, userEmail: this.user?.email });
             this.syncPending();
             this.toast('Info disimpan', 'success');
         },
         
-        renderTabKategori: function(canEdit) {
+        // ============================================================
+        // KATEGORI PAGE
+        // ============================================================
+        renderKategoriPage: function() {
+            const canEdit = this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
+            
             const list = this.kategori.map(k => `
-                <div class="flex items-center gap-3 p-3 bg-ink-850 border border-ink-750 rounded-2xl">
-                    <div class="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+                <div class="card p-3 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-accent-soft flex items-center justify-center shrink-0">
                         <i data-lucide="${k.ICON || 'folder'}" class="w-4 h-4 text-accent"></i>
                     </div>
-                    <span class="flex-1 font-semibold text-xs text-white">${this.escape(k.NAMA)}</span>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-white">${this.escape(k.NAMA)}</p>
+                        <p class="text-[10px] text-zinc-500">${this.menu.filter(m => m.KATEGORI === k.NAMA && m.DELETED !== true && m.DELETED !== 'TRUE').length} menu</p>
+                    </div>
                     ${canEdit ? `
-                        <button onclick="app.editKategoriInline('${k.ID}')" class="p-1.5 text-zinc-500 hover:text-accent rounded-lg hover:bg-ink-800">
-                            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                        <button onclick="app.editKategoriInline('${k.ID}')" class="icon-btn w-7 h-7">
+                            <i data-lucide="pencil" class="w-3 h-3"></i>
                         </button>
-                        <button onclick="app.deleteKategoriInline('${k.ID}')" class="p-1.5 text-zinc-500 hover:text-red-400 rounded-lg hover:bg-ink-800">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        <button onclick="app.deleteKategoriInline('${k.ID}')" class="icon-btn w-7 h-7 text-red-400">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i>
                         </button>
                     ` : ''}
                 </div>
             `).join('');
             
             return `
-                <div class="space-y-3">
+                <div class="max-w-2xl space-y-4">
                     ${canEdit ? `
-                        <button onclick="app.addKategoriInline()" class="w-full px-4 py-3 bg-accent hover:bg-accent-hover text-black rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition">
-                            <i data-lucide="plus" class="w-4 h-4"></i> Tambah Kategori
+                        <button onclick="app.addKategoriInline()" class="btn btn-primary w-full py-3">
+                            <i data-lucide="plus" class="w-4 h-4"></i>
+                            <span>Tambah Kategori</span>
                         </button>
                     ` : ''}
                     <div class="space-y-2">
-                        ${list || '<p class="text-xs text-center text-zinc-500 py-6">Belum ada kategori</p>'}
+                        ${list || '<div class="card p-8 text-center text-xs text-zinc-500"><i data-lucide="folder" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>Belum ada kategori</div>'}
                     </div>
                 </div>
             `;
         },
         
         addKategoriInline: function() {
-            const nama = prompt('Nama kategori baru:');
-            if (!nama || !nama.trim()) return;
-            const icon = prompt('Icon (Lucide name):', 'folder') || 'folder';
+            const nama = prompt('Nama kategori:');
+            if (!nama?.trim()) return;
+            const icon = prompt('Icon Lucide (contoh: folder):', 'folder') || 'folder';
             const data = { ID: null, NAMA: nama.trim(), ICON: icon.trim() };
-            this.kategori.push({ ...data, ID: 'tmp-' + Date.now(), WARNA: 'zinc', URUTAN: this.kategori.length + 1 });
+            this.kategori.push({ ...data, ID: 'tmp-' + Date.now(), URUTAN: this.kategori.length + 1 });
             this.saveCache();
-            this.renderPanel();
-            this.renderAll();
+            this.renderCurrentView();
             this.queuePending({ action: 'saveKategori', data, userEmail: this.user?.email });
             this.syncPending();
-            this.toast('Kategori ditambahkan', 'success');
         },
         
         editKategoriInline: function(id) {
             const k = this.kategori.find(x => x.ID === id);
             if (!k) return;
             const nama = prompt('Nama kategori:', k.NAMA);
-            if (!nama || !nama.trim()) return;
+            if (!nama?.trim()) return;
             const icon = prompt('Icon:', k.ICON || 'folder') || 'folder';
             const data = { ID: id, NAMA: nama.trim(), ICON: icon.trim() };
             const idx = this.kategori.findIndex(x => x.ID === id);
             if (idx >= 0) this.kategori[idx] = { ...this.kategori[idx], ...data };
             this.saveCache();
-            this.renderPanel();
-            this.renderAll();
+            this.renderCurrentView();
             this.queuePending({ action: 'saveKategori', data, userEmail: this.user?.email });
             this.syncPending();
-            this.toast('Kategori diupdate', 'success');
         },
         
         deleteKategoriInline: function(id) {
@@ -1376,40 +1151,46 @@
             if (!confirm(`Hapus kategori "${k.NAMA}"?`)) return;
             this.kategori = this.kategori.filter(x => x.ID !== id);
             this.saveCache();
-            this.renderPanel();
-            this.renderAll();
+            this.renderCurrentView();
             this.queuePending({ action: 'deleteKategori', id, userEmail: this.user?.email });
             this.syncPending();
-            this.toast('Kategori dihapus', 'success');
         },
         
-        renderTabUsers: function(isSuperAdmin) {
-            if (!isSuperAdmin) return `<div class="text-center py-12"><i data-lucide="shield-lock" class="w-10 h-10 text-zinc-700 mx-auto mb-3"></i><p class="text-xs text-zinc-500">Hanya Super Admin</p></div>`;
+        // ============================================================
+        // USERS PAGE
+        // ============================================================
+        renderUsersPage: function() {
+            const isSA = this.user && this.user.jabatan.toLowerCase() === 'super admin';
+            if (!isSA) return `<div class="card p-10 text-center text-xs text-zinc-500"><i data-lucide="shield-lock" class="w-8 h-8 mx-auto mb-3 opacity-40"></i>Hanya Super Admin</div>`;
             
             const list = this.users.map(u => `
-                <div class="flex items-center gap-3 p-3 bg-ink-850 border border-ink-750 rounded-2xl">
-                    <div class="w-9 h-9 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-[11px] font-bold text-accent shrink-0">
+                <div class="card p-3 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-full bg-accent-soft flex items-center justify-center text-[11px] font-bold text-accent shrink-0">
                         ${this.escape(String(u.NAMA || u.EMAIL).substring(0, 2).toUpperCase())}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-semibold text-xs text-white truncate">${this.escape(u.NAMA || '')}</p>
-                        <p class="text-[10px] text-zinc-500 truncate">${this.escape(u.EMAIL || '')} · ${this.escape(u.JABATAN || '')}</p>
+                        <p class="text-xs font-semibold text-white truncate">${this.escape(u.NAMA || '')}</p>
+                        <p class="text-[10px] text-zinc-500 truncate">${this.escape(u.EMAIL || '')}</p>
+                        <p class="text-[10px] text-accent mt-0.5">${this.escape(u.JABATAN || '')}</p>
                     </div>
-                    <button onclick="app.editUserInline('${this.escape(u.EMAIL)}')" class="p-1.5 text-zinc-500 hover:text-accent rounded-lg hover:bg-ink-800">
-                        <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                    <button onclick="app.editUserInline('${this.escape(u.EMAIL)}')" class="icon-btn w-7 h-7">
+                        <i data-lucide="pencil" class="w-3 h-3"></i>
                     </button>
-                    <button onclick="app.deleteUserInline('${this.escape(u.EMAIL)}')" class="p-1.5 text-zinc-500 hover:text-red-400 rounded-lg hover:bg-ink-800">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    <button onclick="app.deleteUserInline('${this.escape(u.EMAIL)}')" class="icon-btn w-7 h-7 text-red-400">
+                        <i data-lucide="trash-2" class="w-3 h-3"></i>
                     </button>
                 </div>
             `).join('');
             
             return `
-                <div class="space-y-3">
-                    <button onclick="app.addUserInline()" class="w-full px-4 py-3 bg-accent hover:bg-accent-hover text-black rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-accent/20 transition">
-                        <i data-lucide="user-plus" class="w-4 h-4"></i> Tambah User
+                <div class="max-w-2xl space-y-4">
+                    <button onclick="app.addUserInline()" class="btn btn-primary w-full py-3">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        <span>Tambah User</span>
                     </button>
-                    <div class="space-y-2">${list || '<p class="text-xs text-center text-zinc-500 py-6">Belum ada user</p>'}</div>
+                    <div class="space-y-2">
+                        ${list || '<div class="card p-8 text-center text-xs text-zinc-500">Belum ada user</div>'}
+                    </div>
                 </div>
             `;
         },
@@ -1421,11 +1202,8 @@
             const unit = prompt('Unit:', '') || '';
             const password = prompt('Password:'); if (!password) return;
             const data = { EMAIL: email.toLowerCase().trim(), NAMA: nama, JABATAN: jabatan, UNIT: unit, PASSWORD: password, STATUS: 'aktif' };
-            this.users.push({ EMAIL: data.EMAIL, NAMA: nama, JABATAN: jabatan, UNIT: unit, STATUS: 'aktif' });
-            this.saveCache();
-            this.renderPanel();
-            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveUser', data, userEmail: this.user?.email }) })
-                .then(r => r.json()).then(res => this.toast(res.status === 'success' ? 'User ditambahkan' : res.message, res.status === 'success' ? 'success' : 'error'));
+            this.apiPost({ action: 'saveUser', data, userEmail: this.user?.email });
+            setTimeout(() => this.syncNow(true), 800);
         },
         
         editUserInline: function(email) {
@@ -1438,72 +1216,77 @@
             const status = prompt('Status (aktif/nonaktif):', u.STATUS || 'aktif') || 'aktif';
             const data = { EMAIL: email, NAMA: nama, JABATAN: jabatan, UNIT: unit, STATUS: status };
             if (password) data.PASSWORD = password;
-            const idx = this.users.findIndex(x => x.EMAIL === email);
-            if (idx >= 0) this.users[idx] = { ...this.users[idx], NAMA: nama, JABATAN: jabatan, UNIT: unit, STATUS: status };
-            this.saveCache();
-            this.renderPanel();
-            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'saveUser', data, userEmail: this.user?.email }) })
-                .then(r => r.json()).then(res => this.toast(res.status === 'success' ? 'User diupdate' : res.message, res.status === 'success' ? 'success' : 'error'));
+            this.apiPost({ action: 'saveUser', data, userEmail: this.user?.email });
+            setTimeout(() => this.syncNow(true), 800);
         },
         
         deleteUserInline: function(email) {
             if (!confirm(`Hapus user ${email}?`)) return;
-            this.users = this.users.filter(x => x.EMAIL !== email);
-            this.saveCache();
-            this.renderPanel();
-            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteUser', email, userEmail: this.user?.email }) })
-                .then(r => r.json()).then(res => this.toast(res.status === 'success' ? 'User dihapus' : res.message, res.status === 'success' ? 'success' : 'error'));
+            this.apiPost({ action: 'deleteUser', email, userEmail: this.user?.email });
+            setTimeout(() => this.syncNow(true), 800);
         },
         
-        renderTabFeedback: function(isAdmin) {
+        // ============================================================
+        // FEEDBACK PAGE
+        // ============================================================
+        renderFeedbackPage: function() {
+            const isAdmin = this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
+            
             if (!isAdmin) {
                 return `
-                    <div class="space-y-3">
-                        <p class="text-xs text-zinc-400 mb-2">Kirim feedback ke admin:</p>
-                        <select id="fb-tipe" class="w-full bg-ink-850 border border-ink-750 rounded-2xl px-4 py-2.5 text-sm text-white outline-none">
-                            <option value="saran">💡 Saran</option>
-                            <option value="bug">🐛 Bug</option>
-                            <option value="lain">📝 Lainnya</option>
-                        </select>
-                        <textarea id="fb-pesan" rows="4" placeholder="Tulis pesan..." class="w-full bg-ink-850 border border-ink-750 rounded-2xl px-4 py-3 text-sm text-white placeholder-zinc-500 resize-none outline-none"></textarea>
-                        <button onclick="app.sendFeedback()" class="w-full px-4 py-3 bg-accent hover:bg-accent-hover text-black rounded-2xl text-xs font-bold flex items-center justify-center gap-2">
-                            <i data-lucide="send" class="w-3.5 h-3.5"></i> Kirim
-                        </button>
+                    <div class="max-w-2xl space-y-3">
+                        <div class="card p-5">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i data-lucide="message-circle" class="w-4 h-4 text-accent"></i>
+                                <h3 class="text-sm font-semibold text-white">Kirim Feedback</h3>
+                            </div>
+                            <div class="space-y-3">
+                                <select id="fb-tipe" class="input">
+                                    <option value="saran">💡 Saran</option>
+                                    <option value="bug">🐛 Laporan Bug</option>
+                                    <option value="lain">📝 Lainnya</option>
+                                </select>
+                                <textarea id="fb-pesan" rows="4" placeholder="Tulis pesan..." class="input resize-none"></textarea>
+                                <button onclick="app.sendFeedback()" class="btn btn-primary w-full py-2.5">
+                                    <i data-lucide="send" class="w-4 h-4"></i> Kirim
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 `;
             }
             
             if (this.feedbackList.length === 0) {
-                return `<div class="text-center py-12 text-zinc-600"><i data-lucide="inbox" class="w-10 h-10 mx-auto mb-3 opacity-50"></i><p class="text-xs">Belum ada feedback</p></div>`;
+                return `<div class="card p-10 text-center text-xs text-zinc-500"><i data-lucide="inbox" class="w-8 h-8 mx-auto mb-3 opacity-40"></i>Belum ada feedback</div>`;
             }
             
             const statusColor = {
-                baru: 'bg-red-500/20 text-red-400 border-red-500/30',
-                dibaca: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-                diproses: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-                selesai: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                baru: 'bg-red-500/15 text-red-300 border-red-500/25',
+                dibaca: 'bg-amber-500/15 text-amber-300 border-amber-500/25',
+                diproses: 'bg-sky-500/15 text-sky-300 border-sky-500/25',
+                selesai: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/25'
             };
             const tipeIcon = { saran: '💡', bug: '🐛', lain: '📝' };
             
             return `
-                <div class="space-y-2">
-                    <p class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest px-1 mb-2">${this.feedbackList.length} feedback</p>
+                <div class="max-w-2xl space-y-2">
+                    <p class="text-[10px] text-zinc-500 uppercase font-semibold tracking-wider mb-3">${this.feedbackList.length} feedback</p>
                     ${this.feedbackList.map(f => `
-                        <div class="p-3.5 bg-ink-850 border border-ink-750 rounded-2xl space-y-2">
+                        <div class="card p-3.5 space-y-2">
                             <div class="flex items-start justify-between gap-2">
                                 <div class="flex items-center gap-1.5 flex-wrap">
                                     <span class="text-sm">${tipeIcon[f.TIPE] || '📝'}</span>
                                     <span class="text-[9px] font-mono text-zinc-500">${this.escape(f.WAKTU)}</span>
                                     <span class="text-[9px] uppercase font-bold px-2 py-0.5 rounded-full border ${statusColor[String(f.STATUS).toLowerCase()] || statusColor.baru}">${this.escape(f.STATUS || 'baru')}</span>
                                 </div>
-                                <button onclick="app.deleteFeedbackInline('${f.ID}')" class="text-zinc-500 hover:text-red-400 p-1">
+                                <button onclick="app.deleteFeedbackInline('${f.ID}')" class="icon-btn w-7 h-7 text-red-400">
                                     <i data-lucide="trash-2" class="w-3 h-3"></i>
                                 </button>
                             </div>
-                            <p class="text-xs text-zinc-300 whitespace-pre-wrap leading-relaxed">${this.escape(f.PESAN)}</p>
-                            <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-1 border-t border-ink-800">
+                            <p class="text-xs text-zinc-300 whitespace-pre-wrap">${this.escape(f.PESAN)}</p>
+                            <div class="flex items-center justify-between text-[10px] text-zinc-500 pt-2 border-t border-ink-750">
                                 <span class="truncate">${this.escape(f.PENGIRIM || 'anon')}</span>
-                                <select onchange="app.updateFeedbackStatusInline('${f.ID}', this.value)" class="text-[10px] bg-ink-900 border border-ink-750 rounded-lg px-2 py-1 text-white outline-none">
+                                <select onchange="app.updateFeedbackStatusInline('${f.ID}', this.value)" class="input py-0.5 px-2 w-auto text-[10px]">
                                     <option value="baru" ${f.STATUS==='baru'?'selected':''}>Baru</option>
                                     <option value="dibaca" ${f.STATUS==='dibaca'?'selected':''}>Dibaca</option>
                                     <option value="diproses" ${f.STATUS==='diproses'?'selected':''}>Diproses</option>
@@ -1526,103 +1309,114 @@
                     if (res.status === 'success') {
                         this.feedbackList = res.data || [];
                         this.saveCache();
-                        if (this.panelOpen && this.currentTab === 'feedback') this.renderPanel();
+                        this.updateFeedbackBadge();
+                        if (this.currentView === 'feedback') this.renderCurrentView();
                     }
                 }).catch(() => {});
+        },
+        
+        updateFeedbackBadge: function() {
+            const badge = document.getElementById('nav-feedback-badge');
+            if (!badge) return;
+            const count = this.feedbackList.filter(f => String(f.STATUS).toLowerCase() === 'baru').length;
+            if (count > 0) { badge.textContent = count > 9 ? '9+' : count; badge.classList.remove('hidden'); }
+            else badge.classList.add('hidden');
         },
         
         sendFeedback: function() {
             const tipe = document.getElementById('fb-tipe').value;
             const pesan = document.getElementById('fb-pesan').value.trim();
             if (!pesan) { this.toast('Pesan wajib', 'error'); return; }
-            fetch(this.apiURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: 'saveFeedback', data: { tipe, pesan, pengirim: this.user?.nama || 'anon', kontak: this.user?.email || '' } })
-            }).then(r => r.json()).then(res => {
-                if (res.status === 'success') { this.toast('Terima kasih!', 'success'); document.getElementById('fb-pesan').value = ''; }
-                else this.toast(res.message, 'error');
-            }).catch(() => this.toast('Gagal', 'error'));
+            this.apiPost({ action: 'saveFeedback', data: { tipe, pesan, pengirim: this.user?.nama || 'anon', kontak: this.user?.email || '' } });
+            document.getElementById('fb-pesan').value = '';
+            this.toast('Terima kasih!', 'success');
         },
         
         updateFeedbackStatusInline: function(id, status) {
             const f = this.feedbackList.find(x => x.ID === id);
             if (f) f.STATUS = status;
             this.saveCache();
-            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'updateFeedback', id, status, userEmail: this.user?.email }) }).catch(() => {});
+            this.apiPost({ action: 'updateFeedback', id, status, userEmail: this.user?.email });
         },
         
         deleteFeedbackInline: function(id) {
             if (!confirm('Hapus feedback?')) return;
             this.feedbackList = this.feedbackList.filter(x => x.ID !== id);
             this.saveCache();
-            this.renderPanel();
-            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'deleteFeedback', id, userEmail: this.user?.email }) }).catch(() => {});
+            this.renderCurrentView();
+            this.apiPost({ action: 'deleteFeedback', id, userEmail: this.user?.email });
         },
         
-        renderTabBackup: function(canEdit) {
-            if (!canEdit) return `<div class="text-center py-12"><i data-lucide="lock" class="w-10 h-10 text-zinc-700 mx-auto mb-3"></i><p class="text-xs text-zinc-500">Login sebagai Admin</p></div>`;
+        // ============================================================
+        // BACKUP PAGE
+        // ============================================================
+        renderBackupPage: function() {
+            const canEdit = this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
+            if (!canEdit) return `<div class="card p-10 text-center text-xs text-zinc-500"><i data-lucide="lock" class="w-8 h-8 mx-auto mb-3 opacity-40"></i>Login sebagai admin</div>`;
             
             const cacheSize = (localStorage.getItem(this.KEYS.CACHE) || '').length;
             const pendingCount = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]').length;
             const lastSync = localStorage.getItem(this.KEYS.LAST_SYNC) || '-';
             
             return `
-                <div class="space-y-4">
-                    <div class="p-4 bg-ink-850 border border-ink-750 rounded-2xl space-y-2.5 text-xs">
-                        <div class="flex justify-between"><span class="text-zinc-500">Cache size</span><span class="font-mono text-white">${(cacheSize/1024).toFixed(1)} KB</span></div>
-                        <div class="flex justify-between"><span class="text-zinc-500">Pending ops</span><span class="font-mono text-white">${pendingCount}</span></div>
+                <div class="max-w-2xl space-y-4">
+                    <div class="card p-4 space-y-2.5 text-xs">
+                        <div class="flex justify-between"><span class="text-zinc-500">Cache</span><span class="font-mono text-white">${(cacheSize/1024).toFixed(1)} KB</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Pending</span><span class="font-mono ${pendingCount > 0 ? 'text-amber-300' : 'text-white'}">${pendingCount}</span></div>
                         <div class="flex justify-between"><span class="text-zinc-500">Last sync</span><span class="font-mono text-white text-[10px]">${lastSync}</span></div>
                         <div class="flex justify-between"><span class="text-zinc-500">Total menu</span><span class="font-mono text-white">${this.menu.length}</span></div>
                     </div>
                     
-                    <div class="p-4 bg-accent/5 border border-accent/20 rounded-2xl">
-                        <div class="flex items-start gap-3 mb-3">
-                            <div class="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+                    <div class="card p-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
                                 <i data-lucide="zap" class="w-4 h-4 text-accent"></i>
                             </div>
-                            <div>
-                                <p class="text-xs font-bold text-white">Force Sync</p>
-                                <p class="text-[10px] text-zinc-400 mt-0.5 leading-relaxed">
-                                    Reset cache, update aplikasi ke versi terbaru, ambil data fresh dari server.
-                                </p>
+                            <div class="flex-1">
+                                <h3 class="text-sm font-semibold text-white">Force Sync</h3>
+                                <p class="text-[10px] text-zinc-500">Reset cache + update app ke versi terbaru</p>
                             </div>
                         </div>
-                        <button onclick="app.forceSync()" class="w-full px-4 py-3 bg-accent hover:bg-accent-hover text-black rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-accent/20">
-                            <i data-lucide="zap" class="w-4 h-4"></i> Jalankan Force Sync
+                        <button onclick="app.forceSync()" class="btn btn-primary w-full py-2.5">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                            <span>Jalankan Force Sync</span>
                         </button>
-                        <p class="text-[10px] text-zinc-500 text-center mt-2">Shortcut: Ctrl+Shift+R</p>
                     </div>
                     
-                    <button onclick="app.exportJSON()" class="w-full px-4 py-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition">
-                        <i data-lucide="download" class="w-4 h-4"></i> Export Backup
-                    </button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="app.exportJSON()" class="btn btn-ghost py-3">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span>Export</span>
+                        </button>
+                        <label class="btn btn-ghost py-3 cursor-pointer">
+                            <i data-lucide="upload" class="w-4 h-4"></i>
+                            <span>Import</span>
+                            <input type="file" accept=".json" class="hidden" onchange="app.importJSON(event)">
+                        </label>
+                    </div>
                     
-                    <label class="w-full px-4 py-3 bg-ink-850 hover:bg-ink-750 text-white border border-ink-750 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition">
-                        <i data-lucide="upload" class="w-4 h-4"></i> Import Backup
-                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="app.importJSON(event)">
-                    </label>
-                    
-                    <hr class="border-ink-800">
-                    
-                    <button onclick="app.clearCache()" class="w-full px-4 py-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-2xl text-xs font-bold transition">
-                        <i data-lucide="refresh-cw" class="w-4 h-4 inline mr-1"></i> Clear Cache & Sync
-                    </button>
-                    
-                    <button onclick="app.factoryReset()" class="w-full px-4 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-2xl text-xs font-bold transition">
-                        <i data-lucide="alert-triangle" class="w-4 h-4 inline mr-1"></i> Reset Semua Data
-                    </button>
+                    <div class="card p-4 space-y-3">
+                        <h4 class="text-xs font-semibold text-red-400 uppercase tracking-wider">Zona Berbahaya</h4>
+                        <button onclick="app.clearCache()" class="btn btn-ghost w-full py-2.5">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            <span>Clear Cache & Sync</span>
+                        </button>
+                        <button onclick="app.factoryReset()" class="btn btn-danger w-full py-2.5">
+                            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                            <span>Reset Semua Data</span>
+                        </button>
+                    </div>
                 </div>
             `;
         },
         
         exportJSON: function() {
-            const data = { version: '3.3', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
+            const data = { version: '4.0', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `superapp-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `console-backup-${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
             this.toast('Backup didownload', 'success');
@@ -1635,8 +1429,8 @@
             reader.onload = (e) => {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (!data.menu) throw new Error('Invalid');
-                    this.toast(`File ${data.menu.length} menu. Apply manual via Sheet.`, 'warning');
+                    if (!data.menu) throw new Error('Format invalid');
+                    this.toast(`File berisi ${data.menu.length} menu — apply manual via Sheet`, 'warning');
                 } catch(err) { this.toast('File tidak valid', 'error'); }
                 event.target.value = '';
             };
@@ -1650,65 +1444,60 @@
             this.menu = []; this.kategori = [];
             this.saveCache();
             this.syncNow();
-            this.closePanel();
         },
         
         factoryReset: function() {
-            if (!confirm('Reset SEMUA data lokal?')) return;
-            if (!confirm('Yakin? Tidak bisa dibatalkan.')) return;
+            if (!confirm('Reset SEMUA data lokal? Anda akan logout.')) return;
+            if (!confirm('Yakin?')) return;
             Object.values(this.KEYS).forEach(k => localStorage.removeItem(k));
             location.reload();
         },
         
-        renderTabPrefs: function() {
+        // ============================================================
+        // PREFS PAGE
+        // ============================================================
+        renderPrefsPage: function() {
             const p = this.prefs;
-            const cardCls = "flex items-center justify-between p-4 bg-ink-850 border border-ink-750 rounded-2xl cursor-pointer";
-            
             return `
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-2 px-1">Tampilan Default</label>
+                <div class="max-w-2xl space-y-4">
+                    <div class="card p-4">
+                        <h3 class="text-sm font-semibold text-white mb-3">Tampilan</h3>
                         <div class="flex gap-2">
-                            <button onclick="app.setPref('view','grid')" class="flex-1 px-4 py-3 rounded-2xl text-xs font-bold border transition ${p.view==='grid' ? 'bg-accent text-black border-accent shadow-lg shadow-accent/20' : 'border-ink-750 text-zinc-400 hover:border-ink-700'}">
-                                <i data-lucide="layout-grid" class="w-4 h-4 inline mr-1"></i> Grid
+                            <button onclick="app.setPref('view','grid')" class="btn ${p.view==='grid' ? 'btn-primary' : 'btn-ghost'} flex-1 py-2.5">
+                                <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                                <span>Grid</span>
                             </button>
-                            <button onclick="app.setPref('view','list')" class="flex-1 px-4 py-3 rounded-2xl text-xs font-bold border transition ${p.view==='list' ? 'bg-accent text-black border-accent shadow-lg shadow-accent/20' : 'border-ink-750 text-zinc-400 hover:border-ink-700'}">
-                                <i data-lucide="layout-list" class="w-4 h-4 inline mr-1"></i> List
+                            <button onclick="app.setPref('view','list')" class="btn ${p.view==='list' ? 'btn-primary' : 'btn-ghost'} flex-1 py-2.5">
+                                <i data-lucide="layout-list" class="w-4 h-4"></i>
+                                <span>List</span>
                             </button>
                         </div>
                     </div>
                     
-                    <label class="${cardCls}">
-                        <div>
-                            <p class="text-xs font-semibold text-white">Click Counter</p>
-                            <p class="text-[10px] text-zinc-500 mt-0.5">Tampilkan jumlah klik</p>
-                        </div>
-                        <input type="checkbox" ${p.showClicks ? 'checked' : ''} onchange="app.setPref('showClicks', this.checked)" class="w-4 h-4 rounded accent-amber-400">
-                    </label>
-                    
-                    <label class="${cardCls}">
-                        <div>
-                            <p class="text-xs font-semibold text-white">Banner Info</p>
-                            <p class="text-[10px] text-zinc-500 mt-0.5">Tampilkan pengumuman</p>
-                        </div>
-                        <input type="checkbox" ${p.showBanner ? 'checked' : ''} onchange="app.setPref('showBanner', this.checked)" class="w-4 h-4 rounded accent-amber-400">
-                    </label>
-                    
-                    <label class="${cardCls}">
-                        <div>
-                            <p class="text-xs font-semibold text-white">Auto Sync</p>
-                            <p class="text-[10px] text-zinc-500 mt-0.5">Sync tiap ${p.autoSyncInterval} menit</p>
-                        </div>
-                        <input type="checkbox" ${p.autoSync ? 'checked' : ''} onchange="app.setPref('autoSync', this.checked)" class="w-4 h-4 rounded accent-amber-400">
-                    </label>
-                    
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase text-zinc-500 mb-1.5 px-1">Interval (menit)</label>
-                        <input type="number" min="1" max="60" value="${p.autoSyncInterval}" onchange="app.setPref('autoSyncInterval', Number(this.value))" class="w-full bg-ink-850 border border-ink-750 focus:border-accent/50 rounded-2xl px-4 py-2.5 text-sm text-white outline-none">
+                    <div class="card p-4 space-y-3">
+                        <h3 class="text-sm font-semibold text-white">Options</h3>
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <div>
+                                <p class="text-xs font-medium text-white">Click Counter</p>
+                                <p class="text-[10px] text-zinc-500 mt-0.5">Tampilkan jumlah klik</p>
+                            </div>
+                            <input type="checkbox" ${p.showClicks ? 'checked' : ''} onchange="app.setPref('showClicks', this.checked)" class="w-4 h-4 rounded">
+                        </label>
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <div>
+                                <p class="text-xs font-medium text-white">Banner Info</p>
+                                <p class="text-[10px] text-zinc-500 mt-0.5">Tampilkan pengumuman</p>
+                            </div>
+                            <input type="checkbox" ${p.showBanner ? 'checked' : ''} onchange="app.setPref('showBanner', this.checked)" class="w-4 h-4 rounded">
+                        </label>
                     </div>
                     
-                    <div class="p-4 bg-accent/5 border border-accent/20 rounded-2xl">
-                        <p class="text-[11px] text-accent leading-relaxed">💡 Aplikasi tidak refresh otomatis saat dibuka. Klik tombol Sync untuk memperbarui.</p>
+                    <div class="card p-4">
+                        <h3 class="text-sm font-semibold text-white mb-3">Data Terakhir</h3>
+                        <button onclick="app.syncNow()" class="btn btn-ghost w-full py-2.5">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            <span>Sync Sekarang</span>
+                        </button>
                     </div>
                 </div>
             `;
@@ -1717,113 +1506,549 @@
         setPref: function(key, value) {
             this.prefs[key] = value;
             this.savePrefs();
-            this.renderPanel();
-            if (key === 'view') { this.updateViewIcon(); this.renderAll(); }
-            if (key === 'showClicks' || key === 'showBanner') this.renderAll();
+            this.renderCurrentView();
+            if (key === 'view') this.updateViewIcon();
         },
         
-        renderKategoriOptions: function() {
+        // ============================================================
+        // DIAGNOSTIC PAGE
+        // ============================================================
+        renderDiagnosticPage: function() {
+            return `
+                <div class="max-w-2xl space-y-4">
+                    <div class="card p-4">
+                        <h3 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+                            <i data-lucide="activity" class="w-4 h-4 text-accent"></i>
+                            Diagnostik Backend
+                        </h3>
+                        <p class="text-[11px] text-zinc-500 mb-3">Test koneksi & endpoint ke Google Apps Script.</p>
+                        <button onclick="app.runDiagnostic()" class="btn btn-primary w-full py-2.5">
+                            <i data-lucide="play" class="w-4 h-4"></i>
+                            <span>Jalankan Test</span>
+                        </button>
+                        <div id="diagnostic-output" class="mt-3"></div>
+                    </div>
+                    
+                    <div class="card p-4">
+                        <h3 class="text-sm font-semibold text-white mb-3">API URL</h3>
+                        <input type="text" id="diag-apiurl" value="${this.apiURL}" class="input font-mono text-[10px]">
+                        <button onclick="app.updateApiUrl()" class="btn btn-ghost w-full py-2 mt-2">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <span>Update URL</span>
+                        </button>
+                        <p class="text-[10px] text-zinc-500 mt-2">Ubah kalau deployment Apps Script berubah URL-nya.</p>
+                    </div>
+                    
+                    <div class="card p-4">
+                        <h3 class="text-sm font-semibold text-white mb-3">Info Device</h3>
+                        <div class="space-y-2 text-[11px] font-mono">
+                            <div class="flex justify-between"><span class="text-zinc-500">Online</span><span>${this.isOnline ? '✓' : '✗'}</span></div>
+                            <div class="flex justify-between"><span class="text-zinc-500">User</span><span>${this.user?.email || '-'}</span></div>
+                            <div class="flex justify-between"><span class="text-zinc-500">Role</span><span>${this.user?.jabatan || '-'}</span></div>
+                            <div class="flex justify-between"><span class="text-zinc-500">Cache</span><span>${(localStorage.getItem(this.KEYS.CACHE) || '').length} B</span></div>
+                            <div class="flex justify-between"><span class="text-zinc-500">SW</span><span>${'serviceWorker' in navigator ? 'available' : 'none'}</span></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+        
+        runDiagnostic: function() {
+            const out = document.getElementById('diagnostic-output');
+            out.innerHTML = '<p class="text-xs text-zinc-500 mt-2">Testing...</p>';
+            
+            const tests = [];
+            tests.push(fetch(`${this.apiURL}?action=ping`).then(r => r.json()).then(d => ({ name: 'Ping', status: d.status, data: d })).catch(e => ({ name: 'Ping', status: 'error', error: e.message })));
+            tests.push(fetch(`${this.apiURL}?action=bootstrap`).then(r => r.json()).then(d => ({ name: 'Bootstrap', status: d.status, data: { menu: d.data?.menu?.length } })).catch(e => ({ name: 'Bootstrap', status: 'error', error: e.message })));
+            
+            Promise.all(tests).then(results => {
+                out.innerHTML = results.map(r => `
+                    <div class="mt-2 p-2 rounded-lg border ${r.status === 'success' ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-red-500/30 bg-red-500/5'}">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold ${r.status === 'success' ? 'text-emerald-300' : 'text-red-300'}">${r.name}</span>
+                            <span class="text-[10px] font-mono">${r.status}</span>
+                        </div>
+                        <pre class="text-[9px] text-zinc-400 mt-1 whitespace-pre-wrap">${this.escape(JSON.stringify(r.data || r.error, null, 2).substring(0, 300))}</pre>
+                    </div>
+                `).join('');
+            });
+        },
+        
+        updateApiUrl: function() {
+            const url = document.getElementById('diag-apiurl').value.trim();
+            if (!url) return;
+            this.apiURL = url;
+            localStorage.setItem('sa4_apiurl', url);
+            this.toast('API URL diupdate', 'success');
+        },
+        
+        // ============================================================
+        // SYNC
+        // ============================================================
+        syncNow: function(silent) {
+            if (!this.isOnline) {
+                if (!silent) this.toast('Offline', 'warning');
+                this.updateSyncIndicator('offline');
+                return;
+            }
+            
+            this.updateSyncIndicator('syncing');
+            const btn = document.getElementById('btn-sync');
+            if (btn) btn.querySelector('i').classList.add('animate-spin');
+            
+            fetch(`${this.apiURL}?action=bootstrap`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.status !== 'success') throw new Error(res.message);
+                    const d = res.data;
+                    if (d.menu) this.menu = d.menu;
+                    if (d.kategori) this.kategori = d.kategori;
+                    if (d.info) this.info = d.info;
+                    if (d.footer) this.footer = d.footer;
+                    if (d.users) this.users = d.users;
+                    this.saveCache();
+                    localStorage.setItem(this.KEYS.LAST_SYNC, res.serverTime);
+                    this.renderCurrentView();
+                    this.updateSyncIndicator('synced');
+                    if (!silent) this.toast('Data tersinkron', 'success');
+                    if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) this.loadFeedback(silent);
+                })
+                .catch(err => {
+                    this.updateSyncIndicator('error');
+                    if (!silent) this.toast('Sync gagal: ' + err.message, 'error');
+                })
+                .finally(() => { if (btn) btn.querySelector('i').classList.remove('animate-spin'); });
+        },
+        
+        apiPost: function(payload) {
+            if (!this.isOnline) return;
+            fetch(this.apiURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.status !== 'success') console.error('[API]', res);
+            })
+            .catch(e => console.error('[API]', e));
+        },
+        
+        // ============================================================
+        // FORCE SYNC
+        // ============================================================
+        forceSync: function() {
+            if (!this.user) { this.toast('Login dulu', 'warning'); return; }
+            const role = this.user.jabatan.toLowerCase();
+            if (role !== 'super admin' && role !== 'admin') { this.toast('Tidak punya akses', 'error'); return; }
+            
+            if (!confirm('Force Sync?\n\nAkan:\n• Hapus cache lokal\n• Update file ke versi terbaru\n• Reload halaman\n\nSession login TETAP tersimpan.')) return;
+            
+            const pending = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
+            if (pending.length > 0) {
+                if (!confirm(`Ada ${pending.length} pending. Sync dulu?`)) {
+                    // Lanjut
+                } else {
+                    this.syncPending();
+                    setTimeout(() => this._doForceSync(), 2500);
+                    return;
+                }
+            }
+            this._doForceSync();
+        },
+        
+        _doForceSync: function() {
+            this.toast('Memproses...', 'info');
+            
+            const clearCaches = (typeof caches !== 'undefined') ? 
+                caches.keys().then(names => Promise.all(names.map(name => caches.delete(name)))) : Promise.resolve();
+            const unregisterSW = ('serviceWorker' in navigator) ?
+                navigator.serviceWorker.getRegistrations().then(regs => Promise.all(regs.map(r => r.unregister()))) : Promise.resolve();
+            
+            const keep = [this.KEYS.SESSION, this.KEYS.PREFS, this.KEYS.THEME];
+            Object.values(this.KEYS).forEach(k => { if (!keep.includes(k)) localStorage.removeItem(k); });
+            
+            Promise.all([clearCaches, unregisterSW]).then(() => {
+                sessionStorage.setItem('force_sync_done', '1');
+                setTimeout(() => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('_fs', Date.now());
+                    window.location.replace(url.toString());
+                }, 600);
+            }).catch(() => {
+                sessionStorage.setItem('force_sync_done', '1');
+                setTimeout(() => window.location.reload(true), 500);
+            });
+        },
+        
+        // ============================================================
+        // PENDING
+        // ============================================================
+        queuePending: function(op) {
+            const q = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
+            q.push({ ...op, queuedAt: Date.now() });
+            localStorage.setItem(this.KEYS.PENDING, JSON.stringify(q));
+            this.updateSyncIndicator();
+        },
+        
+        syncPending: function() {
+            if (!this.isOnline) { this.updateSyncIndicator('offline'); return; }
+            const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
+            if (queue.length === 0) { this.updateSyncIndicator(); return; }
+            
+            this.updateSyncIndicator('syncing');
+            console.log('[SYNC] Processing', queue.length, 'ops');
+            
+            const next = (i) => {
+                if (i >= queue.length) {
+                    localStorage.setItem(this.KEYS.PENDING, '[]');
+                    this.updateSyncIndicator('synced');
+                    console.log('[SYNC] All done');
+                    this.syncNow(true);
+                    return;
+                }
+                const op = queue[i];
+                console.log('[SYNC]', op.action, op);
+                
+                fetch(this.apiURL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(op)
+                })
+                .then(r => r.text())
+                .then(text => {
+                    let res;
+                    try { res = JSON.parse(text); }
+                    catch(e) { throw new Error('Not JSON: ' + text.substring(0, 100)); }
+                    
+                    console.log('[SYNC] Response:', res);
+                    
+                    if (res.status === 'success') {
+                        if (op.action === 'add' && op.tempId && res.id) {
+                            const item = this.menu.find(m => m.ID === op.tempId);
+                            if (item) item.ID = res.id;
+                            this.saveCache();
+                        }
+                        next(i + 1);
+                    } else {
+                        console.error('[SYNC] Server error:', res);
+                        localStorage.setItem(this.KEYS.PENDING, JSON.stringify(queue.slice(i + 1)));
+                        this.updateSyncIndicator('error');
+                        this.toast('Gagal simpan: ' + (res.message || 'Unknown'), 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error('[SYNC] Exception:', err);
+                    this.updateSyncIndicator('error');
+                    this.toast('Gagal kirim: ' + err.message, 'error');
+                });
+            };
+            next(0);
+        },
+        
+        trackClick: function(id) {
+            const item = this.menu.find(m => m.ID === id);
+            if (item) item.CLICKS = (Number(item.CLICKS) || 0) + 1;
+            if (!this.isOnline) return;
+            fetch(this.apiURL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'trackClick', id }) }).catch(() => {});
+        },
+        
+        // ============================================================
+        // AUTH
+        // ============================================================
+        doLogin: function() {
+            const email = document.getElementById('input-email').value.trim();
+            const pass = document.getElementById('input-pass').value;
+            const remember = document.getElementById('remember-me').checked;
+            const btn = document.getElementById('btn-submit');
+            if (!email || !pass) { this.toast('Email & password wajib', 'error'); return; }
+            
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Memverifikasi...';
+            btn.disabled = true;
+            lucide.createIcons();
+            
+            fetch(this.apiURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'login', email, password: pass })
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.status === 'success') {
+                    this.user = { nama: res.nama, jabatan: res.jabatan, unit: res.unit, email: res.email };
+                    this.saveSession();
+                    this.updateUIState();
+                    this.renderCurrentView();
+                    this.closeModal('auth-modal');
+                    this.toast('Selamat datang, ' + res.nama, 'success');
+                    if (remember) { this.trackLogin(); setTimeout(() => this.loadFeedback(true), 800); }
+                    this.syncNow(true);
+                } else {
+                    this.toast(res.message || 'Login gagal', 'error');
+                }
+            })
+            .catch(() => this.toast('Server tidak dapat dijangkau', 'error'))
+            .finally(() => { btn.innerHTML = orig; btn.disabled = false; lucide.createIcons(); });
+        },
+        
+        doLogout: function() {
+            if (!confirm('Logout?')) return;
+            localStorage.removeItem(this.KEYS.SESSION);
+            this.user = null;
+            this.editMode = false;
+            this.updateUIState();
+            this.renderCurrentView();
+            this.closeModal('auth-modal');
+            this.toast('Logout', 'info');
+        },
+        
+        trackLogin: function() {
+            if (!this.user || !this.isOnline) return;
+            const device = /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop';
+            this.apiPost({ action: 'trackLogin', email: this.user.email, device });
+        },
+        
+        // ============================================================
+        // LINK CRUD
+        // ============================================================
+        openLinkModal: function(id) {
+            if (!this.user) { this.toast('Login dulu', 'warning'); return; }
+            
+            const modal = document.getElementById('link-modal');
+            modal.classList.add('show');
+            
+            if (id) {
+                const item = this.menu.find(m => m.ID === id);
+                if (!item) return;
+                document.getElementById('link-modal-title').textContent = 'Edit Link';
+                document.getElementById('link-id').value = item.ID;
+                document.getElementById('link-judul').value = item.JUDUL || '';
+                document.getElementById('link-url').value = item.URL || '';
+                document.getElementById('link-deskripsi').value = item.DESKRIPSI || '';
+                document.getElementById('link-kategori').value = item.KATEGORI || 'Lain-lain';
+                document.getElementById('link-role').value = item.AKSES_ROLE || '';
+                document.getElementById('link-icon').value = item.ICON || 'link';
+                document.getElementById('link-warna').value = item.WARNA || 'indigo';
+                document.getElementById('link-pinned').checked = item.PINNED === true || item.PINNED === 'TRUE';
+                document.getElementById('link-status').value = item.STATUS || 'aktif';
+                this.selectIcon(item.ICON || 'link');
+                this.selectColor(item.WARNA || 'indigo');
+            } else {
+                document.getElementById('link-modal-title').textContent = 'Tambah Link';
+                document.getElementById('link-id').value = '';
+                document.getElementById('link-judul').value = '';
+                document.getElementById('link-url').value = '';
+                document.getElementById('link-deskripsi').value = '';
+                document.getElementById('link-kategori').value = this.kategori[0]?.NAMA || 'Lain-lain';
+                document.getElementById('link-role').value = '';
+                document.getElementById('link-icon').value = 'link';
+                document.getElementById('link-warna').value = 'indigo';
+                document.getElementById('link-pinned').checked = false;
+                document.getElementById('link-status').value = 'aktif';
+                this.selectIcon('link');
+                this.selectColor('indigo');
+            }
+            
             const sel = document.getElementById('link-kategori');
-            if (!sel) return;
             sel.innerHTML = this.kategori.map(k => `<option value="${this.escape(k.NAMA)}">${this.escape(k.NAMA)}</option>`).join('') + `<option value="Lain-lain">Lain-lain</option>`;
+            
+            setTimeout(() => document.getElementById('link-judul')?.focus(), 100);
+            lucide.createIcons();
+        },
+        
+        editLink: function(id) { this.openLinkModal(id); },
+        
+        saveLink: function() {
+            const id = document.getElementById('link-id').value;
+            const data = {
+                judul: document.getElementById('link-judul').value.trim(),
+                url: document.getElementById('link-url').value.trim(),
+                deskripsi: document.getElementById('link-deskripsi').value.trim(),
+                kategori: document.getElementById('link-kategori').value,
+                akses_role: document.getElementById('link-role').value.trim(),
+                icon: document.getElementById('link-icon').value,
+                warna: document.getElementById('link-warna').value,
+                pinned: document.getElementById('link-pinned').checked,
+                status: document.getElementById('link-status').value
+            };
+            
+            if (!data.judul || !data.url) { this.toast('Judul & URL wajib', 'error'); return; }
+            try { const u = new URL(data.url); if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error(); }
+            catch(e) { this.toast('URL tidak valid', 'error'); return; }
+            
+            this.closeModal('link-modal');
+            
+            if (!id) {
+                const tempId = 'tmp-' + Date.now();
+                data.ID = tempId; data.CLICKS = 0; data.DELETED = false;
+                this.menu.push(data);
+                this.queuePending({ action: 'add', tempId, data, userEmail: this.user?.email });
+            } else {
+                const idx = this.menu.findIndex(m => m.ID === id);
+                if (idx >= 0) this.menu[idx] = { ...this.menu[idx], ...data };
+                this.queuePending({ action: 'update', id, data, userEmail: this.user?.email });
+            }
+            this.saveCache();
+            this.renderCurrentView();
+            
+            // Immediate sync attempt
+            this.syncPending();
+            this.toast(id ? 'Link diupdate' : 'Link ditambahkan', 'success');
+        },
+        
+        deleteLink: function(id) {
+            const item = this.menu.find(m => m.ID === id);
+            if (!item) return;
+            if (!confirm(`Hapus "${item.JUDUL}"?`)) return;
+            this.menu = this.menu.filter(m => m.ID !== id);
+            this.saveCache();
+            this.renderCurrentView();
+            this.queuePending({ action: 'delete', id, userEmail: this.user?.email });
+            this.syncPending();
+            this.toast('Link dihapus', 'success');
+        },
+        
+        reorderMenus: function(ids) {
+            ids.forEach((id, idx) => {
+                const item = this.menu.find(m => m.ID === id);
+                if (item) item.URUTAN = idx + 1;
+            });
+            this.saveCache();
+            this.queuePending({ action: 'reorder', ids, userEmail: this.user?.email });
+            this.syncPending();
+        },
+        
+        toggleEditMode: function() {
+            if (!this.user) { this.toast('Login dulu', 'warning'); return; }
+            const role = this.user.jabatan.toLowerCase();
+            if (role !== 'super admin' && role !== 'admin') { this.toast('Tidak punya akses', 'error'); return; }
+            this.editMode = !this.editMode;
+            this.renderCurrentView();
+            this.toast(this.editMode ? 'Edit mode aktif' : 'Edit mode nonaktif', 'info');
+        },
+        
+        setupSortable: function() {
+            this.sortables.forEach(s => { try { s.destroy(); } catch(e) {} });
+            this.sortables = [];
+            if (!this.editMode) return;
+            document.querySelectorAll('.menu-grid, .menu-list').forEach(grid => {
+                const s = Sortable.create(grid, {
+                    animation: 180, handle: '.drag-handle',
+                    ghostClass: 'sortable-ghost',
+                    onEnd: () => {
+                        const ids = [];
+                        document.querySelectorAll('.menu-grid, .menu-list').forEach(g => g.querySelectorAll('[data-id]').forEach(el => ids.push(el.dataset.id)));
+                        this.reorderMenus(ids);
+                    }
+                });
+                this.sortables.push(s);
+            });
         },
         
         // ============================================================
         // UI STATE
         // ============================================================
         updateUIState: function() {
-            const isLoggedIn = !!this.user;
-            const canEdit = isLoggedIn && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
+            const info = document.getElementById('sidebar-user-info');
+            if (info) info.textContent = this.user ? this.user.nama : 'Guest';
             
-            document.getElementById('form-login').classList.toggle('hidden', isLoggedIn);
-            document.getElementById('view-profile').classList.toggle('hidden', !isLoggedIn);
-            
-            const navBadge = document.getElementById('nav-role-badge');
-            const authText = document.getElementById('btn-auth-text');
-            const btnTambah = document.getElementById('btn-tambah');
-            const btnForceSync = document.getElementById('btn-force-sync');
-            const btnEditMode = document.getElementById('btn-edit-mode');
-            
-            if (isLoggedIn) {
-                navBadge.innerText = this.user.jabatan;
-                navBadge.className = "text-[9px] font-mono uppercase tracking-wider text-accent font-bold hidden sm:inline";
-                authText.innerText = this.user.nama.split(' ')[0];
-                document.getElementById('prof-name').innerText = this.user.nama;
-                document.getElementById('prof-role').innerText = this.user.jabatan;
-                document.getElementById('prof-unit').innerText = this.user.unit || '-';
-                document.getElementById('prof-email').innerText = this.user.email || '-';
-                
-                if (canEdit) {
-                    btnTambah.classList.remove('hidden');
-                    btnForceSync.classList.remove('hidden');
-                    btnEditMode.classList.remove('hidden');
-                    
-                    // Update style tombol Edit Mode
-                    if (this.editMode) {
-                        btnEditMode.className = "p-2 text-black bg-accent rounded-xl shadow-lg shadow-accent/20 transition";
-                    } else {
-                        btnEditMode.className = "p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition";
-                    }
+            const authArea = document.getElementById('sidebar-auth-area');
+            if (authArea) {
+                if (this.user) {
+                    authArea.innerHTML = `
+                        <div class="p-2 rounded-lg bg-ink-850 border border-ink-750">
+                            <p class="text-[10px] text-zinc-500">Login sebagai</p>
+                            <p class="text-xs font-semibold text-white truncate">${this.escape(this.user.nama)}</p>
+                            <p class="text-[10px] text-accent font-mono">${this.escape(this.user.jabatan)}</p>
+                        </div>
+                        <button onclick="app.doLogout()" class="btn btn-ghost w-full py-2 text-xs">
+                            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                            <span>Logout</span>
+                        </button>
+                    `;
                 } else {
-                    btnTambah.classList.add('hidden');
-                    btnForceSync.classList.add('hidden');
-                    btnEditMode.classList.add('hidden');
+                    authArea.innerHTML = `
+                        <button onclick="app.openAuthModal()" class="btn btn-primary w-full py-2.5">
+                            <i data-lucide="log-in" class="w-4 h-4"></i>
+                            <span>Login</span>
+                        </button>
+                    `;
                 }
-            } else {
-                navBadge.innerText = "Guest";
-                navBadge.className = "text-[9px] font-mono uppercase tracking-wider text-zinc-500 font-semibold hidden sm:inline";
-                authText.innerText = "Login";
-                btnTambah.classList.add('hidden');
-                btnForceSync.classList.add('hidden');
-                btnEditMode.classList.add('hidden');
-                this.editMode = false;
             }
+            
+            const authText = document.getElementById('btn-auth-text');
+            if (authText) authText.textContent = this.user ? this.user.nama.split(' ')[0] : 'Login';
+            
+            // Update profile views
+            document.getElementById('form-login').classList.toggle('hidden', !!this.user);
+            document.getElementById('view-profile').classList.toggle('hidden', !this.user);
+            
+            if (this.user) {
+                document.getElementById('prof-name').textContent = this.user.nama;
+                document.getElementById('prof-role').textContent = this.user.jabatan;
+                document.getElementById('prof-unit').textContent = this.user.unit || '-';
+                document.getElementById('prof-email').textContent = this.user.email || '-';
+            }
+            
+            this.updateFeedbackBadge();
             lucide.createIcons();
         },
         
         updateSyncIndicator: function(state) {
             const dot = document.getElementById('sync-dot');
             const text = document.getElementById('sync-text');
+            if (!dot || !text) return;
             const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
             const lastSync = localStorage.getItem(this.KEYS.LAST_SYNC);
             
             const s = state || (this.isOnline ? 'synced' : 'offline');
-            const states = {
-                synced: { color: 'bg-emerald-400' },
-                syncing: { color: 'bg-accent sync-pulse' },
-                offline: { color: 'bg-zinc-600' },
-                error: { color: 'bg-red-400' }
-            };
-            const cfg = states[s] || states.synced;
-            dot.className = 'w-1.5 h-1.5 rounded-full ' + cfg.color;
+            dot.className = 'sync-dot';
+            if (s === 'syncing') dot.classList.add('syncing');
+            else if (s === 'offline') dot.classList.add('offline');
+            else if (s === 'error') dot.classList.add('error');
             
-            let label = 'Baru saja';
-            if (queue.length > 0) label = `Pending (${queue.length})`;
+            let label = 'Synced';
+            if (queue.length > 0) label = `Pending ${queue.length}`;
             else if (!this.isOnline) label = 'Offline';
             else if (lastSync) label = this.timeAgo(lastSync);
-            text.innerText = label;
+            text.textContent = label;
         },
         
-        timeAgo: function(isoString) {
-            if (!isoString) return 'Belum sync';
+        timeAgo: function(iso) {
+            if (!iso) return 'Belum sync';
             try {
-                const d = new Date(isoString.replace(' ', 'T'));
+                const d = new Date(iso.replace(' ', 'T'));
                 const diff = Math.floor((Date.now() - d.getTime()) / 1000);
                 if (diff < 60) return 'Baru saja';
-                if (diff < 3600) return `${Math.floor(diff/60)}m lalu`;
-                if (diff < 86400) return `${Math.floor(diff/3600)}j lalu`;
-                return `${Math.floor(diff/86400)}h lalu`;
+                if (diff < 3600) return `${Math.floor(diff/60)}m`;
+                if (diff < 86400) return `${Math.floor(diff/3600)}j`;
+                return `${Math.floor(diff/86400)}h`;
             } catch(e) { return 'Belum sync'; }
         },
         
+        updateViewIcon: function() {
+            const icon = document.getElementById('view-icon');
+            if (!icon) return;
+            icon.setAttribute('data-lucide', this.prefs.view === 'grid' ? 'layout-grid' : 'layout-list');
+            lucide.createIcons();
+        },
+        
+        toggleView: function() {
+            this.prefs.view = this.prefs.view === 'grid' ? 'list' : 'grid';
+            this.savePrefs();
+            this.updateViewIcon();
+            if (this.currentView === 'dashboard') this.renderCurrentView();
+            this.toast(this.prefs.view === 'list' ? 'Tampilan list' : 'Tampilan grid', 'info');
+        },
+        
         openAuthModal: function() {
-            const m = document.getElementById('auth-modal');
-            m.classList.remove('hidden'); m.classList.add('flex');
+            document.getElementById('auth-modal').classList.add('show');
+            setTimeout(() => document.getElementById('input-email')?.focus(), 100);
         },
         
         closeModal: function(id) {
-            const m = document.getElementById(id);
-            if (m) { m.classList.add('hidden'); m.classList.remove('flex'); }
+            document.getElementById(id).classList.remove('show');
         },
         
         toggleTheme: function() {
@@ -1832,28 +2057,23 @@
         },
         
         toast: function(msg, type) {
-            const colors = {
-                success: 'bg-emerald-500 text-white',
-                error: 'bg-red-500 text-white',
-                warning: 'bg-amber-500 text-black',
-                info: 'bg-ink-800 text-white border border-ink-700'
-            };
-            const icons = { success: 'check-circle', error: 'alert-circle', warning: 'alert-triangle', info: 'info' };
-            
             const el = document.createElement('div');
-            el.className = `toast ${colors[type] || colors.info} px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-semibold backdrop-blur`;
+            el.className = `toast toast-${type || 'info'}`;
+            const icons = { success: 'check-circle', error: 'alert-circle', warning: 'alert-triangle', info: 'info' };
             el.innerHTML = `<i data-lucide="${icons[type] || 'info'}" class="w-4 h-4 shrink-0"></i><span class="flex-1">${this.escape(msg)}</span>`;
             document.getElementById('toast-container').appendChild(el);
             lucide.createIcons();
-            
             setTimeout(() => {
                 el.style.transition = 'all 0.3s';
                 el.style.opacity = '0';
                 el.style.transform = 'translateX(120%)';
                 setTimeout(() => el.remove(), 300);
-            }, 2800);
+            }, 3000);
         },
         
+        // ============================================================
+        // ICON PICKER
+        // ============================================================
         setupIconPicker: function() {
             const grid = document.getElementById('icon-grid');
             const search = document.getElementById('link-icon-search');
@@ -1861,7 +2081,7 @@
             const render = (filter) => {
                 const list = filter ? this.ICONS.filter(i => i.includes(filter.toLowerCase())) : this.ICONS;
                 grid.innerHTML = list.map(ic => `
-                    <div class="icon-btn ${document.getElementById('link-icon').value === ic ? 'selected' : ''}" 
+                    <div class="aspect-square flex items-center justify-center rounded-lg cursor-pointer transition ${document.getElementById('link-icon').value === ic ? 'bg-accent text-ink-950' : 'text-zinc-400 hover:bg-ink-750 hover:text-accent'}" 
                          onclick="app.selectIcon('${ic}')" title="${ic}">
                         <i data-lucide="${ic}" class="w-4 h-4"></i>
                     </div>
@@ -1874,67 +2094,53 @@
         
         selectIcon: function(ic) {
             document.getElementById('link-icon').value = ic;
-            document.querySelectorAll('#icon-grid .icon-btn').forEach(b => b.classList.remove('selected'));
-            const target = Array.from(document.querySelectorAll('#icon-grid .icon-btn')).find(b => b.title === ic);
-            if (target) target.classList.add('selected');
+            document.querySelectorAll('#icon-grid > div').forEach(b => {
+                b.classList.remove('bg-accent', 'text-ink-950');
+                b.classList.add('text-zinc-400');
+                if (b.title === ic) {
+                    b.classList.add('bg-accent', 'text-ink-950');
+                    b.classList.remove('text-zinc-400');
+                }
+            });
         },
         
         setupColorPicker: function() {
             const picker = document.getElementById('color-picker');
             if (!picker) return;
-            const colorMap = {
-                zinc: 'bg-zinc-500', blue: 'bg-blue-500', red: 'bg-red-500', green: 'bg-green-500',
-                emerald: 'bg-emerald-500', rose: 'bg-rose-500', yellow: 'bg-yellow-400', amber: 'bg-amber-400',
-                indigo: 'bg-indigo-500', purple: 'bg-purple-500', orange: 'bg-orange-500', pink: 'bg-pink-500',
-                sky: 'bg-sky-500', teal: 'bg-teal-500', violet: 'bg-violet-500'
+            const map = {
+                indigo: 'bg-indigo-400', sky: 'bg-sky-400', emerald: 'bg-emerald-400', rose: 'bg-rose-400',
+                amber: 'bg-amber-400', purple: 'bg-purple-400', teal: 'bg-teal-400', pink: 'bg-pink-400',
+                orange: 'bg-orange-400', red: 'bg-red-400', green: 'bg-green-400', blue: 'bg-blue-400',
+                violet: 'bg-violet-400', zinc: 'bg-zinc-400'
             };
             picker.innerHTML = this.COLORS.map(c => `
-                <div class="color-dot ${colorMap[c]}" data-color="${c}" onclick="app.selectColor('${c}')" title="${c}"></div>
+                <button type="button" class="w-6 h-6 rounded-full ${map[c]} ring-2 ring-transparent hover:ring-white/30 transition" data-color="${c}" onclick="app.selectColor('${c}')" title="${c}"></button>
             `).join('');
         },
         
         selectColor: function(c) {
             document.getElementById('link-warna').value = c;
-            document.querySelectorAll('#color-picker .color-dot').forEach(d => d.classList.remove('selected'));
-            const target = document.querySelector(`#color-picker .color-dot[data-color="${c}"]`);
-            if (target) target.classList.add('selected');
+            document.querySelectorAll('#color-picker button').forEach(b => b.classList.remove('ring-white/60'));
+            const target = document.querySelector(`#color-picker button[data-color="${c}"]`);
+            if (target) target.classList.add('ring-white/60');
         },
         
-        getColorConfig: function(color) {
-            const map = {
-                zinc:    { bg: 'bg-zinc-500/15',   text: 'text-zinc-300',   glow: 'shadow-[0_0_20px_-4px_rgba(161,161,170,0.5)]' },
-                blue:    { bg: 'bg-blue-500/15',   text: 'text-blue-400',   glow: 'shadow-[0_0_20px_-4px_rgba(59,130,246,0.6)]' },
-                red:     { bg: 'bg-red-500/15',    text: 'text-red-400',    glow: 'shadow-[0_0_20px_-4px_rgba(239,68,68,0.6)]' },
-                green:   { bg: 'bg-green-500/15',  text: 'text-green-400',  glow: 'shadow-[0_0_20px_-4px_rgba(34,197,94,0.6)]' },
-                emerald: { bg: 'bg-emerald-500/15',text: 'text-emerald-400',glow: 'shadow-[0_0_20px_-4px_rgba(16,185,129,0.6)]' },
-                rose:    { bg: 'bg-rose-500/15',   text: 'text-rose-400',   glow: 'shadow-[0_0_20px_-4px_rgba(244,63,94,0.6)]' },
-                yellow:  { bg: 'bg-yellow-400/15', text: 'text-yellow-300', glow: 'shadow-[0_0_20px_-4px_rgba(250,204,21,0.7)]' },
-                amber:   { bg: 'bg-amber-400/15',  text: 'text-amber-300',  glow: 'shadow-[0_0_20px_-4px_rgba(251,191,36,0.7)]' },
-                indigo:  { bg: 'bg-indigo-500/15', text: 'text-indigo-400', glow: 'shadow-[0_0_20px_-4px_rgba(99,102,241,0.6)]' },
-                purple:  { bg: 'bg-purple-500/15', text: 'text-purple-400', glow: 'shadow-[0_0_20px_-4px_rgba(168,85,247,0.6)]' },
-                orange:  { bg: 'bg-orange-500/15', text: 'text-orange-400', glow: 'shadow-[0_0_20px_-4px_rgba(249,115,22,0.6)]' },
-                pink:    { bg: 'bg-pink-500/15',   text: 'text-pink-400',   glow: 'shadow-[0_0_20px_-4px_rgba(236,72,153,0.6)]' },
-                sky:     { bg: 'bg-sky-500/15',    text: 'text-sky-400',    glow: 'shadow-[0_0_20px_-4px_rgba(14,165,233,0.6)]' },
-                teal:    { bg: 'bg-teal-500/15',   text: 'text-teal-400',   glow: 'shadow-[0_0_20px_-4px_rgba(20,184,166,0.6)]' },
-                violet:  { bg: 'bg-violet-500/15', text: 'text-violet-400', glow: 'shadow-[0_0_20px_-4px_rgba(139,92,246,0.6)]' }
-            };
-            return map[color] || map.zinc;
-        },
-        
-        escape: function(str) {
-            return String(str ?? '').replace(/[&<>"']/g, m => ({
-                '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-            })[m]);
+        // ============================================================
+        // UTILS
+        // ============================================================
+        escape: function(s) {
+            return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
         },
         
         safeUrl: function(url) {
-            try {
-                const u = new URL(String(url));
-                if (u.protocol === 'http:' || u.protocol === 'https:') return u.href;
-            } catch(e) {}
+            try { const u = new URL(String(url)); if (u.protocol === 'http:' || u.protocol === 'https:') return u.href; } catch(e) {}
             return '#';
         }
     };
+    
+    // Restore API URL if saved
+    const savedUrl = localStorage.getItem('sa4_apiurl');
+    if (savedUrl) app.apiURL = savedUrl;
     
     document.addEventListener('DOMContentLoaded', () => app.init());
     </script>
