@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="theme-color" content="#0a0a0a">
-    <meta name="description" content="Super Admin Console v3.1">
+    <meta name="description" content="Super Admin Console v3.2">
     <title>Console</title>
     
     <link rel="manifest" href="manifest.json">
@@ -46,7 +46,6 @@
         html, body { background-color: #0a0a0a; }
         body { font-family: 'Inter', sans-serif; color: #e4e4e7; }
         
-        /* Subtle noise texture */
         body::before {
             content: '';
             position: fixed;
@@ -57,15 +56,16 @@
             z-index: 0;
         }
         
-        /* Light mode */
         html:not(.dark) body { background-color: #f5f5f7; color: #18181b; }
         html:not(.dark) body::before { background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px); }
         html:not(.dark) .bg-ink-950 { background-color: #f5f5f7 !important; }
         html:not(.dark) .bg-ink-900 { background-color: #ffffff !important; }
         html:not(.dark) .bg-ink-800 { background-color: #ffffff !important; }
         html:not(.dark) .bg-ink-850 { background-color: #fafafa !important; }
+        html:not(.dark) .bg-ink-750 { background-color: #f4f4f5 !important; }
         html:not(.dark) .border-ink-700 { border-color: #e4e4e7 !important; }
         html:not(.dark) .border-ink-800 { border-color: #e4e4e7 !important; }
+        html:not(.dark) .border-ink-750 { border-color: #e4e4e7 !important; }
         html:not(.dark) .text-white { color: #18181b !important; }
         html:not(.dark) .text-zinc-400 { color: #71717a !important; }
         html:not(.dark) .text-zinc-500 { color: #71717a !important; }
@@ -73,56 +73,32 @@
         html:not(.dark) .text-zinc-200 { color: #27272a !important; }
         html:not(.dark) .text-zinc-100 { color: #18181b !important; }
         
-        /* Glass navbar */
         .glass { background: rgba(10, 10, 10, 0.85); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); }
         html:not(.dark) .glass { background: rgba(255, 255, 255, 0.85); }
         
-        /* Glow effect untuk icon circle */
-        .icon-glow {
-            position: relative;
-        }
-        .icon-glow::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: inherit;
-            background: currentColor;
-            opacity: 0.25;
-            filter: blur(12px);
-            z-index: -1;
-        }
-        
-        /* Card hover */
-        .card-link {
-            transition: transform 0.2s ease, background 0.2s ease;
-        }
+        .card-link { transition: transform 0.2s ease, background 0.2s ease; }
         @media (hover: hover) {
             .card-link:hover { transform: translateY(-2px); }
             .card-link:hover .card-inner { background: #232326; }
         }
         html:not(.dark) .card-link:hover .card-inner { background: #f4f4f5; }
         
-        /* Sortable */
         .sortable-ghost { opacity: 0.3; background: rgba(252, 211, 77, 0.3) !important; }
         .sortable-chosen { transform: scale(1.03) rotate(1deg); z-index: 100; }
         .drag-handle { cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
         
-        /* Modal */
         .modal-enter { animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         
-        /* Panel slide */
         .panel-enter { animation: panelIn 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes panelIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
         .panel-exit { animation: panelOut 0.22s ease-in forwards; }
         @keyframes panelOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
         
-        /* Toast */
         .toast { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         
-        /* Icon picker */
         .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; max-height: 180px; overflow-y: auto; padding: 8px; border: 1px solid #232326; border-radius: 14px; background: #141416; }
         html:not(.dark) .icon-grid { background: #fafafa; border-color: #e4e4e7; }
         .icon-btn { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: #a1a1aa; }
@@ -130,42 +106,38 @@
         html:not(.dark) .icon-btn:hover { background: #f4f4f5; }
         .icon-btn.selected { background: #fcd34d; color: #0a0a0a; }
         
-        /* Color picker */
         .color-dot { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
         .color-dot:hover { transform: scale(1.15); }
         .color-dot.selected { border-color: #fcd34d; transform: scale(1.15); }
         
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #2a2a2e; border-radius: 3px; }
         html:not(.dark) ::-webkit-scrollbar-thumb { background: #d4d4d8; }
         ::-webkit-scrollbar-thumb:hover { background: #3a3a3f; }
         
-        /* Pulse sync */
         @keyframes syncPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .sync-pulse { animation: syncPulse 1.2s ease-in-out infinite; }
         
-        /* Line clamp */
         .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
         .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         
-        /* Tab active */
         .ptab-active { background: #fcd34d; color: #0a0a0a; font-weight: 700; }
         
-        /* Hide scrollbar for tab row */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        @keyframes forceSpin { 100% { transform: rotate(360deg); } }
+        .force-spin { animation: forceSpin 1s linear infinite; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col relative transition-colors duration-200">
 
-    <!-- ============ NAVBAR ============ -->
+    <!-- NAVBAR -->
     <nav class="sticky top-0 z-40 w-full glass border-b border-ink-800/50">
         <div class="max-w-[1600px] mx-auto px-3 sm:px-4">
             <div class="flex items-center justify-between h-14 gap-2">
                 
-                <!-- Logo -->
                 <div class="flex items-center gap-2.5 min-w-0">
                     <div class="w-9 h-9 rounded-2xl bg-accent flex items-center justify-center shrink-0 shadow-lg shadow-accent/20">
                         <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-6 h-6 object-contain" alt="Logo">
@@ -182,7 +154,6 @@
                     </div>
                 </div>
 
-                <!-- Search desktop -->
                 <div class="hidden md:flex flex-1 max-w-md mx-4">
                     <div class="relative w-full">
                         <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
@@ -191,13 +162,15 @@
                     </div>
                 </div>
 
-                <!-- Actions -->
                 <div class="flex items-center gap-1">
                     <button onclick="app.toggleView()" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Ganti tampilan">
                         <i data-lucide="layout-grid" id="view-icon" class="w-4 h-4"></i>
                     </button>
                     <button onclick="app.syncNow()" id="btn-sync" class="p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Sync">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="app.forceSync()" id="btn-force-sync" class="hidden p-2 text-zinc-400 hover:text-accent rounded-xl hover:bg-ink-850 transition" title="Force Sync (Ctrl+Shift+R)">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
                     </button>
                     <button id="btn-tambah" onclick="app.openLinkModal()" class="hidden items-center gap-1 px-3 py-1.5 bg-accent hover:bg-accent-hover text-black rounded-full text-xs font-bold transition shadow-lg shadow-accent/20" title="Tambah link">
                         <i data-lucide="plus" class="w-3.5 h-3.5"></i>
@@ -218,7 +191,6 @@
             </div>
         </div>
         
-        <!-- Mobile search -->
         <div class="md:hidden px-3 pb-2.5">
             <div class="relative w-full">
                 <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
@@ -228,7 +200,7 @@
         </div>
     </nav>
 
-    <!-- ============ MAIN ============ -->
+    <!-- MAIN -->
     <main class="flex-1 relative z-10 p-3 sm:p-5 max-w-[1600px] mx-auto w-full">
         <div id="info-banner" class="hidden mb-4"></div>
         
@@ -240,7 +212,7 @@
         </div>
     </main>
 
-    <!-- ============ SETTINGS PANEL ============ -->
+    <!-- SETTINGS PANEL -->
     <div id="settings-panel" class="fixed inset-0 z-50 hidden">
         <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="app.closePanel()"></div>
         
@@ -283,7 +255,7 @@
         </div>
     </div>
 
-    <!-- ============ MODAL: LOGIN ============ -->
+    <!-- MODAL: LOGIN -->
     <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
         <div class="w-full max-w-sm bg-ink-900 border border-ink-800 rounded-3xl shadow-2xl overflow-hidden modal-enter relative">
             <button onclick="app.closeModal('auth-modal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white z-10 p-1.5 rounded-xl hover:bg-ink-800 transition">
@@ -340,7 +312,7 @@
         </div>
     </div>
 
-    <!-- ============ MODAL: LINK CRUD ============ -->
+    <!-- MODAL: LINK CRUD -->
     <div id="link-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
         <div class="w-full max-w-xl bg-ink-900 border border-ink-800 rounded-3xl shadow-2xl overflow-hidden modal-enter max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between p-5 border-b border-ink-800 shrink-0">
@@ -423,7 +395,7 @@
 
     <script>
     // ============================================================
-    // APP v3.1
+    // APP v3.2 — With Force Sync
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
@@ -459,13 +431,29 @@
             showBanner: true
         },
         
-        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','hash','at-sign','regex','info','help-circle','alert-circle','alert-triangle','save','grip-vertical','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','folder-cog','shield-lock','sliders','send','check-circle','alert-triangle'],
+        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','hash','at-sign','regex','info','help-circle','alert-circle','alert-triangle','save','grip-vertical','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock'],
         
         COLORS: ['zinc','blue','red','green','emerald','rose','yellow','amber','indigo','purple','orange','pink','sky','teal','violet'],
         
+        // ============================================================
+        // INIT
+        // ============================================================
         init: function() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').catch(() => {});
+            }
+            
+            // Deteksi Force Sync baru selesai
+            const forceSyncFlag = sessionStorage.getItem('force_sync_done');
+            if (forceSyncFlag) {
+                sessionStorage.removeItem('force_sync_done');
+                console.log('[Force Sync] Reload complete');
+                setTimeout(() => {
+                    if (app && app.toast) app.toast('Force Sync selesai — data terbaru dimuat', 'success');
+                }, 800);
+                setTimeout(() => {
+                    if (app && app.syncNow) app.syncNow(true);
+                }, 1200);
             }
             
             // Theme — default DARK
@@ -520,14 +508,29 @@
             this.renderPanel();
             
             document.addEventListener('keydown', (e) => {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('search-input').focus(); }
-                if (e.key === 'Escape') { this.closeModal('auth-modal'); this.closeModal('link-modal'); this.closePanel(); }
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') { 
+                    e.preventDefault(); 
+                    document.getElementById('search-input').focus(); 
+                }
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') { 
+                    e.preventDefault();
+                    if (this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin')) {
+                        this.forceSync();
+                    }
+                }
+                if (e.key === 'Escape') { 
+                    this.closeModal('auth-modal'); 
+                    this.closeModal('link-modal'); 
+                    this.closePanel(); 
+                }
             });
             
             lucide.createIcons();
         },
         
+        // ============================================================
         // STORAGE
+        // ============================================================
         loadFromCache: function() {
             try {
                 const cached = JSON.parse(localStorage.getItem(this.KEYS.CACHE) || '{}');
@@ -558,7 +561,9 @@
         
         savePrefs: function() { localStorage.setItem(this.KEYS.PREFS, JSON.stringify(this.prefs)); },
         
+        // ============================================================
         // SYNC
+        // ============================================================
         syncNow: function(silent) {
             if (!this.isOnline) {
                 if (!silent) this.toast('Offline — tidak bisa sync', 'warning');
@@ -595,7 +600,103 @@
                 .finally(() => { if (btn) btn.querySelector('i').classList.remove('animate-spin'); });
         },
         
+        // ============================================================
+        // FORCE SYNC — Reset penuh + ambil versi terbaru
+        // ============================================================
+        forceSync: function() {
+            if (!this.user) { this.toast('Login dulu untuk Force Sync', 'warning'); return; }
+            const role = this.user.jabatan.toLowerCase();
+            if (role !== 'super admin' && role !== 'admin') {
+                this.toast('Hanya Admin/Super Admin yang bisa Force Sync', 'error');
+                return;
+            }
+            
+            const confirmed = confirm(
+                'FORCE SYNC\n\n' +
+                'Tindakan ini akan:\n' +
+                '• Hapus semua cache lokal (menu, kategori, feedback)\n' +
+                '• Update file aplikasi ke versi terbaru\n' +
+                '• Reload halaman otomatis\n\n' +
+                '✓ Session login tetap tersimpan\n' +
+                '✗ Perubahan yang belum sync akan HILANG\n\n' +
+                'Lanjutkan?'
+            );
+            if (!confirmed) return;
+            
+            const pending = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
+            if (pending.length > 0) {
+                const doSyncFirst = confirm(
+                    `Ada ${pending.length} perubahan belum tersinkron.\n\n` +
+                    'OK = Sync dulu, baru Force Sync\n' +
+                    'Cancel = Lanjut Force Sync (data pending HILANG)'
+                );
+                if (doSyncFirst) {
+                    this.syncPending();
+                    setTimeout(() => {
+                        if (confirm('Sync selesai. Lanjut Force Sync sekarang?')) {
+                            this._doForceSync();
+                        }
+                    }, 2500);
+                    return;
+                }
+            }
+            
+            this._doForceSync();
+        },
+        
+        _doForceSync: function() {
+            this.toast('Memproses Force Sync...', 'info');
+            this.updateSyncIndicator('syncing');
+            
+            // Tombol force sync di navbar — animasi
+            const btnFS = document.getElementById('btn-force-sync');
+            if (btnFS) btnFS.querySelector('i').classList.add('force-spin');
+            
+            // Clear all caches (Cache Storage API)
+            const clearCaches = (typeof caches !== 'undefined') ? 
+                caches.keys().then(names => 
+                    Promise.all(names.map(name => caches.delete(name)))
+                ) : Promise.resolve();
+            
+            // Unregister service worker
+            const unregisterSW = ('serviceWorker' in navigator) ?
+                navigator.serviceWorker.getRegistrations().then(regs => 
+                    Promise.all(regs.map(reg => reg.unregister()))
+                ) : Promise.resolve();
+            
+            // Hapus cache keys (kecuali session, prefs, theme)
+            const keysToKeep = [this.KEYS.SESSION, this.KEYS.PREFS, this.KEYS.THEME];
+            Object.values(this.KEYS).forEach(k => {
+                if (!keysToKeep.includes(k)) {
+                    localStorage.removeItem(k);
+                }
+            });
+            
+            Promise.all([clearCaches, unregisterSW])
+                .then(() => {
+                    console.log('[Force Sync] Cache & SW cleared');
+                    sessionStorage.setItem('force_sync_done', Date.now().toString());
+                    
+                    setTimeout(() => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('_fs', Date.now());
+                        window.location.replace(url.toString());
+                    }, 800);
+                })
+                .catch(err => {
+                    console.error('[Force Sync] Error:', err);
+                    sessionStorage.setItem('force_sync_done', Date.now().toString());
+                    setTimeout(() => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('_fs', Date.now());
+                        window.location.replace(url.toString());
+                    }, 500);
+                });
+        },
+        
+        // ============================================================
         // RENDER
+        // ============================================================
         renderAll: function(searchQuery) {
             this.renderMenu(searchQuery);
             this.renderInfoBanner();
@@ -751,7 +852,6 @@
                            onclick="${isEdit ? 'event.preventDefault()' : `app.trackClick('${item.ID}')`}"
                            class="flex flex-col items-center text-center ${isEdit ? 'pointer-events-none' : ''}">
                             
-                            <!-- Icon circle with glow -->
                             <div class="relative mt-1 mb-3">
                                 <div class="w-14 h-14 rounded-full flex items-center justify-center ${colorMap.bg} ${colorMap.glow}">
                                     <i data-lucide="${icon}" class="w-6 h-6 ${colorMap.text}"></i>
@@ -811,7 +911,9 @@
             `;
         },
         
+        // ============================================================
         // VIEW
+        // ============================================================
         toggleView: function() {
             this.prefs.view = this.prefs.view === 'grid' ? 'list' : 'grid';
             this.savePrefs();
@@ -828,7 +930,9 @@
             lucide.createIcons();
         },
         
+        // ============================================================
         // SORTABLE
+        // ============================================================
         setupSortable: function() {
             this.sortables.forEach(s => { try { s.destroy(); } catch(e) {} });
             this.sortables = [];
@@ -859,7 +963,9 @@
             this.toast(this.editMode ? 'Edit mode aktif' : 'Edit mode nonaktif', 'info');
         },
         
+        // ============================================================
         // LINK CRUD
+        // ============================================================
         openLinkModal: function(id) {
             if (!this.user) { this.toast('Login dulu', 'warning'); return; }
             const modal = document.getElementById('link-modal');
@@ -961,7 +1067,9 @@
             this.syncPending();
         },
         
+        // ============================================================
         // PENDING
+        // ============================================================
         queuePending: function(op) {
             const queue = JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]');
             queue.push({ ...op, queuedAt: Date.now() });
@@ -1016,7 +1124,9 @@
             }).catch(() => {});
         },
         
+        // ============================================================
         // AUTH
+        // ============================================================
         doLogin: function() {
             const email = document.getElementById('input-email').value.trim();
             const pass = document.getElementById('input-pass').value;
@@ -1074,7 +1184,9 @@
             }).catch(() => {});
         },
         
+        // ============================================================
         // PANEL
+        // ============================================================
         openPanel: function() {
             const panel = document.getElementById('settings-panel');
             panel.classList.remove('hidden');
@@ -1265,7 +1377,7 @@
         },
         
         renderTabUsers: function(isSuperAdmin) {
-            if (!isSuperAdmin) return `<div class="text-center py-12"><i data-lucide="shield-alert" class="w-10 h-10 text-zinc-700 mx-auto mb-3"></i><p class="text-xs text-zinc-500">Hanya Super Admin</p></div>`;
+            if (!isSuperAdmin) return `<div class="text-center py-12"><i data-lucide="shield-lock" class="w-10 h-10 text-zinc-700 mx-auto mb-3"></i><p class="text-xs text-zinc-500">Hanya Super Admin</p></div>`;
             
             const list = this.users.map(u => `
                 <div class="flex items-center gap-3 p-3 bg-ink-850 border border-ink-750 rounded-2xl">
@@ -1457,6 +1569,25 @@
                         <div class="flex justify-between"><span class="text-zinc-500">Total menu</span><span class="font-mono text-white">${this.menu.length}</span></div>
                     </div>
                     
+                    <!-- FORCE SYNC -->
+                    <div class="p-4 bg-accent/5 border border-accent/20 rounded-2xl">
+                        <div class="flex items-start gap-3 mb-3">
+                            <div class="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+                                <i data-lucide="zap" class="w-4 h-4 text-accent"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Force Sync</p>
+                                <p class="text-[10px] text-zinc-400 mt-0.5 leading-relaxed">
+                                    Reset cache, update aplikasi ke versi terbaru, ambil data fresh dari server.
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="app.forceSync()" class="w-full px-4 py-3 bg-accent hover:bg-accent-hover text-black rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg shadow-accent/20">
+                            <i data-lucide="zap" class="w-4 h-4"></i> Jalankan Force Sync
+                        </button>
+                        <p class="text-[10px] text-zinc-500 text-center mt-2">Shortcut: Ctrl+Shift+R</p>
+                    </div>
+                    
                     <button onclick="app.exportJSON()" class="w-full px-4 py-3 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition">
                         <i data-lucide="download" class="w-4 h-4"></i> Export Backup
                     </button>
@@ -1480,7 +1611,7 @@
         },
         
         exportJSON: function() {
-            const data = { version: '3.1', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
+            const data = { version: '3.2', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1591,7 +1722,9 @@
             sel.innerHTML = this.kategori.map(k => `<option value="${this.escape(k.NAMA)}">${this.escape(k.NAMA)}</option>`).join('') + `<option value="Lain-lain">Lain-lain</option>`;
         },
         
+        // ============================================================
         // UI
+        // ============================================================
         updateUIState: function() {
             const isLoggedIn = !!this.user;
             const canEdit = isLoggedIn && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
@@ -1602,6 +1735,7 @@
             const navBadge = document.getElementById('nav-role-badge');
             const authText = document.getElementById('btn-auth-text');
             const btnTambah = document.getElementById('btn-tambah');
+            const btnForceSync = document.getElementById('btn-force-sync');
             
             if (isLoggedIn) {
                 navBadge.innerText = this.user.jabatan;
@@ -1611,12 +1745,19 @@
                 document.getElementById('prof-role').innerText = this.user.jabatan;
                 document.getElementById('prof-unit').innerText = this.user.unit || '-';
                 document.getElementById('prof-email').innerText = this.user.email || '-';
-                if (canEdit) btnTambah.classList.remove('hidden'); else btnTambah.classList.add('hidden');
+                if (canEdit) {
+                    btnTambah.classList.remove('hidden');
+                    btnForceSync.classList.remove('hidden');
+                } else {
+                    btnTambah.classList.add('hidden');
+                    btnForceSync.classList.add('hidden');
+                }
             } else {
                 navBadge.innerText = "Guest";
                 navBadge.className = "text-[9px] font-mono uppercase tracking-wider text-zinc-500 font-semibold hidden sm:inline";
                 authText.innerText = "Login";
                 btnTambah.classList.add('hidden');
+                btnForceSync.classList.add('hidden');
                 this.editMode = false;
             }
             lucide.createIcons();
@@ -1741,7 +1882,6 @@
             if (target) target.classList.add('selected');
         },
         
-        // COLOR CONFIG (with glow)
         getColorConfig: function(color) {
             const map = {
                 zinc:    { bg: 'bg-zinc-500/15',   text: 'text-zinc-300',   glow: 'shadow-[0_0_20px_-4px_rgba(161,161,170,0.5)]' },
