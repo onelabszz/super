@@ -25,6 +25,10 @@
         body { font-family: 'Inter', sans-serif; color: #e4e4e7; overflow-x: hidden; }
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-thumb { background: #252a3a; border-radius: 3px; }
+        
+        /* ============================================
+           SIDEBAR
+           ============================================ */
         .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; background: #0d0f14; border-right: 1px solid #1e2230; transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.16,1,0.3,1); z-index: 60; display: flex; flex-direction: column; }
         .sidebar.open { transform: translateX(0); }
         @media (min-width: 1024px) {
@@ -36,15 +40,57 @@
         .backdrop { position: fixed; inset: 0; background: #000; z-index: 55; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
         .backdrop.show { opacity: 0.75; pointer-events: auto; }
         @media (min-width: 1024px) { .backdrop { display: none !important; } }
+        
+        /* ============================================
+           NAV
+           ============================================ */
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; color: #a1a1aa; transition: all 0.15s; cursor: pointer; position: relative; background: transparent; border: none; text-align: left; width: 100%; }
         .nav-item:hover { background: #181c26; color: #e4e4e7; }
         .nav-item.active { background: #1e2230; color: #a5b4fc; font-weight: 600; }
         .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; }
+        
+        /* ============================================
+           HEADER — Responsive & Theme-aware
+           ============================================ */
+        .app-header {
+            background: #0a0b10;
+            border-color: #1e2230;
+        }
+        html:not(.dark) .app-header {
+            background: #ffffff;
+            border-color: #e4e4e7;
+        }
+        .page-title { color: #ffffff; }
+        html:not(.dark) .page-title { color: #18181b; }
+        
+        /* Icon theme toggle */
+        .icon-moon { display: none; }
+        .icon-sun  { display: block; }
+        html.dark .icon-moon { display: block; }
+        html.dark .icon-sun  { display: none; }
+        
+        /* Auth button text */
+        .auth-btn-text { display: none; }
+        @media (min-width: 400px) { .auth-btn-text { display: inline; } }
+        
+        /* Search wrapper hidden */
+        #search-wrapper.hidden { display: none; }
+        
+        /* Sync status — hide on very small screens */
+        @media (max-width: 480px) { .sync-status { display: none !important; } }
+        
+        /* ============================================
+           CARD
+           ============================================ */
         .card { background: #14171f; border: 1px solid #1e2230; border-radius: 14px; }
         .link-card { display: flex; flex-direction: column; align-items: center; padding: 14px 10px; text-align: center; cursor: pointer; position: relative; transition: all 0.2s; }
         @media (hover: hover) { .link-card:hover { transform: translateY(-2px); border-color: #3a4054; } }
         .link-card:active { transform: scale(0.98); }
         .icon-circle { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        
+        /* ============================================
+           BUTTONS
+           ============================================ */
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; transition: all 0.15s; cursor: pointer; border: none; white-space: nowrap; }
         .btn-primary { background: #a5b4fc; color: #0a0b10; }
         .btn-primary:hover { background: #c4caff; }
@@ -54,17 +100,27 @@
         .btn-danger { background: #2a1a1f; color: #fca5a5; border: 1px solid #4a2028; }
         .btn-danger:hover { background: #3a1f26; }
         .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+        
         .icon-btn { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; color: #a1a1aa; transition: all 0.15s; cursor: pointer; background: transparent; border: none; flex-shrink: 0; }
         .icon-btn:hover { background: #181c26; color: #e4e4e7; }
         .icon-btn:active { transform: scale(0.94); }
+        
         .input { width: 100%; background: #14171f; border: 1px solid #1e2230; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #e4e4e7; outline: none; transition: all 0.15s; }
         .input:focus { border-color: #4a5490; background: #181c26; }
         .input::placeholder { color: #52525b; }
         .input:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* ============================================
+           MODAL
+           ============================================ */
         .modal { position: fixed; inset: 0; z-index: 70; display: none; align-items: center; justify-content: center; padding: 16px; background: #000; }
         .modal.show { display: flex; }
         .modal-box { background: #0d0f14; border: 1px solid #1e2230; border-radius: 18px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.9); max-height: 92vh; width: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; animation: modalIn 0.22s cubic-bezier(0.16,1,0.3,1); }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        /* ============================================
+           TOAST
+           ============================================ */
         #toast-container { position: fixed; top: 76px; right: 14px; z-index: 80; display: flex; flex-direction: column; gap: 8px; max-width: 320px; pointer-events: none; }
         .toast { padding: 12px 14px; border-radius: 12px; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.7); animation: slideIn 0.3s cubic-bezier(0.16,1,0.3,1); pointer-events: auto; border: 1px solid; }
         @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -72,46 +128,73 @@
         .toast-error { background: #331820; color: #fca5a5; border-color: #5a1e2a; }
         .toast-warning { background: #332b13; color: #fcd34d; border-color: #5a4a1e; }
         .toast-info { background: #1e2230; color: #a5b4fc; border-color: #3a4054; }
+        
+        /* ============================================
+           SYNC
+           ============================================ */
         .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; flex-shrink: 0; }
         .sync-dot.syncing { background: #a5b4fc; animation: pulse 1.2s ease-in-out infinite; }
         .sync-dot.offline { background: #52525b; }
         .sync-dot.error { background: #fca5a5; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        
+        /* ============================================
+           LINKS
+           ============================================ */
         .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
         @media (min-width: 640px) { .links-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
         @media (min-width: 1024px) { .links-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } }
         .links-list { display: flex; flex-direction: column; gap: 6px; }
         .link-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: #14171f; border: 1px solid #1e2230; border-radius: 12px; transition: all 0.15s; }
         .link-row:hover { background: #181c26; border-color: #3a4054; }
+        
+        /* ============================================
+           SORTABLE
+           ============================================ */
         .sortable-ghost { opacity: 0.3; background: #2a2f47 !important; border-radius: 12px; }
         .drag-handle { cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
+        
         .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 0 2px; }
+        
+        /* ============================================
+           DEBUG PANEL
+           ============================================ */
         #debug-panel { position: fixed; bottom: 0; left: 0; right: 0; max-height: 40vh; background: #0a0b10; border-top: 2px solid #a5b4fc; color: #a5b4fc; font-family: monospace; font-size: 10px; padding: 8px; overflow-y: auto; z-index: 9999; display: none; }
         #debug-panel.show { display: block; }
         #debug-panel .log-line { padding: 3px 0; border-bottom: 1px solid #1e2230; word-break: break-all; }
         #debug-panel .log-error { color: #fca5a5; }
         #debug-panel .log-success { color: #86efac; }
         #debug-panel .log-info { color: #a5b4fc; }
+        
+        /* ============================================
+           LIGHT MODE OVERRIDES
+           ============================================ */
         html:not(.dark) body { background: #f4f5f8; color: #1e2230; }
         html:not(.dark) .sidebar { background: #fff; border-color: #e4e4e7; }
         html:not(.dark) .nav-item { color: #52525b; }
         html:not(.dark) .nav-item:hover { background: #f4f4f5; color: #18181b; }
         html:not(.dark) .nav-item.active { background: #eef0ff; color: #6366f1; }
+        html:not(.dark) .nav-item.active::before { background: #6366f1; }
         html:not(.dark) .card, html:not(.dark) .link-card, html:not(.dark) .link-row { background: #fff; border-color: #e4e4e7; }
         html:not(.dark) .input { background: #fff; border-color: #e4e4e7; color: #18181b; }
+        html:not(.dark) .input:focus { background: #f9fafb; }
         html:not(.dark) .modal-box { background: #fff; border-color: #e4e4e7; }
         html:not(.dark) .icon-btn:hover { background: #f4f4f5; color: #18181b; }
         html:not(.dark) .btn-ghost { background: #fff; border-color: #e4e4e7; color: #52525b; }
+        html:not(.dark) .btn-ghost:hover { background: #f4f4f5; color: #18181b; }
         html:not(.dark) .text-white { color: #18181b; }
         html:not(.dark) .text-zinc-400, html:not(.dark) .text-zinc-500 { color: #71717a; }
         html:not(.dark) .border-ink-750, html:not(.dark) .border-ink-700, html:not(.dark) .border-ink-800 { border-color: #e4e4e7; }
         html:not(.dark) .bg-ink-850, html:not(.dark) .bg-ink-800, html:not(.dark) .bg-ink-900, html:not(.dark) .bg-ink-950 { background: #fff; }
+        html:not(.dark) .sync-status { background: #f4f4f5; }
         html:not(.dark) #debug-panel { background: #fff; color: #4f46e5; border-color: #4f46e5; }
     </style>
 </head>
 <body>
+
     <div id="sidebar-backdrop" class="backdrop" onclick="app.closeSidebar()"></div>
+
     <aside id="sidebar" class="sidebar">
         <div class="flex items-center justify-between p-4 border-b border-ink-750">
             <div class="flex items-center gap-2.5 min-w-0">
@@ -141,32 +224,46 @@
     </aside>
 
     <div id="main-area" class="main-area min-h-screen flex flex-col">
-        <header class="sticky top-0 z-40 border-b border-ink-750" style="background:#0a0b10;">
+        
+        <!-- HEADER — Responsive & theme-aware -->
+        <header class="app-header sticky top-0 z-40 border-b">
             <div class="h-14 flex items-center gap-2 px-3">
-                <button onclick="app.toggleSidebar()" class="icon-btn"><i data-lucide="menu" class="w-5 h-5"></i></button>
-                <h2 id="page-title" class="font-semibold text-sm text-white truncate">Dashboard</h2>
-                <div class="hidden md:flex flex-1 max-w-md mx-auto relative" id="search-desktop">
-                    <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-                    <input type="text" id="search-input" placeholder="Cari menu..." class="input pl-9 py-1.5 text-xs">
+                <button onclick="app.toggleSidebar()" class="icon-btn" title="Menu">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <h2 id="page-title" class="page-title font-semibold text-sm truncate flex-shrink min-w-0">Dashboard</h2>
+                
+                <div class="sync-status hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md bg-ink-850 text-[10px] ml-2">
+                    <span id="sync-dot" class="sync-dot"></span>
+                    <span id="sync-text" class="text-zinc-500 font-mono">Synced</span>
                 </div>
+                
                 <div class="flex items-center gap-0.5 ml-auto">
-                    <div class="hidden sm:flex items-center gap-1.5 mr-1.5 px-2 py-1 rounded-md bg-ink-850 text-[10px]">
-                        <span id="sync-dot" class="sync-dot"></span>
-                        <span id="sync-text" class="text-zinc-500 font-mono">Synced</span>
-                    </div>
-                    <button onclick="app.syncNow()" id="btn-sync" class="icon-btn" title="Sync"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
-                    <button onclick="app.toggleView()" id="btn-view" class="icon-btn" title="Ganti tampilan"><i data-lucide="layout-grid" id="view-icon" class="w-4 h-4"></i></button>
-                    <button onclick="app.toggleTheme()" class="icon-btn"><i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i><i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i></button>
-                    <button onclick="app.openAuthModal()" class="btn btn-primary btn-sm ml-1"><i data-lucide="user-circle" class="w-3.5 h-3.5"></i><span id="btn-auth-text" class="hidden sm:inline">Login</span></button>
+                    <button onclick="app.syncNow()" id="btn-sync" class="icon-btn" title="Sync">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="app.toggleView()" id="btn-view" class="icon-btn" title="Ganti tampilan">
+                        <i data-lucide="layout-grid" id="view-icon" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="app.toggleTheme()" class="icon-btn" title="Theme">
+                        <i data-lucide="moon" class="w-4 h-4 icon-moon"></i>
+                        <i data-lucide="sun" class="w-4 h-4 icon-sun"></i>
+                    </button>
+                    <button onclick="app.openAuthModal()" class="btn btn-primary btn-sm ml-1">
+                        <i data-lucide="user-circle" class="w-3.5 h-3.5"></i>
+                        <span id="btn-auth-text" class="auth-btn-text">Login</span>
+                    </button>
                 </div>
             </div>
-            <div class="md:hidden px-3 pb-2.5" id="search-mobile-wrapper">
+            
+            <div class="search-wrapper px-3 pb-2.5" id="search-wrapper">
                 <div class="relative">
                     <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"></i>
-                    <input type="text" id="search-input-mobile" placeholder="Cari menu..." class="input pl-9 py-2 text-xs">
+                    <input type="text" id="search-input" placeholder="Cari menu..." class="input pl-9 py-2 text-xs">
                 </div>
             </div>
         </header>
+        
         <main id="page-content" class="flex-1 p-3 sm:p-5 pb-16"></main>
     </div>
 
@@ -280,7 +377,7 @@
     window.addEventListener('error', (e) => dbg('JS ERROR: ' + e.message, 'error'));
 
     // ============================================================
-    // APP v4.3
+    // APP v4.4
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
@@ -294,7 +391,6 @@
         ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','info','help-circle','alert-circle','alert-triangle','save','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock','menu','megaphone','store'],
         COLORS: ['indigo','sky','emerald','rose','amber','purple','teal','pink','orange','red','green','blue','violet','zinc'],
         
-        // Helper: safe query (fix null error)
         spinBtn: function(btn, on) {
             if (!btn) return;
             const icon = btn.querySelector('svg') || btn.querySelector('i');
@@ -322,13 +418,15 @@
             this.updateViewIcon();
             this.updateSyncIndicator();
             this.navigate('dashboard');
-            ['search-input','search-input-mobile'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('input', (e) => {
+            
+            const searchEl = document.getElementById('search-input');
+            if (searchEl) {
+                searchEl.addEventListener('input', (e) => {
                     if (this.currentView !== 'dashboard') this.navigate('dashboard');
                     this.renderDashboard(e.target.value.toLowerCase());
                 });
-            });
+            }
+            
             this.setupIconPicker();
             this.setupColorPicker();
             window.addEventListener('online', () => { this.isOnline = true; this.updateSyncIndicator(); this.syncPending(); });
@@ -353,7 +451,7 @@
             setTimeout(() => {
                 if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) this.loadFeedback(true);
             }, 1500);
-            dbg('Init. User: ' + (this.user?.email || 'Guest'), 'success');
+            dbg('Init v4.4. User: ' + (this.user?.email || 'Guest'), 'success');
             lucide.createIcons();
         },
         
@@ -388,12 +486,10 @@
             const titles = { dashboard:'Dashboard', info:'Info & Banner', kategori:'Kategori', users:'Users', feedback:'Feedback', backup:'Backup & Sync', prefs:'Preferensi', diagnostic:'Diagnostik' };
             const title = document.getElementById('page-title');
             if (title) title.textContent = titles[view] || 'Dashboard';
-            const searchDesktop = document.getElementById('search-desktop');
-            const searchMobile = document.getElementById('search-mobile-wrapper');
+            const searchWrapper = document.getElementById('search-wrapper');
             const btnView = document.getElementById('btn-view');
             const show = view === 'dashboard';
-            if (searchDesktop) searchDesktop.classList.toggle('hidden', !show);
-            if (searchMobile) searchMobile.classList.toggle('hidden', !show);
+            if (searchWrapper) searchWrapper.classList.toggle('hidden', !show);
             if (btnView) btnView.style.display = show ? '' : 'none';
             this.renderCurrentView();
             this.closeSidebar();
@@ -459,9 +555,6 @@
             }
         },
         
-        // ============================================================
-        // DASHBOARD
-        // ============================================================
         renderDashboard: function(q) {
             q = q || '';
             const userRole = this.user ? this.user.jabatan.toLowerCase() : '';
@@ -826,7 +919,7 @@
         },
         
         exportJSON: function() {
-            const data = { version: '4.3', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info };
+            const data = { version: '4.4', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -969,9 +1062,6 @@
             this.toast('API URL diupdate', 'success');
         },
         
-        // ============================================================
-        // SYNC — FIXED
-        // ============================================================
         syncNow: function(silent) {
             if (!this.isOnline) {
                 if (!silent) this.toast('Offline', 'warning');
@@ -1192,9 +1282,6 @@
         
         editLink: function(id) { this.openLinkModal(id); },
         
-        // ============================================================
-        // SAVE LINK — FIXED (uppercase fields + safe)
-        // ============================================================
         saveLink: function() {
             const id = document.getElementById('link-id').value;
             const rawData = {
@@ -1219,7 +1306,6 @@
             if (isTempId) {
                 if (id) this.menu = this.menu.filter(m => m.ID !== id);
                 const tempId = 'tmp-' + Date.now();
-                // PUSH dengan UPPERCASE fields (konsisten dengan backend)
                 const newItem = {
                     ID: tempId,
                     JUDUL: rawData.judul,
@@ -1239,14 +1325,12 @@
                     DELETED: false
                 };
                 this.menu.push(newItem);
-                // Kirim payload lowercase (yang dibaca backend)
                 this.queuePending({ action:'add', tempId, data:rawData, userEmail:this.user?.email });
                 this.toast('Link ditambahkan', 'success');
                 dbg('Add: ' + rawData.judul, 'info');
             } else {
                 const idx = this.menu.findIndex(m => m.ID === id);
                 if (idx >= 0) {
-                    // Update dengan UPPERCASE fields
                     this.menu[idx] = {
                         ...this.menu[idx],
                         JUDUL: rawData.judul,
