@@ -26,9 +26,7 @@
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-thumb { background: #252a3a; border-radius: 3px; }
         
-        /* ============================================
-           SIDEBAR
-           ============================================ */
+        /* SIDEBAR */
         .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; background: #0d0f14; border-right: 1px solid #1e2230; transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.16,1,0.3,1); z-index: 60; display: flex; flex-direction: column; }
         .sidebar.open { transform: translateX(0); }
         @media (min-width: 1024px) {
@@ -41,56 +39,34 @@
         .backdrop.show { opacity: 0.75; pointer-events: auto; }
         @media (min-width: 1024px) { .backdrop { display: none !important; } }
         
-        /* ============================================
-           NAV
-           ============================================ */
+        /* NAV */
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; color: #a1a1aa; transition: all 0.15s; cursor: pointer; position: relative; background: transparent; border: none; text-align: left; width: 100%; }
         .nav-item:hover { background: #181c26; color: #e4e4e7; }
         .nav-item.active { background: #1e2230; color: #a5b4fc; font-weight: 600; }
         .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; }
         
-        /* ============================================
-           HEADER — Responsive & Theme-aware
-           ============================================ */
-        .app-header {
-            background: #0a0b10;
-            border-color: #1e2230;
-        }
-        html:not(.dark) .app-header {
-            background: #ffffff;
-            border-color: #e4e4e7;
-        }
+        /* HEADER */
+        .app-header { background: #0a0b10; border-color: #1e2230; }
+        html:not(.dark) .app-header { background: #ffffff; border-color: #e4e4e7; }
         .page-title { color: #ffffff; }
         html:not(.dark) .page-title { color: #18181b; }
-        
-        /* Icon theme toggle */
         .icon-moon { display: none; }
         .icon-sun  { display: block; }
         html.dark .icon-moon { display: block; }
         html.dark .icon-sun  { display: none; }
-        
-        /* Auth button text */
         .auth-btn-text { display: none; }
         @media (min-width: 400px) { .auth-btn-text { display: inline; } }
-        
-        /* Search wrapper hidden */
         #search-wrapper.hidden { display: none; }
-        
-        /* Sync status — hide on very small screens */
         @media (max-width: 480px) { .sync-status { display: none !important; } }
         
-        /* ============================================
-           CARD
-           ============================================ */
+        /* CARD */
         .card { background: #14171f; border: 1px solid #1e2230; border-radius: 14px; }
         .link-card { display: flex; flex-direction: column; align-items: center; padding: 14px 10px; text-align: center; cursor: pointer; position: relative; transition: all 0.2s; }
         @media (hover: hover) { .link-card:hover { transform: translateY(-2px); border-color: #3a4054; } }
         .link-card:active { transform: scale(0.98); }
         .icon-circle { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
         
-        /* ============================================
-           BUTTONS
-           ============================================ */
+        /* BUTTONS */
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; transition: all 0.15s; cursor: pointer; border: none; white-space: nowrap; }
         .btn-primary { background: #a5b4fc; color: #0a0b10; }
         .btn-primary:hover { background: #c4caff; }
@@ -110,17 +86,13 @@
         .input::placeholder { color: #52525b; }
         .input:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        /* ============================================
-           MODAL
-           ============================================ */
+        /* MODAL */
         .modal { position: fixed; inset: 0; z-index: 70; display: none; align-items: center; justify-content: center; padding: 16px; background: #000; }
         .modal.show { display: flex; }
         .modal-box { background: #0d0f14; border: 1px solid #1e2230; border-radius: 18px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.9); max-height: 92vh; width: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; animation: modalIn 0.22s cubic-bezier(0.16,1,0.3,1); }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         
-        /* ============================================
-           TOAST
-           ============================================ */
+        /* TOAST */
         #toast-container { position: fixed; top: 76px; right: 14px; z-index: 80; display: flex; flex-direction: column; gap: 8px; max-width: 320px; pointer-events: none; }
         .toast { padding: 12px 14px; border-radius: 12px; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.7); animation: slideIn 0.3s cubic-bezier(0.16,1,0.3,1); pointer-events: auto; border: 1px solid; }
         @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -129,18 +101,14 @@
         .toast-warning { background: #332b13; color: #fcd34d; border-color: #5a4a1e; }
         .toast-info { background: #1e2230; color: #a5b4fc; border-color: #3a4054; }
         
-        /* ============================================
-           SYNC
-           ============================================ */
+        /* SYNC */
         .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; flex-shrink: 0; }
         .sync-dot.syncing { background: #a5b4fc; animation: pulse 1.2s ease-in-out infinite; }
         .sync-dot.offline { background: #52525b; }
         .sync-dot.error { background: #fca5a5; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
         
-        /* ============================================
-           LINKS
-           ============================================ */
+        /* LINKS */
         .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
         @media (min-width: 640px) { .links-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
         @media (min-width: 1024px) { .links-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } }
@@ -148,9 +116,7 @@
         .link-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: #14171f; border: 1px solid #1e2230; border-radius: 12px; transition: all 0.15s; }
         .link-row:hover { background: #181c26; border-color: #3a4054; }
         
-        /* ============================================
-           SORTABLE
-           ============================================ */
+        /* SORTABLE */
         .sortable-ghost { opacity: 0.3; background: #2a2f47 !important; border-radius: 12px; }
         .drag-handle { cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
@@ -158,8 +124,131 @@
         .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 0 2px; }
         
         /* ============================================
-           DEBUG PANEL
+           FOOTER
            ============================================ */
+        .app-footer {
+            border-top: 1px solid #1e2230;
+            padding: 16px 20px 20px;
+            margin-top: auto;
+            background: #0a0b10;
+        }
+        html:not(.dark) .app-footer {
+            background: #ffffff;
+            border-color: #e4e4e7;
+        }
+        .app-footer.empty {
+            border-top: none;
+            padding: 0;
+        }
+        
+        .footer-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        .footer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 11px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #71717a;
+            background: #14171f;
+            border: 1px solid #1e2230;
+            text-decoration: none;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .footer-link:hover {
+            color: #a5b4fc;
+            background: #181c26;
+            border-color: #3a4054;
+            transform: translateY(-1px);
+        }
+        .footer-link:active {
+            transform: translateY(0);
+        }
+        .footer-link i {
+            width: 13px;
+            height: 13px;
+        }
+        
+        html:not(.dark) .footer-link {
+            color: #52525b;
+            background: #f9fafb;
+            border-color: #e4e4e7;
+        }
+        html:not(.dark) .footer-link:hover {
+            color: #6366f1;
+            background: #eef0ff;
+            border-color: #c7d2fe;
+        }
+        
+        .footer-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            color: #52525b;
+            font-family: 'SF Mono', Consolas, monospace;
+        }
+        .footer-meta-sep { opacity: 0.4; }
+        .footer-version {
+            padding: 3px 8px;
+            background: #1e2230;
+            border-radius: 6px;
+            color: #a5b4fc;
+            font-weight: 600;
+        }
+        html:not(.dark) .footer-version {
+            background: #eef0ff;
+            color: #6366f1;
+        }
+        
+        @media (max-width: 640px) {
+            .footer-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .footer-links {
+                width: 100%;
+            }
+            .footer-link {
+                flex: 1 1 auto;
+                justify-content: center;
+                min-width: 0;
+            }
+            .footer-link span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .footer-link span:not(.always-show) {
+                display: none;
+            }
+            .footer-link {
+                padding: 8px 10px;
+            }
+        }
+        
+        /* DEBUG PANEL */
         #debug-panel { position: fixed; bottom: 0; left: 0; right: 0; max-height: 40vh; background: #0a0b10; border-top: 2px solid #a5b4fc; color: #a5b4fc; font-family: monospace; font-size: 10px; padding: 8px; overflow-y: auto; z-index: 9999; display: none; }
         #debug-panel.show { display: block; }
         #debug-panel .log-line { padding: 3px 0; border-bottom: 1px solid #1e2230; word-break: break-all; }
@@ -167,9 +256,7 @@
         #debug-panel .log-success { color: #86efac; }
         #debug-panel .log-info { color: #a5b4fc; }
         
-        /* ============================================
-           LIGHT MODE OVERRIDES
-           ============================================ */
+        /* LIGHT MODE */
         html:not(.dark) body { background: #f4f5f8; color: #1e2230; }
         html:not(.dark) .sidebar { background: #fff; border-color: #e4e4e7; }
         html:not(.dark) .nav-item { color: #52525b; }
@@ -214,6 +301,7 @@
             <button onclick="app.navigate('kategori')" data-nav="kategori" class="nav-item"><i data-lucide="folder" class="w-4 h-4 shrink-0"></i><span>Kategori</span></button>
             <button onclick="app.navigate('users')" data-nav="users" class="nav-item"><i data-lucide="users" class="w-4 h-4 shrink-0"></i><span>Users</span></button>
             <button onclick="app.navigate('feedback')" data-nav="feedback" class="nav-item"><i data-lucide="inbox" class="w-4 h-4 shrink-0"></i><span>Feedback</span><span id="nav-feedback-badge" class="ml-auto text-[10px] bg-red-500 text-white font-bold px-1.5 py-0.5 rounded-full hidden">0</span></button>
+            <button onclick="app.navigate('footer')" data-nav="footer" class="nav-item"><i data-lucide="link-2" class="w-4 h-4 shrink-0"></i><span>Footer Links</span></button>
             <div class="my-3 border-t border-ink-750"></div>
             <p class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-600">Sistem</p>
             <button onclick="app.navigate('backup')" data-nav="backup" class="nav-item"><i data-lucide="database" class="w-4 h-4 shrink-0"></i><span>Backup & Sync</span></button>
@@ -225,7 +313,6 @@
 
     <div id="main-area" class="main-area min-h-screen flex flex-col">
         
-        <!-- HEADER — Responsive & theme-aware -->
         <header class="app-header sticky top-0 z-40 border-b">
             <div class="h-14 flex items-center gap-2 px-3">
                 <button onclick="app.toggleSidebar()" class="icon-btn" title="Menu">
@@ -264,11 +351,25 @@
             </div>
         </header>
         
-        <main id="page-content" class="flex-1 p-3 sm:p-5 pb-16"></main>
+        <!-- MAIN CONTENT -->
+        <main id="page-content" class="flex-1 p-3 sm:p-5"></main>
+        
+        <!-- FOOTER -->
+        <footer id="app-footer" class="app-footer empty">
+            <div class="footer-container">
+                <div class="footer-links" id="footer-links"></div>
+                <div class="footer-meta" id="footer-meta">
+                    <span id="footer-version" class="footer-version">v4.5</span>
+                    <span class="footer-meta-sep">·</span>
+                    <span id="footer-copyright">© 2026 Console</span>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <div id="toast-container"></div>
 
+    <!-- MODAL: LOGIN -->
     <div id="auth-modal" class="modal">
         <div class="modal-box max-w-sm">
             <button onclick="app.closeModal('auth-modal')" class="icon-btn absolute top-3 right-3 z-10"><i data-lucide="x" class="w-4 h-4"></i></button>
@@ -304,6 +405,7 @@
         </div>
     </div>
 
+    <!-- MODAL: LINK CRUD -->
     <div id="link-modal" class="modal">
         <div class="modal-box max-w-lg">
             <div class="flex items-center justify-between p-4 border-b border-ink-750 shrink-0">
@@ -338,6 +440,26 @@
             <div class="flex items-center gap-2 p-4 border-t border-ink-750 shrink-0">
                 <button onclick="app.closeModal('link-modal')" class="btn btn-ghost flex-1">Batal</button>
                 <button onclick="app.saveLink()" id="btn-save-link" class="btn btn-primary flex-1"><i data-lucide="save" class="w-4 h-4"></i><span>Simpan</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: FOOTER CRUD -->
+    <div id="footer-modal" class="modal">
+        <div class="modal-box max-w-md">
+            <div class="flex items-center justify-between p-4 border-b border-ink-750 shrink-0">
+                <h3 class="text-sm font-semibold text-white" id="footer-modal-title">Tambah Footer Link</h3>
+                <button onclick="app.closeModal('footer-modal')" class="icon-btn"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto space-y-3 flex-1">
+                <input type="hidden" id="footer-id">
+                <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Judul *</label><input type="text" id="footer-judul" placeholder="Documentation" class="input"></div>
+                <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">URL *</label><input type="url" id="footer-url" placeholder="https://..." class="input font-mono text-xs"></div>
+                <div><label class="block text-[10px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5">Icon (Lucide)</label><input type="text" id="footer-icon" placeholder="book-open" class="input"></div>
+            </div>
+            <div class="flex items-center gap-2 p-4 border-t border-ink-750 shrink-0">
+                <button onclick="app.closeModal('footer-modal')" class="btn btn-ghost flex-1">Batal</button>
+                <button onclick="app.saveFooter()" class="btn btn-primary flex-1"><i data-lucide="save" class="w-4 h-4"></i><span>Simpan</span></button>
             </div>
         </div>
     </div>
@@ -377,7 +499,7 @@
     window.addEventListener('error', (e) => dbg('JS ERROR: ' + e.message, 'error'));
 
     // ============================================================
-    // APP v4.4
+    // APP v4.5
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
@@ -388,7 +510,7 @@
         KEYS: { SESSION:'sa4_session', CACHE:'sa4_cache', PENDING:'sa4_pending', LAST_SYNC:'sa4_lastsync', PREFS:'sa4_prefs', THEME:'sa4_theme', APIURL:'sa4_apiurl' },
         prefs: { view: 'grid', showClicks: true, showBanner: true },
         
-        ICONS: ['link','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','info','help-circle','alert-circle','alert-triangle','save','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock','menu','megaphone','store'],
+        ICONS: ['link','link-2','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','info','help-circle','alert-circle','alert-triangle','save','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock','menu','megaphone','store','github'],
         COLORS: ['indigo','sky','emerald','rose','amber','purple','teal','pink','orange','red','green','blue','violet','zinc'],
         
         spinBtn: function(btn, on) {
@@ -417,6 +539,7 @@
             this.updateUIState();
             this.updateViewIcon();
             this.updateSyncIndicator();
+            this.renderFooter();
             this.navigate('dashboard');
             
             const searchEl = document.getElementById('search-input');
@@ -431,10 +554,10 @@
             this.setupColorPicker();
             window.addEventListener('online', () => { this.isOnline = true; this.updateSyncIndicator(); this.syncPending(); });
             window.addEventListener('offline', () => { this.isOnline = false; this.updateSyncIndicator(); });
-            window.addEventListener('storage', (e) => { if (e.key === this.KEYS.CACHE) { this.loadFromCache(); this.renderCurrentView(); } });
+            window.addEventListener('storage', (e) => { if (e.key === this.KEYS.CACHE) { this.loadFromCache(); this.renderCurrentView(); this.renderFooter(); } });
             document.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('search-input')?.focus(); }
-                if (e.key === 'Escape') { this.closeModal('auth-modal'); this.closeModal('link-modal'); this.closeSidebar(); }
+                if (e.key === 'Escape') { this.closeModal('auth-modal'); this.closeModal('link-modal'); this.closeModal('footer-modal'); this.closeSidebar(); }
             });
             let tapCount = 0;
             const logo = document.getElementById('app-logo');
@@ -451,7 +574,7 @@
             setTimeout(() => {
                 if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) this.loadFeedback(true);
             }, 1500);
-            dbg('Init v4.4. User: ' + (this.user?.email || 'Guest'), 'success');
+            dbg('Init v4.5. User: ' + (this.user?.email || 'Guest'), 'success');
             lucide.createIcons();
         },
         
@@ -483,7 +606,7 @@
         navigate: function(view) {
             this.currentView = view;
             document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.nav === view));
-            const titles = { dashboard:'Dashboard', info:'Info & Banner', kategori:'Kategori', users:'Users', feedback:'Feedback', backup:'Backup & Sync', prefs:'Preferensi', diagnostic:'Diagnostik' };
+            const titles = { dashboard:'Dashboard', info:'Info & Banner', kategori:'Kategori', users:'Users', feedback:'Feedback', footer:'Footer Links', backup:'Backup & Sync', prefs:'Preferensi', diagnostic:'Diagnostik' };
             const title = document.getElementById('page-title');
             if (title) title.textContent = titles[view] || 'Dashboard';
             const searchWrapper = document.getElementById('search-wrapper');
@@ -504,6 +627,7 @@
                 kategori: () => this.renderKategoriPage(),
                 users: () => this.renderUsersPage(),
                 feedback: () => this.renderFeedbackPage(),
+                footer: () => this.renderFooterPage(),
                 backup: () => this.renderBackupPage(),
                 prefs: () => this.renderPrefsPage(),
                 diagnostic: () => this.renderDiagnosticPage()
@@ -555,6 +679,181 @@
             }
         },
         
+        // ============================================================
+        // FOOTER RENDER
+        // ============================================================
+        renderFooter: function() {
+            const footer = document.getElementById('app-footer');
+            const linksEl = document.getElementById('footer-links');
+            const versionEl = document.getElementById('footer-version');
+            if (!footer || !linksEl) return;
+            
+            const items = (this.footer || []).filter(item => {
+                return item && item.JUDUL && item.URL && 
+                       String(item.JUDUL).toLowerCase() !== 'judul' && 
+                       String(item.URL).toLowerCase() !== 'url';
+            });
+            
+            if (versionEl) versionEl.textContent = 'v' + (this.info?.VERSI || '4.5');
+            
+            if (items.length === 0) {
+                footer.classList.add('empty');
+                linksEl.innerHTML = '';
+                return;
+            }
+            
+            footer.classList.remove('empty');
+            items.sort((a, b) => (Number(a.URUTAN) || 999) - (Number(b.URUTAN) || 999));
+            
+            linksEl.innerHTML = items.map(item => {
+                const icon = item.ICON && String(item.ICON).toLowerCase() !== 'icon' ? item.ICON : 'external-link';
+                const url = this.safeUrl(item.URL);
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="footer-link" title="${this.escape(item.JUDUL)}">
+                    <i data-lucide="${icon}"></i>
+                    <span>${this.escape(item.JUDUL)}</span>
+                </a>`;
+            }).join('');
+            
+            lucide.createIcons();
+        },
+        
+        // ============================================================
+        // FOOTER PAGE (CRUD)
+        // ============================================================
+        renderFooterPage: function() {
+            const canEdit = this.user && (this.user.jabatan.toLowerCase() === 'super admin' || this.user.jabatan.toLowerCase() === 'admin');
+            
+            const items = (this.footer || []).filter(item => 
+                item && item.JUDUL && String(item.JUDUL).toLowerCase() !== 'judul'
+            );
+            
+            const list = items.map(f => `
+                <div class="card p-3 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-accent-soft flex items-center justify-center shrink-0">
+                        <i data-lucide="${f.ICON || 'link'}" class="w-4 h-4 text-accent"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-white truncate">${this.escape(f.JUDUL)}</p>
+                        <p class="text-[10px] text-zinc-500 truncate">${this.escape(f.URL)}</p>
+                    </div>
+                    ${canEdit ? `
+                        <button onclick="app.openFooterModal('${f.ID}')" class="icon-btn w-7 h-7">
+                            <i data-lucide="pencil" class="w-3 h-3"></i>
+                        </button>
+                        <button onclick="app.deleteFooter('${f.ID}')" class="icon-btn w-7 h-7 text-red-400">
+                            <i data-lucide="trash-2" class="w-3 h-3"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            return `
+                <div class="max-w-2xl space-y-4">
+                    <div class="card p-4">
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
+                                <i data-lucide="link-2" class="w-4 h-4 text-accent"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">Footer Links</h3>
+                                <p class="text-[10px] text-zinc-500">Link yang tampil di footer. Semua link dibuka di tab baru.</p>
+                            </div>
+                        </div>
+                        ${canEdit ? `
+                            <button onclick="app.openFooterModal()" class="btn btn-primary w-full py-2.5 mt-2">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                <span>Tambah Footer Link</span>
+                            </button>
+                        ` : `
+                            <div class="p-3 bg-ink-850 rounded-lg text-xs text-zinc-500 text-center mt-2">
+                                Login sebagai admin untuk mengelola
+                            </div>
+                        `}
+                    </div>
+                    <div class="space-y-2">
+                        ${list || '<div class="card p-8 text-center text-xs text-zinc-500"><i data-lucide="link" class="w-8 h-8 mx-auto mb-2 opacity-40"></i>Belum ada footer link</div>'}
+                    </div>
+                </div>
+            `;
+        },
+        
+        openFooterModal: function(id) {
+            if (!this.user) { this.toast('Login dulu', 'warning'); return; }
+            const modal = document.getElementById('footer-modal');
+            modal.classList.add('show');
+            
+            if (id) {
+                const f = this.footer.find(x => x.ID === id);
+                if (!f) return;
+                document.getElementById('footer-modal-title').textContent = 'Edit Footer Link';
+                document.getElementById('footer-id').value = f.ID;
+                document.getElementById('footer-judul').value = f.JUDUL || '';
+                document.getElementById('footer-url').value = f.URL || '';
+                document.getElementById('footer-icon').value = f.ICON || '';
+            } else {
+                document.getElementById('footer-modal-title').textContent = 'Tambah Footer Link';
+                document.getElementById('footer-id').value = '';
+                document.getElementById('footer-judul').value = '';
+                document.getElementById('footer-url').value = '';
+                document.getElementById('footer-icon').value = 'external-link';
+            }
+            
+            setTimeout(() => document.getElementById('footer-judul')?.focus(), 100);
+            lucide.createIcons();
+        },
+        
+        saveFooter: function() {
+            const id = document.getElementById('footer-id').value;
+            const judul = document.getElementById('footer-judul').value.trim();
+            const url = document.getElementById('footer-url').value.trim();
+            const icon = document.getElementById('footer-icon').value.trim() || 'external-link';
+            
+            if (!judul || !url) { this.toast('Judul & URL wajib', 'error'); return; }
+            try { const u = new URL(url); if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error(); }
+            catch(e) { this.toast('URL tidak valid', 'error'); return; }
+            
+            this.closeModal('footer-modal');
+            
+            const isTempId = !id || String(id).startsWith('tmp-');
+            
+            if (isTempId) {
+                if (id) this.footer = this.footer.filter(f => f.ID !== id);
+                const tempId = 'tmp-' + Date.now();
+                const newItem = {
+                    ID: tempId, JUDUL: judul, URL: url, ICON: icon,
+                    URUTAN: this.footer.length + 1
+                };
+                this.footer.push(newItem);
+                this.queuePending({ action:'saveFooter', data: { NAMA: judul, URL: url, ICON: icon }, userEmail: this.user?.email });
+                this.toast('Footer ditambahkan', 'success');
+            } else {
+                const idx = this.footer.findIndex(f => f.ID === id);
+                if (idx >= 0) this.footer[idx] = { ...this.footer[idx], JUDUL: judul, URL: url, ICON: icon };
+                this.queuePending({ action:'saveFooter', data: { ID: id, NAMA: judul, URL: url, ICON: icon }, userEmail: this.user?.email });
+                this.toast('Footer diupdate', 'success');
+            }
+            
+            this.saveCache();
+            this.renderFooter();
+            this.renderCurrentView();
+            this.syncPending();
+        },
+        
+        deleteFooter: function(id) {
+            if (!confirm('Hapus footer link ini?')) return;
+            this.footer = this.footer.filter(f => f.ID !== id);
+            this.saveCache();
+            this.renderFooter();
+            this.renderCurrentView();
+            if (String(id).startsWith('tmp-')) return;
+            this.queuePending({ action:'deleteFooter', id, userEmail: this.user?.email });
+            this.syncPending();
+            this.toast('Footer dihapus', 'success');
+        },
+        
+        // ============================================================
+        // DASHBOARD
+        // ============================================================
         renderDashboard: function(q) {
             q = q || '';
             const userRole = this.user ? this.user.jabatan.toLowerCase() : '';
@@ -898,6 +1197,7 @@
                     <div class="flex justify-between"><span class="text-zinc-500">Pending</span><span class="font-mono ${pendingCount > 0 ? 'text-amber-300' : 'text-white'}">${pendingCount}</span></div>
                     <div class="flex justify-between"><span class="text-zinc-500">Last sync</span><span class="font-mono text-white text-[10px]">${lastSync}</span></div>
                     <div class="flex justify-between"><span class="text-zinc-500">Total menu</span><span class="font-mono text-white">${this.menu.length}</span></div>
+                    <div class="flex justify-between"><span class="text-zinc-500">Footer links</span><span class="font-mono text-white">${this.footer.length}</span></div>
                 </div>
                 <div class="card p-4">
                     <div class="flex items-center gap-2 mb-3">
@@ -919,7 +1219,7 @@
         },
         
         exportJSON: function() {
-            const data = { version: '4.4', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info };
+            const data = { version: '4.5', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1007,6 +1307,7 @@
                         <div class="flex justify-between"><span class="text-zinc-500">User</span><span>${this.user?.email || '-'}</span></div>
                         <div class="flex justify-between"><span class="text-zinc-500">Role</span><span>${this.user?.jabatan || '-'}</span></div>
                         <div class="flex justify-between"><span class="text-zinc-500">Menu</span><span>${this.menu.length} items</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-500">Footer</span><span>${this.footer.length} items</span></div>
                         <div class="flex justify-between"><span class="text-zinc-500">Pending</span><span>${JSON.parse(localStorage.getItem(this.KEYS.PENDING) || '[]').length}</span></div>
                     </div>
                 </div>
@@ -1023,7 +1324,7 @@
             out.innerHTML = '<p class="text-xs text-zinc-500 mt-2">Testing...</p>';
             const tests = [
                 fetch(`${this.apiURL}?action=ping`).then(r => r.json()).then(d => ({ name:'Ping', ok:d.status === 'success', data:d })).catch(e => ({ name:'Ping', ok:false, error:e.message })),
-                fetch(`${this.apiURL}?action=bootstrap`).then(r => r.json()).then(d => ({ name:'Bootstrap', ok:d.status === 'success', data:{ menu:d.data?.menu?.length || 0, kategori:d.data?.kategori?.length || 0 } })).catch(e => ({ name:'Bootstrap', ok:false, error:e.message }))
+                fetch(`${this.apiURL}?action=bootstrap`).then(r => r.json()).then(d => ({ name:'Bootstrap', ok:d.status === 'success', data:{ menu:d.data?.menu?.length || 0, kategori:d.data?.kategori?.length || 0, footer:d.data?.footer?.length || 0 } })).catch(e => ({ name:'Bootstrap', ok:false, error:e.message }))
             ];
             Promise.all(tests).then(results => {
                 out.innerHTML = results.map(r => `<div class="mt-2 p-3 rounded-lg border ${r.ok ? 'border-emerald-700 bg-emerald-900/30' : 'border-red-700 bg-red-900/30'}">
@@ -1086,6 +1387,7 @@
                     this.saveCache();
                     localStorage.setItem(this.KEYS.LAST_SYNC, res.serverTime);
                     this.renderCurrentView();
+                    this.renderFooter();
                     this.updateSyncIndicator('synced');
                     dbg('Sync OK: ' + this.menu.length + ' menu', 'success');
                     if (!silent) this.toast('Data tersinkron', 'success');
@@ -1307,22 +1609,11 @@
                 if (id) this.menu = this.menu.filter(m => m.ID !== id);
                 const tempId = 'tmp-' + Date.now();
                 const newItem = {
-                    ID: tempId,
-                    JUDUL: rawData.judul,
-                    DESKRIPSI: rawData.deskripsi,
-                    URL: rawData.url,
-                    ICON: rawData.icon,
-                    WARNA: rawData.warna,
-                    KATEGORI: rawData.kategori,
-                    AKSES_ROLE: rawData.akses_role,
-                    URUTAN: 999,
-                    PINNED: rawData.pinned,
-                    STATUS: rawData.status,
-                    CLICKS: 0,
-                    CREATED_BY: this.user?.email || 'system',
-                    CREATED_AT: now,
-                    UPDATED_AT: now,
-                    DELETED: false
+                    ID: tempId, JUDUL: rawData.judul, DESKRIPSI: rawData.deskripsi, URL: rawData.url,
+                    ICON: rawData.icon, WARNA: rawData.warna, KATEGORI: rawData.kategori,
+                    AKSES_ROLE: rawData.akses_role, URUTAN: 999, PINNED: rawData.pinned,
+                    STATUS: rawData.status, CLICKS: 0, CREATED_BY: this.user?.email || 'system',
+                    CREATED_AT: now, UPDATED_AT: now, DELETED: false
                 };
                 this.menu.push(newItem);
                 this.queuePending({ action:'add', tempId, data:rawData, userEmail:this.user?.email });
@@ -1331,17 +1622,10 @@
             } else {
                 const idx = this.menu.findIndex(m => m.ID === id);
                 if (idx >= 0) {
-                    this.menu[idx] = {
-                        ...this.menu[idx],
-                        JUDUL: rawData.judul,
-                        DESKRIPSI: rawData.deskripsi,
-                        URL: rawData.url,
-                        ICON: rawData.icon,
-                        WARNA: rawData.warna,
-                        KATEGORI: rawData.kategori,
-                        AKSES_ROLE: rawData.akses_role,
-                        PINNED: rawData.pinned,
-                        STATUS: rawData.status,
+                    this.menu[idx] = { ...this.menu[idx],
+                        JUDUL: rawData.judul, DESKRIPSI: rawData.deskripsi, URL: rawData.url,
+                        ICON: rawData.icon, WARNA: rawData.warna, KATEGORI: rawData.kategori,
+                        AKSES_ROLE: rawData.akses_role, PINNED: rawData.pinned, STATUS: rawData.status,
                         UPDATED_AT: now
                     };
                 }
@@ -1349,7 +1633,6 @@
                 this.toast('Link diupdate', 'success');
                 dbg('Update: ' + rawData.judul, 'info');
             }
-            
             this.saveCache();
             this.renderCurrentView();
             this.syncPending();
