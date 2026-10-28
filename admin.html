@@ -6,6 +6,14 @@
     <meta name="theme-color" content="#0a0b10">
     <title>Console</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png">
+    
+    <!-- ============ PWA META TAGS ============ -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Console">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -123,132 +131,26 @@
         
         .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 0 2px; }
         
-        /* ============================================
-           FOOTER
-           ============================================ */
-        .app-footer {
-            border-top: 1px solid #1e2230;
-            padding: 16px 20px 20px;
-            margin-top: auto;
-            background: #0a0b10;
-        }
-        html:not(.dark) .app-footer {
-            background: #ffffff;
-            border-color: #e4e4e7;
-        }
-        .app-footer.empty {
-            border-top: none;
-            padding: 0;
-        }
-        
-        .footer-container {
-            max-width: 1600px;
-            margin: 0 auto;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-        
-        .footer-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            align-items: center;
-        }
-        
-        .footer-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 11px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 500;
-            color: #71717a;
-            background: #14171f;
-            border: 1px solid #1e2230;
-            text-decoration: none;
-            transition: all 0.15s;
-            white-space: nowrap;
-        }
-        .footer-link:hover {
-            color: #a5b4fc;
-            background: #181c26;
-            border-color: #3a4054;
-            transform: translateY(-1px);
-        }
-        .footer-link:active {
-            transform: translateY(0);
-        }
-        .footer-link i {
-            width: 13px;
-            height: 13px;
-        }
-        
-        html:not(.dark) .footer-link {
-            color: #52525b;
-            background: #f9fafb;
-            border-color: #e4e4e7;
-        }
-        html:not(.dark) .footer-link:hover {
-            color: #6366f1;
-            background: #eef0ff;
-            border-color: #c7d2fe;
-        }
-        
-        .footer-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 10px;
-            color: #52525b;
-            font-family: 'SF Mono', Consolas, monospace;
-        }
+        /* FOOTER */
+        .app-footer { border-top: 1px solid #1e2230; padding: 16px 20px 20px; margin-top: auto; background: #0a0b10; }
+        html:not(.dark) .app-footer { background: #ffffff; border-color: #e4e4e7; }
+        .app-footer.empty { border-top: none; padding: 0; }
+        .footer-container { max-width: 1600px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+        .footer-links { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+        .footer-link { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 8px; font-size: 11px; font-weight: 500; color: #71717a; background: #14171f; border: 1px solid #1e2230; text-decoration: none; transition: all 0.15s; white-space: nowrap; }
+        .footer-link:hover { color: #a5b4fc; background: #181c26; border-color: #3a4054; transform: translateY(-1px); }
+        .footer-link:active { transform: translateY(0); }
+        .footer-link i { width: 13px; height: 13px; }
+        html:not(.dark) .footer-link { color: #52525b; background: #f9fafb; border-color: #e4e4e7; }
+        html:not(.dark) .footer-link:hover { color: #6366f1; background: #eef0ff; border-color: #c7d2fe; }
+        .footer-meta { display: flex; align-items: center; gap: 8px; font-size: 10px; color: #52525b; font-family: 'SF Mono', Consolas, monospace; }
         .footer-meta-sep { opacity: 0.4; }
-        .footer-version {
-            padding: 3px 8px;
-            background: #1e2230;
-            border-radius: 6px;
-            color: #a5b4fc;
-            font-weight: 600;
-        }
-        html:not(.dark) .footer-version {
-            background: #eef0ff;
-            color: #6366f1;
-        }
+        .footer-version { padding: 3px 8px; background: #1e2230; border-radius: 6px; color: #a5b4fc; font-weight: 600; }
+        html:not(.dark) .footer-version { background: #eef0ff; color: #6366f1; }
+        @media (max-width: 640px) { .footer-container { flex-direction: column; align-items: flex-start; } .footer-links { width: 100%; } .footer-link { flex: 1 1 auto; justify-content: center; min-width: 0; } .footer-link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+        @media (max-width: 400px) { .footer-link span:not(.always-show) { display: none; } .footer-link { padding: 8px 10px; } }
         
-        @media (max-width: 640px) {
-            .footer-container {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .footer-links {
-                width: 100%;
-            }
-            .footer-link {
-                flex: 1 1 auto;
-                justify-content: center;
-                min-width: 0;
-            }
-            .footer-link span {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-        }
-        
-        @media (max-width: 400px) {
-            .footer-link span:not(.always-show) {
-                display: none;
-            }
-            .footer-link {
-                padding: 8px 10px;
-            }
-        }
-        
-        /* DEBUG PANEL */
+        /* DEBUG */
         #debug-panel { position: fixed; bottom: 0; left: 0; right: 0; max-height: 40vh; background: #0a0b10; border-top: 2px solid #a5b4fc; color: #a5b4fc; font-family: monospace; font-size: 10px; padding: 8px; overflow-y: auto; z-index: 9999; display: none; }
         #debug-panel.show { display: block; }
         #debug-panel .log-line { padding: 3px 0; border-bottom: 1px solid #1e2230; word-break: break-all; }
@@ -351,15 +253,13 @@
             </div>
         </header>
         
-        <!-- MAIN CONTENT -->
         <main id="page-content" class="flex-1 p-3 sm:p-5"></main>
         
-        <!-- FOOTER -->
         <footer id="app-footer" class="app-footer empty">
             <div class="footer-container">
                 <div class="footer-links" id="footer-links"></div>
                 <div class="footer-meta" id="footer-meta">
-                    <span id="footer-version" class="footer-version">v4.5</span>
+                    <span id="footer-version" class="footer-version">v4.6</span>
                     <span class="footer-meta-sep">·</span>
                     <span id="footer-copyright">© 2026 Console</span>
                 </div>
@@ -499,7 +399,7 @@
     window.addEventListener('error', (e) => dbg('JS ERROR: ' + e.message, 'error'));
 
     // ============================================================
-    // APP v4.5
+    // APP v4.6
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
@@ -522,6 +422,17 @@
         },
         
         init: function() {
+            // PWA Service Worker Registration (Hanya di HTTPS)
+            if ('serviceWorker' in navigator && window.isSecureContext) {
+                navigator.serviceWorker.register('sw.js').then(() => {
+                    dbg('Service Worker Registered', 'success');
+                }).catch(err => {
+                    dbg('Service Worker Failed: ' + err.message, 'error');
+                });
+            } else {
+                dbg('Service Worker skipped (bukan HTTPS)', 'warning');
+            }
+
             const fsFlag = sessionStorage.getItem('force_sync_done');
             if (fsFlag) {
                 sessionStorage.removeItem('force_sync_done');
@@ -574,7 +485,7 @@
             setTimeout(() => {
                 if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) this.loadFeedback(true);
             }, 1500);
-            dbg('Init v4.5. User: ' + (this.user?.email || 'Guest'), 'success');
+            dbg('Init v4.6. User: ' + (this.user?.email || 'Guest'), 'success');
             lucide.createIcons();
         },
         
@@ -694,7 +605,7 @@
                        String(item.URL).toLowerCase() !== 'url';
             });
             
-            if (versionEl) versionEl.textContent = 'v' + (this.info?.VERSI || '4.5');
+            if (versionEl) versionEl.textContent = 'v' + (this.info?.VERSI || '4.6');
             
             if (items.length === 0) {
                 footer.classList.add('empty');
@@ -1219,7 +1130,7 @@
         },
         
         exportJSON: function() {
-            const data = { version: '4.5', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
+            const data = { version: '4.6', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1781,6 +1692,9 @@
         toggleTheme: function() {
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.setItem(this.KEYS.THEME, isDark ? 'dark' : 'light');
+            // Update meta theme-color
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.content = isDark ? '#0a0b10' : '#f4f5f8';
         },
         
         toast: function(msg, type) {
