@@ -1,11 +1,11 @@
-const CACHE_NAME = 'superapp-v3';
+const CACHE_NAME = 'console-v4-6';
 const APP_SHELL = [
   './admin.html',
   './manifest.json',
   'https://cdn.tailwindcss.com',
   'https://unpkg.com/lucide@latest',
   'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap'
 ];
 
 self.addEventListener('install', e => {
@@ -30,11 +30,13 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET') return;
   
+  // Apps Script API: Network First
   if (url.hostname === 'script.google.com') {
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
     return;
   }
   
+  // Aset lain: Cache First
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
