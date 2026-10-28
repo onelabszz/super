@@ -1,11 +1,11 @@
 {
   "name": "Super Admin Console",
   "short_name": "Console",
-  "description": "Launcher & Admin Console v3.0",
+  "description": "Launcher & Admin Console",
   "start_url": "./admin.html",
   "display": "standalone",
-  "background_color": "#09090b",
-  "theme_color": "#18181b",
+  "background_color": "#0a0b10",
+  "theme_color": "#0a0b10",
   "orientation": "any",
   "scope": "./",
   "icons": [
