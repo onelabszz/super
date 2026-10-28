@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="theme-color" content="#0a0b10">
     <title>Console</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
     
-    <!-- ============ PWA META TAGS ============ -->
+    <!-- PWA META -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Console">
-    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -34,7 +34,6 @@
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-thumb { background: #252a3a; border-radius: 3px; }
         
-        /* SIDEBAR */
         .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: 260px; background: #0d0f14; border-right: 1px solid #1e2230; transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.16,1,0.3,1); z-index: 60; display: flex; flex-direction: column; }
         .sidebar.open { transform: translateX(0); }
         @media (min-width: 1024px) {
@@ -47,13 +46,11 @@
         .backdrop.show { opacity: 0.75; pointer-events: auto; }
         @media (min-width: 1024px) { .backdrop { display: none !important; } }
         
-        /* NAV */
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 10px; font-size: 13px; font-weight: 500; color: #a1a1aa; transition: all 0.15s; cursor: pointer; position: relative; background: transparent; border: none; text-align: left; width: 100%; }
         .nav-item:hover { background: #181c26; color: #e4e4e7; }
         .nav-item.active { background: #1e2230; color: #a5b4fc; font-weight: 600; }
         .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #a5b4fc; border-radius: 0 3px 3px 0; }
         
-        /* HEADER */
         .app-header { background: #0a0b10; border-color: #1e2230; }
         html:not(.dark) .app-header { background: #ffffff; border-color: #e4e4e7; }
         .page-title { color: #ffffff; }
@@ -67,14 +64,12 @@
         #search-wrapper.hidden { display: none; }
         @media (max-width: 480px) { .sync-status { display: none !important; } }
         
-        /* CARD */
         .card { background: #14171f; border: 1px solid #1e2230; border-radius: 14px; }
         .link-card { display: flex; flex-direction: column; align-items: center; padding: 14px 10px; text-align: center; cursor: pointer; position: relative; transition: all 0.2s; }
         @media (hover: hover) { .link-card:hover { transform: translateY(-2px); border-color: #3a4054; } }
         .link-card:active { transform: scale(0.98); }
         .icon-circle { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
         
-        /* BUTTONS */
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; transition: all 0.15s; cursor: pointer; border: none; white-space: nowrap; }
         .btn-primary { background: #a5b4fc; color: #0a0b10; }
         .btn-primary:hover { background: #c4caff; }
@@ -94,13 +89,11 @@
         .input::placeholder { color: #52525b; }
         .input:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        /* MODAL */
         .modal { position: fixed; inset: 0; z-index: 70; display: none; align-items: center; justify-content: center; padding: 16px; background: #000; }
         .modal.show { display: flex; }
         .modal-box { background: #0d0f14; border: 1px solid #1e2230; border-radius: 18px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.9); max-height: 92vh; width: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; animation: modalIn 0.22s cubic-bezier(0.16,1,0.3,1); }
         @keyframes modalIn { from { opacity: 0; transform: scale(0.96) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         
-        /* TOAST */
         #toast-container { position: fixed; top: 76px; right: 14px; z-index: 80; display: flex; flex-direction: column; gap: 8px; max-width: 320px; pointer-events: none; }
         .toast { padding: 12px 14px; border-radius: 12px; font-size: 12.5px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.7); animation: slideIn 0.3s cubic-bezier(0.16,1,0.3,1); pointer-events: auto; border: 1px solid; }
         @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -109,14 +102,12 @@
         .toast-warning { background: #332b13; color: #fcd34d; border-color: #5a4a1e; }
         .toast-info { background: #1e2230; color: #a5b4fc; border-color: #3a4054; }
         
-        /* SYNC */
         .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #6ee7b7; flex-shrink: 0; }
         .sync-dot.syncing { background: #a5b4fc; animation: pulse 1.2s ease-in-out infinite; }
         .sync-dot.offline { background: #52525b; }
         .sync-dot.error { background: #fca5a5; }
         @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
         
-        /* LINKS */
         .links-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
         @media (min-width: 640px) { .links-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } }
         @media (min-width: 1024px) { .links-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } }
@@ -124,14 +115,12 @@
         .link-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: #14171f; border: 1px solid #1e2230; border-radius: 12px; transition: all 0.15s; }
         .link-row:hover { background: #181c26; border-color: #3a4054; }
         
-        /* SORTABLE */
         .sortable-ghost { opacity: 0.3; background: #2a2f47 !important; border-radius: 12px; }
         .drag-handle { cursor: grab; }
         .drag-handle:active { cursor: grabbing; }
         
         .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding: 0 2px; }
         
-        /* FOOTER */
         .app-footer { border-top: 1px solid #1e2230; padding: 16px 20px 20px; margin-top: auto; background: #0a0b10; }
         html:not(.dark) .app-footer { background: #ffffff; border-color: #e4e4e7; }
         .app-footer.empty { border-top: none; padding: 0; }
@@ -150,7 +139,6 @@
         @media (max-width: 640px) { .footer-container { flex-direction: column; align-items: flex-start; } .footer-links { width: 100%; } .footer-link { flex: 1 1 auto; justify-content: center; min-width: 0; } .footer-link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
         @media (max-width: 400px) { .footer-link span:not(.always-show) { display: none; } .footer-link { padding: 8px 10px; } }
         
-        /* DEBUG */
         #debug-panel { position: fixed; bottom: 0; left: 0; right: 0; max-height: 40vh; background: #0a0b10; border-top: 2px solid #a5b4fc; color: #a5b4fc; font-family: monospace; font-size: 10px; padding: 8px; overflow-y: auto; z-index: 9999; display: none; }
         #debug-panel.show { display: block; }
         #debug-panel .log-line { padding: 3px 0; border-bottom: 1px solid #1e2230; word-break: break-all; }
@@ -158,7 +146,6 @@
         #debug-panel .log-success { color: #86efac; }
         #debug-panel .log-info { color: #a5b4fc; }
         
-        /* LIGHT MODE */
         html:not(.dark) body { background: #f4f5f8; color: #1e2230; }
         html:not(.dark) .sidebar { background: #fff; border-color: #e4e4e7; }
         html:not(.dark) .nav-item { color: #52525b; }
@@ -188,7 +175,7 @@
         <div class="flex items-center justify-between p-4 border-b border-ink-750">
             <div class="flex items-center gap-2.5 min-w-0">
                 <div id="app-logo" class="w-9 h-9 rounded-xl bg-accent flex items-center justify-center shrink-0">
-                    <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-6 h-6 object-contain" alt="Logo">
+                    <img src="icon-192.png" class="w-6 h-6 object-contain" alt="Logo">
                 </div>
                 <div class="min-w-0">
                     <h1 class="font-bold text-sm text-white leading-tight">Console</h1>
@@ -210,6 +197,15 @@
             <button onclick="app.navigate('prefs')" data-nav="prefs" class="nav-item"><i data-lucide="sliders" class="w-4 h-4 shrink-0"></i><span>Preferensi</span></button>
             <button onclick="app.navigate('diagnostic')" data-nav="diagnostic" class="nav-item"><i data-lucide="activity" class="w-4 h-4 shrink-0"></i><span>Diagnostik</span></button>
         </nav>
+        
+        <!-- TOMBOL INSTALL PWA DI SINI -->
+        <div class="px-3 pb-3">
+            <button id="btn-install-pwa" onclick="app.installPWA()" class="hidden w-full items-center justify-center gap-2 px-4 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-indigo-500/30">
+                <i data-lucide="download"></i>
+                <span>Install Aplikasi</span>
+            </button>
+        </div>
+
         <div class="p-3 border-t border-ink-750 space-y-2"><div id="sidebar-auth-area"></div></div>
     </aside>
 
@@ -259,7 +255,7 @@
             <div class="footer-container">
                 <div class="footer-links" id="footer-links"></div>
                 <div class="footer-meta" id="footer-meta">
-                    <span id="footer-version" class="footer-version">v4.6</span>
+                    <span id="footer-version" class="footer-version">v4.7</span>
                     <span class="footer-meta-sep">·</span>
                     <span id="footer-copyright">© 2026 Console</span>
                 </div>
@@ -291,7 +287,7 @@
             <div id="view-profile" class="hidden">
                 <div class="p-6 text-center border-b border-ink-750">
                     <div class="w-16 h-16 rounded-2xl mx-auto mb-3 flex items-center justify-center border border-accent/20 bg-accent-soft">
-                        <img src="https://raw.githubusercontent.com/onelabszz/super/refs/heads/main/super.png" class="w-10 h-10 object-contain" alt="Avatar">
+                        <img src="icon-192.png" class="w-10 h-10 object-contain" alt="Avatar">
                     </div>
                     <h3 class="text-sm font-semibold text-white" id="prof-name">-</h3>
                     <p class="inline-block mt-1.5 px-2.5 py-0.5 bg-accent-soft text-accent text-[10px] font-mono font-bold uppercase rounded-full" id="prof-role">-</p>
@@ -377,7 +373,7 @@
 
     <script>
     // ============================================================
-    // DEBUG
+    // DEBUG & LUCIDE SAFETY NET
     // ============================================================
     window.dbg = function(msg, type) {
         type = type || 'info';
@@ -398,19 +394,29 @@
     console.warn = function() { _origWarn.apply(console, arguments); dbg(Array.from(arguments).join(' '), 'error'); };
     window.addEventListener('error', (e) => dbg('JS ERROR: ' + e.message, 'error'));
 
+    // Safety net: Ganti icon github ke git-branch jika error
+    const origCreateIcons = lucide.createIcons;
+    lucide.createIcons = function() {
+        document.querySelectorAll('i[data-lucide="github"]').forEach(el => {
+            el.setAttribute('data-lucide', 'git-branch');
+        });
+        origCreateIcons.call(lucide);
+    };
+
     // ============================================================
-    // APP v4.6
+    // APP v4.7
     // ============================================================
     const app = {
         apiURL: "https://script.google.com/macros/s/AKfycbx-VZ5H9Yy0drhyHucFrrhe4CHm5R7gNzmA-3VFrhgTBzYJzHYPCMp-TkWDVU0eIdr0/exec",
         user: null, menu: [], kategori: [], info: {}, footer: [], users: [], feedbackList: [],
         editMode: false, sortables: [], isOnline: navigator.onLine,
         currentView: 'dashboard', sidebarOpen: false,
+        deferredPrompt: null,
         
         KEYS: { SESSION:'sa4_session', CACHE:'sa4_cache', PENDING:'sa4_pending', LAST_SYNC:'sa4_lastsync', PREFS:'sa4_prefs', THEME:'sa4_theme', APIURL:'sa4_apiurl' },
         prefs: { view: 'grid', showClicks: true, showBanner: true },
         
-        ICONS: ['link','link-2','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','info','help-circle','alert-circle','alert-triangle','save','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock','menu','megaphone','store','github'],
+        ICONS: ['link','link-2','home','settings','user','users','folder','folder-cog','file','file-text','image','video','music','download','upload','cloud','database','server','globe','map-pin','calendar','clock','mail','message-circle','phone','bell','book','book-open','graduation-cap','clipboard','clipboard-check','award','star','heart','bookmark','tag','shopping-cart','shopping-bag','credit-card','dollar-sign','trending-up','bar-chart','pie-chart','activity','zap','shield','shield-check','lock','unlock','key','eye','search','filter','edit','trash-2','plus','minus','check','x','arrow-right','arrow-up-right','external-link','play','pause','power','wifi','battery','monitor','smartphone','tablet','printer','cpu','hard-drive','code','terminal','git-branch','inbox','send','log-out','log-in','layout-dashboard','package','truck','map','compass','sparkles','rocket','flame','crown','gem','palette','brush','pen-tool','camera','headphones','mic','radio','tv','film','gamepad-2','puzzle','trophy','target','flag','info','help-circle','alert-circle','alert-triangle','save','pencil','loader-2','refresh-cw','layout-grid','layout-list','settings-2','user-circle','user-plus','sliders','check-circle','shield-lock','menu','megaphone','store'],
         COLORS: ['indigo','sky','emerald','rose','amber','purple','teal','pink','orange','red','green','blue','violet','zinc'],
         
         spinBtn: function(btn, on) {
@@ -422,15 +428,24 @@
         },
         
         init: function() {
-            // PWA Service Worker Registration (Hanya di HTTPS)
+            // Tangkap event Install PWA
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                this.deferredPrompt = e;
+                const btn = document.getElementById('btn-install-pwa');
+                if (btn) {
+                    btn.classList.remove('hidden');
+                    btn.classList.add('flex');
+                }
+                dbg('PWA installable!', 'success');
+            });
+
             if ('serviceWorker' in navigator && window.isSecureContext) {
                 navigator.serviceWorker.register('sw.js').then(() => {
                     dbg('Service Worker Registered', 'success');
                 }).catch(err => {
                     dbg('Service Worker Failed: ' + err.message, 'error');
                 });
-            } else {
-                dbg('Service Worker skipped (bukan HTTPS)', 'warning');
             }
 
             const fsFlag = sessionStorage.getItem('force_sync_done');
@@ -485,8 +500,24 @@
             setTimeout(() => {
                 if (this.user && (this.user.jabatan === 'Super Admin' || this.user.jabatan === 'Admin')) this.loadFeedback(true);
             }, 1500);
-            dbg('Init v4.6. User: ' + (this.user?.email || 'Guest'), 'success');
+            dbg('Init v4.7. User: ' + (this.user?.email || 'Guest'), 'success');
             lucide.createIcons();
+        },
+        
+        installPWA: function() {
+            if (!this.deferredPrompt) {
+                this.toast('Browser tidak mendukung install, atau sudah terinstall.', 'warning');
+                return;
+            }
+            this.deferredPrompt.prompt();
+            this.deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    this.toast('Aplikasi berhasil diinstall!', 'success');
+                    const btn = document.getElementById('btn-install-pwa');
+                    if (btn) btn.classList.add('hidden');
+                }
+                this.deferredPrompt = null;
+            });
         },
         
         toggleSidebar: function() {
@@ -605,7 +636,7 @@
                        String(item.URL).toLowerCase() !== 'url';
             });
             
-            if (versionEl) versionEl.textContent = 'v' + (this.info?.VERSI || '4.6');
+            if (versionEl) versionEl.textContent = 'v' + (this.info?.VERSI || '4.7');
             
             if (items.length === 0) {
                 footer.classList.add('empty');
@@ -617,7 +648,8 @@
             items.sort((a, b) => (Number(a.URUTAN) || 999) - (Number(b.URUTAN) || 999));
             
             linksEl.innerHTML = items.map(item => {
-                const icon = item.ICON && String(item.ICON).toLowerCase() !== 'icon' ? item.ICON : 'external-link';
+                let icon = item.ICON && String(item.ICON).toLowerCase() !== 'icon' ? item.ICON : 'external-link';
+                if (icon === 'github') icon = 'git-branch'; // Fallback
                 const url = this.safeUrl(item.URL);
                 return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="footer-link" title="${this.escape(item.JUDUL)}">
                     <i data-lucide="${icon}"></i>
@@ -641,7 +673,7 @@
             const list = items.map(f => `
                 <div class="card p-3 flex items-center gap-3">
                     <div class="w-9 h-9 rounded-lg bg-accent-soft flex items-center justify-center shrink-0">
-                        <i data-lucide="${f.ICON || 'link'}" class="w-4 h-4 text-accent"></i>
+                        <i data-lucide="${f.ICON === 'github' ? 'git-branch' : (f.ICON || 'link')}" class="w-4 h-4 text-accent"></i>
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-semibold text-white truncate">${this.escape(f.JUDUL)}</p>
@@ -717,7 +749,8 @@
             const id = document.getElementById('footer-id').value;
             const judul = document.getElementById('footer-judul').value.trim();
             const url = document.getElementById('footer-url').value.trim();
-            const icon = document.getElementById('footer-icon').value.trim() || 'external-link';
+            let icon = document.getElementById('footer-icon').value.trim() || 'external-link';
+            if (icon === 'github') icon = 'git-branch';
             
             if (!judul || !url) { this.toast('Judul & URL wajib', 'error'); return; }
             try { const u = new URL(url); if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error(); }
@@ -846,7 +879,8 @@
         renderCard: function(item) {
             const isPinned = item.PINNED === true || item.PINNED === 'TRUE';
             const c = this.colorConfig(item.WARNA);
-            const icon = item.ICON || 'link';
+            let icon = item.ICON || 'link';
+            if (icon === 'github') icon = 'git-branch';
             const isEdit = this.editMode;
             const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
             const isTemp = String(item.ID).startsWith('tmp-');
@@ -870,7 +904,8 @@
         renderRow: function(item) {
             const isPinned = item.PINNED === true || item.PINNED === 'TRUE';
             const c = this.colorConfig(item.WARNA);
-            const icon = item.ICON || 'link';
+            let icon = item.ICON || 'link';
+            if (icon === 'github') icon = 'git-branch';
             const isEdit = this.editMode;
             const showClicks = this.prefs.showClicks && Number(item.CLICKS) > 0;
             const isTemp = String(item.ID).startsWith('tmp-');
@@ -1130,7 +1165,7 @@
         },
         
         exportJSON: function() {
-            const data = { version: '4.6', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
+            const data = { version: '4.7', exportedAt: new Date().toISOString(), menu: this.menu, kategori: this.kategori, info: this.info, footer: this.footer };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1466,11 +1501,12 @@
                 document.getElementById('link-deskripsi').value = item.DESKRIPSI || '';
                 document.getElementById('link-kategori').value = item.KATEGORI || 'Lain-lain';
                 document.getElementById('link-role').value = item.AKSES_ROLE || '';
-                document.getElementById('link-icon').value = item.ICON || 'link';
+                let ic = item.ICON || 'link'; if (ic === 'github') ic = 'git-branch';
+                document.getElementById('link-icon').value = ic;
                 document.getElementById('link-warna').value = item.WARNA || 'indigo';
                 document.getElementById('link-pinned').checked = item.PINNED === true || item.PINNED === 'TRUE';
                 document.getElementById('link-status').value = item.STATUS || 'aktif';
-                this.selectIcon(item.ICON || 'link');
+                this.selectIcon(ic);
                 this.selectColor(item.WARNA || 'indigo');
             } else {
                 document.getElementById('link-modal-title').textContent = 'Tambah Link';
